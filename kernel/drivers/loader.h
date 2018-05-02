@@ -5,6 +5,7 @@
 #include "kernel/drivers/keyboard.h"
 #include "kernel/drivers/gdt.h"
 #include "kernel/drivers/cmos.h"
+#include "kernel/drivers/serial.h"
 
 void loadDrivers() {
     driverDefinition drivers[] = {
@@ -12,9 +13,10 @@ void loadDrivers() {
         KEYBOARD_DRIVER,
         GDT_DRIVER,
         CMOS_DRIVER,
+        SERIAL_DRIVER,
     };
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < sizeof(drivers) / sizeof(driverDefinition); i++) {
         driverDefinition d = drivers[i];
         if (d.isAvailable()) {
             d.initialize();

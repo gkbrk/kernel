@@ -10,30 +10,10 @@ typedef struct Task {
 } Task;
 
 static Task *runningTask;
-static Task tasks[10];
+static Task tasks[20];
 
-static void otherMain() {
-    char prev_sec;
+void task_empty() {
     while (true) {
-        char sec = get_RTC_second();
-        sec = (sec & 0x0F) + ((sec / 16) * 10);
-
-        if (sec != prev_sec) {
-            char num[5];
-            itoa(sec, num);
-
-            size_t old_col = terminal_column;
-            size_t old_row = terminal_row;
-
-            terminal_row = 0;
-            terminal_column = VGA_WIDTH - 4;
-            terminal_writestring(num);
-
-            terminal_row = old_row;
-            terminal_column = old_col;
-        }
-
-        prev_sec = sec;
         yield();
     }
 }
@@ -43,7 +23,7 @@ void initTasking() {
     asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(tasks[0].regs.cr3)::"%eax");
     asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(tasks[0].regs.eflags)::"%eax");
 
-    createTask(&tasks[1], otherMain, tasks[0].regs.eflags, (uint32_t*)tasks[0].regs.cr3);
+    createTask(&tasks[1], task_empty, tasks[0].regs.eflags, (uint32_t*)tasks[0].regs.cr3);
     tasks[0].next = &tasks[1];
     tasks[1].next = &tasks[0];
 
@@ -64,26 +44,11 @@ void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir) {
     task->next = 0;
 }
 
-Task *getLastTask() {
-    terminal_writestring("Looking for last task\n");
-
-    for (int i = 0; i < 10; i++) {
-        if (tasks[i].next == &tasks[0]) {
-            terminal_writestring("Found it\n");
-            char a[5];
-            itoa(i, a);
-            terminal_writestring(a);
-            terminal_writestring("\n");
-            return &tasks[i];
-        }
-    }
-}
-
 void spawnTask(void (*main)()) {
     Task *t;
     Task *l;
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
         if (tasks[i].next == &tasks[0]) {
             t = &tasks[i + 1];
             l = &tasks[i];
@@ -96,6 +61,17 @@ void spawnTask(void (*main)()) {
 
     l->next = t;
     t->next = &tasks[0];
+}
+
+void exitTask() {
+    int id = 0;
+
+    for (int i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
+        if (runningTask == &tasks[i]) {
+            tasks[i - 1].next = tasks[i].next;
+            return;
+        }
+    }
 }
 
 void yield() {

@@ -1,31 +1,40 @@
 #pragma once
 
 size_t strlen(const char* str) {
-    size_t len = 0;
-    while (str[len]) {
-        len++;
-    }
-    return len;
+  size_t len = 0;
+  while (str[len]) {
+    len++;
+  }
+  return len;
 }
 
 int strcmp(const char* a, const char* b) {
-    for ( size_t i = 0; true; i++ ) {
-        unsigned char ac = (unsigned char) a[i];
-        unsigned char bc = (unsigned char) b[i];
-        if ( ac == '\0' && bc == '\0' )
-            return 0;
-        if ( ac < bc )
-            return -1;
-        if ( ac > bc )
-            return 1;
-    }
+  for ( size_t i = 0; true; i++ ) {
+    unsigned char ac = (unsigned char) a[i];
+    unsigned char bc = (unsigned char) b[i];
+    if ( ac == '\0' && bc == '\0' )
+      return 0;
+    if ( ac < bc )
+      return -1;
+    if ( ac > bc )
+      return 1;
+  }
 }
 
 void* memset(void* bufptr, int value, size_t size) {
-    unsigned char* buf = (unsigned char*) bufptr;
-    for (size_t i = 0; i < size; i++)
-        buf[i] = (unsigned char) value;
-    return bufptr;
+  unsigned char* buf = (unsigned char*) bufptr;
+  for (size_t i = 0; i < size; i++)
+    buf[i] = (unsigned char) value;
+  return bufptr;
+}
+
+void* memcpy(void* restrict dstptr, const void* restrict srcptr, size_t size) {
+  unsigned char* dst = (unsigned char*) dstptr;
+  const unsigned char* src = (const unsigned char*) srcptr;
+  for (size_t i = 0; i < size; i++) {
+    dst[i] = src[i];
+  }
+  return dstptr;
 }
 
 /* reverse:  reverse string s in place */

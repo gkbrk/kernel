@@ -4,6 +4,7 @@
 #include "kernel/drivers/terminal.h"
 #include "kernel/libk/alloc.h"
 #include "kernel/libk/string.h"
+#include "kernel/scheduler.h"
 
 typedef struct {
     char *name;
@@ -31,22 +32,25 @@ void shell_help() {
     terminal_writestring("mem - display memory usage\n");
 }
 
-void shell_time() {
-    char prev_sec;
-    while (true) {
-        char sec = get_RTC_second();
-        sec = (sec & 0x0F) + ((sec / 16) * 10);
-        if (sec == 0) break;
+void test() {
+    int i = 0;
+    while(true) {
+        char n[5];
+        itoa(i, n);
+        terminal_writestring(n);
+        terminal_writestring("         \r");
+        yield();
 
-        if (sec != prev_sec) {
-            char num[5];
-            itoa(sec, num);
-            terminal_writestring("\r       \r");
-            terminal_writestring(num);
+        if (i > 300) {
+            exitTask();
+        } else {
+            i++;
         }
-
-        prev_sec = sec;
     }
+}
+
+void shell_time() {
+    spawnTask(test);
 }
 
 ShellCommand commands[] = {
@@ -55,6 +59,7 @@ ShellCommand commands[] = {
     {.name = "mem", .function = shell_memusage},
     {.name = "help", .function = shell_help},
     {.name = "time", .function = shell_time},
+    {.name = "exit", .function = exitTask},
 };
 
 char *shell_read_line() {
@@ -95,7 +100,7 @@ void shell() {
         }
 
         bool executed = false;
-        for (size_t i = 0; i < 5; i++) {
+        for (size_t i = 0; i < sizeof(commands) / sizeof(ShellCommand); i++) {
             if (strcmp(cmd, commands[i].name) == 0) {
                 commands[i].function();
                 executed = true;

@@ -8,10 +8,29 @@
 
 #include "kernel/scheduler.h"
 
-static void t3() {
+static void time_task() {
+    char prev_sec;
     while (true) {
-        for (int i = 0; i < 99999; i++) yield();
-        terminal_writestring("Ping!\n");
+        char sec = get_RTC_second();
+        sec = (sec & 0x0F) + ((sec / 16) * 10);
+        if (sec % 10 == 0) exitTask();
+
+        if (sec != prev_sec) {
+            char num[5];
+            itoa(sec, num);
+
+            size_t old_col = terminal_column;
+            size_t old_row = terminal_row;
+
+            terminal_row = 0;
+            terminal_column = VGA_WIDTH - 4;
+            terminal_writestring(num);
+
+            terminal_row = old_row;
+            terminal_column = old_col;
+        }
+
+        prev_sec = sec;
         yield();
     }
 }
@@ -24,7 +43,8 @@ void kernel_main() {
     initTasking();
     yield();
 
-    spawnTask(&t3);
+    //spawnTask(test);
 
+    spawnTask(time_task);
     shell();
 }
