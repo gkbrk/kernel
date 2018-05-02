@@ -49,7 +49,7 @@ void test() {
     }
 }
 
-void shell_time() {
+void shell_spawn_test() {
     spawnTask(test);
 }
 
@@ -58,7 +58,7 @@ ShellCommand commands[] = {
     {.name = "clear", .function = terminal_initialize},
     {.name = "mem", .function = shell_memusage},
     {.name = "help", .function = shell_help},
-    {.name = "time", .function = shell_time},
+    {.name = "task", .function = shell_spawn_test},
     {.name = "exit", .function = exitTask},
 };
 

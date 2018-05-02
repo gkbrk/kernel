@@ -13,7 +13,6 @@ static void time_task() {
     while (true) {
         char sec = get_RTC_second();
         sec = (sec & 0x0F) + ((sec / 16) * 10);
-        if (sec % 10 == 0) exitTask();
 
         if (sec != prev_sec) {
             char num[5];
@@ -43,8 +42,8 @@ void kernel_main() {
     initTasking();
     yield();
 
-    //spawnTask(test);
-
     spawnTask(time_task);
-    shell();
+    spawnTask(shell);
+
+    while (true) yield();
 }
