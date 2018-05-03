@@ -1,5 +1,5 @@
 #pragma once
-#define KMALLOC_NUM_BLOCKS 50
+#define KMALLOC_NUM_BLOCKS 150
 #define KMALLOC_BLOCK_SIZE 4096
 
 typedef struct {
@@ -8,18 +8,18 @@ typedef struct {
 } kmalloc_block;
 
 void *alloc_begin;
-void *KERNEL_END;
+extern void *__KERNEL_END;
 
 void *kmalloc_forever(size_t size) {
-    void *ptr = KERNEL_END;
-    KERNEL_END += size;
+    void *ptr = __KERNEL_END;
+    __KERNEL_END += size;
     return ptr;
 }
 
 kmalloc_block *allocation_table;
 
 void kmalloc_init() {
-    alloc_begin = KERNEL_END;
+    alloc_begin = __KERNEL_END;
 
     allocation_table = kmalloc_forever(sizeof(kmalloc_block) * KMALLOC_NUM_BLOCKS);
 

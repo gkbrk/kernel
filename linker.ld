@@ -26,5 +26,5 @@ SECTIONS
         *(.bss)
     }
 
-    endKernel = ALIGN(4K);
+    __KERNEL_END = ALIGN(4K);
 }
