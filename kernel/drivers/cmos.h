@@ -54,7 +54,7 @@ void read_rtc() {
       // Note: This uses the "read registers until you get the same values twice in a row" technique
       //       to avoid getting dodgy/inconsistent values due to RTC updates
  
-      while (get_update_in_progress_flag()) yield();                // Make sure an update isn't in progress
+      while (get_update_in_progress_flag());              // Make sure an update isn't in progress
       cmos_second = get_RTC_register(0x00);
       cmos_minute = get_RTC_register(0x02);
       cmos_hour = get_RTC_register(0x04);
@@ -84,8 +84,6 @@ void read_rtc() {
             if(century_register != 0) {
                   century = get_RTC_register(century_register);
             }
-
-            yield();
       } while( (last_second != cmos_second) || (last_minute != cmos_minute) || (last_hour != cmos_hour) ||
                (last_day != cmos_day) || (last_month != cmos_month) || (last_year != cmos_year) ||
                (last_century != century) );

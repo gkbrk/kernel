@@ -20,6 +20,10 @@ void shell_memusage() {
     kprintf("Current memory usage: %d bytes\n", get_mem_usage());
 }
 
+void shell_clear() {
+    sendMessageToTask("terminal-driver", "clear");
+}
+
 void shell_help() {
     terminal_writestring("help - display help menu\n");
     terminal_writestring("clear - clear the screen\n");
@@ -57,19 +61,38 @@ void shell_ps() {
             if (runningTask == t) {
                 c = "[current task]";
             }
-            kprintf("Task %d -> %s %s\n", i, t->name, c);
+            kprintf("Task %d -> %s %s -> %s\n", i, t->name, c, t->next->name);
         }
     }
 }
 
+void msg() {
+    while (true) {
+        Task *t = findTaskByName("logger");
+        if (t == NULL || t->name == NULL) yield();
+        Message m;
+        memset(&m, '\0', sizeof(Message));
+        m.message = "Hello!";
+        message_put(&t->port, &m);
+        kprintf("Resp: %s\n", message_get_response(&m));
+        exitTask();
+        yield();
+    }
+}
+
+void shell_msg() {
+    spawnTask(msg, "background_task");
+}
+
 ShellCommand commands[] = {
     {.name = "test", .function = shell_test},
-    {.name = "clear", .function = terminal_initialize},
+    {.name = "clear", .function = shell_clear},
     {.name = "mem", .function = shell_memusage},
     {.name = "help", .function = shell_help},
     {.name = "task", .function = shell_spawn_test},
     {.name = "exit", .function = exitTask},
     {.name = "ps", .function = shell_ps},
+    {.name = "msg", .function = shell_msg},
 };
 
 char *shell_read_line() {

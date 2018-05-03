@@ -2,6 +2,7 @@
 
 #include "kernel/libk/alloc.h"
 #include "kernel/libk/log.h"
+#include "kernel/libk/messaging.h"
 
 typedef struct {
     uint32_t eax, ebx, ecx, edx, esi, edi, esp, ebp, eip, eflags, cr3;
@@ -10,6 +11,7 @@ typedef struct {
 typedef struct Task {
     Registers regs;
     char *name;
+    MessagePort port;
     struct Task *next;
 } Task;
 
@@ -53,6 +55,10 @@ void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir) {
 }
 
 void spawnTask(void (*main)(), char *name) {
+    char log[120];
+    sprintf(log, "Spawning new task %s", name);
+    klog(log);
+
     Task *t;
     Task *l;
 
@@ -65,7 +71,6 @@ void spawnTask(void (*main)(), char *name) {
     }
 
     createTask(t, main, tasks[0].regs.eflags, (uint32_t*)tasks[0].regs.cr3);
-    klog("Created task");
 
     l->next = t;
     t->next = &tasks[0];
@@ -78,9 +83,32 @@ void exitTask() {
     for (int i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
         if (runningTask == &tasks[i]) {
             tasks[i - 1].next = tasks[i].next;
+            tasks[i].name = NULL;
             return;
         }
     }
+}
+
+Task *findTaskByName(char *name) {
+    for (int i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
+        Task *t = &tasks[i];
+
+        if (strcmp(name, t->name) == 0) {
+            return t;
+        }
+    }
+
+    return NULL;
+}
+
+void sendMessageToTask(char *name, char *message) {
+    Task *t = findTaskByName(name);
+    if (t == NULL || t->name == NULL) return;
+    Message m;
+    memset(&m, '\0', sizeof(Message));
+    m.message = message;
+    message_put(&t->port, &m);
+    message_get_response(&m);
 }
 
 void yield() {

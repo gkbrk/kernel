@@ -3,6 +3,8 @@
 #include "kernel/drivers/vga.h"
 #include "kernel/libk/string.h"
 #include "kernel/drivers/driver.h"
+#include "kernel/libk/messaging.h"
+#include "kernel/scheduler.h"
 
 size_t terminal_row;
 size_t terminal_column;
@@ -10,21 +12,6 @@ uint8_t terminal_color;
 
 /* Note the use of the volatile keyword to prevent the compiler from eliminating dead stores. */
 volatile uint16_t* terminal_buffer;
-
-bool terminal_initialize() {
-    terminal_row = 0;
-    terminal_column = 0;
-    terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
-    terminal_buffer = (uint16_t*) 0xB8000;
-    for (size_t y = 0; y < VGA_HEIGHT; y++) {
-        for (size_t x = 0; x < VGA_WIDTH; x++) {
-            const size_t index = y * VGA_WIDTH + x;
-            terminal_buffer[index] = vga_entry(' ', terminal_color);
-        }
-    }
-
-    return true;
-}
 
 void terminal_setcolor(uint8_t color) 
 {
@@ -83,6 +70,39 @@ void terminal_write(const char* data, size_t size)
 void terminal_writestring(const char* data) 
 {
     terminal_write(data, strlen(data));
+}
+
+bool terminal_initialize();
+
+void terminal_task() {
+    while (true) {
+        Message *m = message_get(&runningTask->port);
+
+        kprintf("The message is: %s\n", m->message);
+        if (strcmp(m->message, "clear") == 0) {
+            terminal_initialize();
+        }
+
+        m->response = "";
+        yield();
+    }
+}
+
+bool terminal_initialize() {
+    terminal_row = 0;
+    terminal_column = 0;
+    terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    terminal_buffer = (uint16_t*) 0xB8000;
+    for (size_t y = 0; y < VGA_HEIGHT; y++) {
+        for (size_t x = 0; x < VGA_WIDTH; x++) {
+            const size_t index = y * VGA_WIDTH + x;
+            terminal_buffer[index] = vga_entry(' ', terminal_color);
+        }
+    }
+
+    spawnTask(terminal_task, "terminal-driver");
+
+    return true;
 }
 
 driverDefinition TERMINAL_DRIVER = {

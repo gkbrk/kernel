@@ -33,7 +33,7 @@ int serial_sent() {
 }
  
 void serial_write_char(char a) {
-   while (serial_sent() == 0) yield();
+   while (serial_sent() == 0);
  
    outb(COM1, a);
 }
