@@ -45,7 +45,21 @@ void test() {
 }
 
 void shell_spawn_test() {
-    spawnTask(test);
+    spawnTask(test, "test");
+}
+
+void shell_ps() {
+    for (int i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
+        Task *t = &tasks[i];
+
+        if (t->name != NULL) {
+            char *c = "";
+            if (runningTask == t) {
+                c = "[current task]";
+            }
+            kprintf("Task %d -> %s %s\n", i, t->name, c);
+        }
+    }
 }
 
 ShellCommand commands[] = {
@@ -55,6 +69,7 @@ ShellCommand commands[] = {
     {.name = "help", .function = shell_help},
     {.name = "task", .function = shell_spawn_test},
     {.name = "exit", .function = exitTask},
+    {.name = "ps", .function = shell_ps},
 };
 
 char *shell_read_line() {

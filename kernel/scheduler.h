@@ -9,6 +9,7 @@ typedef struct {
 
 typedef struct Task {
     Registers regs;
+    char *name;
     struct Task *next;
 } Task;
 
@@ -23,12 +24,16 @@ void task_empty() {
 
 void initTasking() {
     // Get EFLAGS and CR3
+    memset(tasks, '\0', sizeof(tasks));
     asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(tasks[0].regs.cr3)::"%eax");
     asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(tasks[0].regs.eflags)::"%eax");
 
     createTask(&tasks[1], task_empty, tasks[0].regs.eflags, (uint32_t*)tasks[0].regs.cr3);
     tasks[0].next = &tasks[1];
     tasks[1].next = &tasks[0];
+
+    tasks[0].name = "init";
+    tasks[1].name = "yielder";
 
     runningTask = &tasks[0];
 }
@@ -47,7 +52,7 @@ void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir) {
     task->next = 0;
 }
 
-void spawnTask(void (*main)()) {
+void spawnTask(void (*main)(), char *name) {
     Task *t;
     Task *l;
 
@@ -64,6 +69,7 @@ void spawnTask(void (*main)()) {
 
     l->next = t;
     t->next = &tasks[0];
+    t->name = name;
 }
 
 void exitTask() {

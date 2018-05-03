@@ -41,8 +41,8 @@ void kernel_main() {
     klog("Booting kernel");
     terminal_writestring("Booting kernel...\n");
 
-    spawnTask(time_task);
-    spawnTask(shell);
+    spawnTask(time_task, "time_display");
+    spawnTask(shell, "shell");
 
     while (true) yield();
 }
