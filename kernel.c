@@ -6,31 +6,24 @@
 #include "kernel/drivers/keyboard.h"
 #include "kernel/shell.h"
 #include "kernel/libk/log.h"
+#include "kernel/libk/alloc.h"
 
 #include "kernel/scheduler.h"
 
 static void time_task() {
-    char prev_sec;
     while (true) {
-        char sec = get_RTC_second();
-        sec = (sec & 0x0F) + ((sec / 16) * 10);
+        char *t = cmos_formatted_time();
+        size_t old_col = terminal_column;
+        size_t old_row = terminal_row;
 
-        if (sec != prev_sec) {
-            char num[5];
-            itoa(sec, num);
+        terminal_row = 0;
+        terminal_column = VGA_WIDTH - 10;
+        terminal_writestring(t);
 
-            size_t old_col = terminal_column;
-            size_t old_row = terminal_row;
+        terminal_row = old_row;
+        terminal_column = old_col;
 
-            terminal_row = 0;
-            terminal_column = VGA_WIDTH - 4;
-            terminal_writestring(num);
-
-            terminal_row = old_row;
-            terminal_column = old_col;
-        }
-
-        prev_sec = sec;
+        kmfree(t);
         yield();
     }
 }
