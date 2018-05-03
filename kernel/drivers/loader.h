@@ -6,6 +6,7 @@
 #include "kernel/drivers/gdt.h"
 #include "kernel/drivers/cmos.h"
 #include "kernel/drivers/serial.h"
+#include "kernel/drivers/ata.h"
 
 void loadDrivers() {
     driverDefinition drivers[] = {
@@ -14,6 +15,7 @@ void loadDrivers() {
         GDT_DRIVER,
         CMOS_DRIVER,
         SERIAL_DRIVER,
+        ATA_DRIVER,
     };
 
     for (int i = 0; i < sizeof(drivers) / sizeof(driverDefinition); i++) {

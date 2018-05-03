@@ -13,7 +13,7 @@ clean:
 
 run:
 	make all
-	qemu-system-x86_64 -kernel build/leonardo.bin
+	qemu-system-x86_64 -serial mon:stdio -kernel build/leonardo.bin
 
 iso:
 	make all

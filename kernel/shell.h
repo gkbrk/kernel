@@ -4,6 +4,7 @@
 #include "kernel/drivers/terminal.h"
 #include "kernel/libk/alloc.h"
 #include "kernel/libk/string.h"
+#include "kernel/libk/printf.h"
 #include "kernel/scheduler.h"
 
 typedef struct {
@@ -16,13 +17,7 @@ void shell_test() {
 }
 
 void shell_memusage() {
-    char *n = kmalloc(256);
-    memset(n, '\0', 256);
-    itoa(get_mem_usage(), n);
-    terminal_writestring("Current memory usage: ");
-    terminal_writestring(n);
-    terminal_writestring("\n");
-    kmfree(n);
+    kprintf("Current memory usage: %d bytes\n", get_mem_usage());
 }
 
 void shell_help() {
@@ -109,9 +104,7 @@ void shell() {
         }
 
         if (!executed) {
-            terminal_writestring("Unknown command ");
-            terminal_writestring(cmd);
-            terminal_writestring(". Try typing \"help\".\n");
+            kprintf("Unknown command %s. Try typing \"help\".\n", cmd);
         }
 
         kmfree(cmd);

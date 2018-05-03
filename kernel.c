@@ -5,6 +5,7 @@
 #include "kernel/drivers/loader.h"
 #include "kernel/drivers/keyboard.h"
 #include "kernel/shell.h"
+#include "kernel/libk/log.h"
 
 #include "kernel/scheduler.h"
 
@@ -36,11 +37,16 @@ static void time_task() {
 
 void kernel_main() {
     kmalloc_init();
-    loadDrivers();
-    terminal_writestring("Booting kernel...\n");
-    
     initTasking();
-    yield();
+    klog("Starting scheduler/tasking");
+    klog("Kernel memory allocator initialized");
+
+    klog("Loading drivers...");
+    loadDrivers();
+    klog("Drivers loaded");
+
+    klog("Booting kernel");
+    terminal_writestring("Booting kernel...\n");
 
     spawnTask(time_task);
     spawnTask(shell);

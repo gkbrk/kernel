@@ -1,5 +1,8 @@
 #pragma once
 
+#include "kernel/libk/alloc.h"
+#include "kernel/libk/log.h"
+
 typedef struct {
     uint32_t eax, ebx, ecx, edx, esi, edi, esp, ebp, eip, eflags, cr3;
 } Registers;
@@ -57,7 +60,7 @@ void spawnTask(void (*main)()) {
     }
 
     createTask(t, main, tasks[0].regs.eflags, (uint32_t*)tasks[0].regs.cr3);
-    terminal_writestring("Created task\n");
+    klog("Created task");
 
     l->next = t;
     t->next = &tasks[0];

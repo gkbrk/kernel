@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdarg.h>
+
 size_t strlen(const char* str) {
   size_t len = 0;
   while (str[len]) {
@@ -19,6 +21,19 @@ int strcmp(const char* a, const char* b) {
     if ( ac > bc )
       return 1;
   }
+}
+
+char *strcpy(char *dest, const char *src) {
+   char *save = dest;
+   while(*dest++ = *src++);
+   return save;
+}
+
+void sprintf(char * buf, const char * fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    vsprintf(buf, NULL, fmt, ap);
+    va_end(ap);
 }
 
 void* memset(void* bufptr, int value, size_t size) {
@@ -51,7 +66,7 @@ static void reverse( char s[] ) {
 }
 
 /* itoa:  convert n to characters in s */
-void itoa( int n, char s[] ){
+void itoa(int n, char s[] ){
   int i, sign ;
 
   if ( (sign = n) < 0 )  /* record sign */
@@ -69,6 +84,20 @@ void itoa( int n, char s[] ){
   {
     s[i++] = '-';
   }
+
+  s[i] = '\0';
+
+  reverse( s ) ;
+}
+
+void u64toa(uint64_t n, char s[] ){
+  uint64_t i;
+
+  i = 0;
+  do
+  {       /* generate digits in reverse order */
+    s[i++] = n % 10 + '0';   /* get next digit */
+  } while ((n /= 10) > 0) ;     /* delete it */
 
   s[i] = '\0';
 

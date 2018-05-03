@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kernel/drivers/io.h"
+#include "kernel/scheduler.h"
 
 char scanCodes[128] = {
     0,  27, '1', '2', '3', '4', '5', '6', '7', '8', 
