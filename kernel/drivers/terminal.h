@@ -72,23 +72,7 @@ void terminal_writestring(const char* data)
     terminal_write(data, strlen(data));
 }
 
-bool terminal_initialize();
-
-void terminal_task() {
-    while (true) {
-        Message *m = message_get(&runningTask->port);
-
-        kprintf("The message is: %s\n", m->message);
-        if (strcmp(m->message, "clear") == 0) {
-            terminal_initialize();
-        }
-
-        m->response = "";
-        yield();
-    }
-}
-
-bool terminal_initialize() {
+void terminal_clear() {
     terminal_row = 0;
     terminal_column = 0;
     terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
@@ -99,9 +83,40 @@ bool terminal_initialize() {
             terminal_buffer[index] = vga_entry(' ', terminal_color);
         }
     }
+}
+
+void terminal_task() {
+    while (true) {
+        Message *m = message_get(&runningTask->port);
+
+        char *cmd = strsep(&m->message, " ");
+
+        serial_printf("The message is: %s\n", cmd);
+
+        if (streq(cmd, "clear")) {
+            terminal_clear();
+        } else if (streq(cmd, "setpos")) {
+            char *xStr = strsep(&m->message, " ");
+            char *yStr = strsep(&m->message, " ");
+
+            size_t x = atoi(xStr);
+            size_t y = atoi(xStr);
+
+            terminal_row = y;
+            terminal_column = x;
+        } else if (streq(cmd, "print")) {
+            terminal_writestring(m->message);
+        }
+
+        m->response = "";
+        yield();
+    }
+}
+
+bool terminal_initialize() {
+    terminal_clear();
 
     spawnTask(terminal_task, "terminal-driver");
-
     return true;
 }
 

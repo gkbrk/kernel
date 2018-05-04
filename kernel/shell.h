@@ -9,11 +9,15 @@
 
 typedef struct {
     char *name;
-    void (*function)();
+    void (*function)(char *args);
 } ShellCommand;
 
-void shell_test() {
-    terminal_writestring("Test successful\n");
+void shell_echo(char *arg) {
+    if (arg != NULL) {
+        kprintf("%s\n", arg);
+    } else {
+        kprintf("\n");
+    }
 }
 
 void shell_memusage() {
@@ -48,11 +52,11 @@ void test() {
     }
 }
 
-void shell_spawn_test() {
+void shell_spawn_test(char *args) {
     spawnTask(test, "test");
 }
 
-void shell_ps() {
+void shell_ps(char *args) {
     for (int i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
         Task *t = &tasks[i];
 
@@ -80,12 +84,13 @@ void msg() {
     }
 }
 
-void shell_msg() {
-    spawnTask(msg, "background_task");
+void shell_msg(char *args) {
+    char *target = strsep(&args, " ");
+    sendMessageToTask(target, args);
 }
 
 ShellCommand commands[] = {
-    {.name = "test", .function = shell_test},
+    {.name = "echo", .function = shell_echo},
     {.name = "clear", .function = shell_clear},
     {.name = "mem", .function = shell_memusage},
     {.name = "help", .function = shell_help},
@@ -125,7 +130,9 @@ char *shell_read_line() {
 
 void shell() {
     while (true) {
-        char *cmd = shell_read_line();
+        char *input = shell_read_line();
+
+        char *cmd = strsep(&input, " ");
 
         if (strcmp(cmd, "") == 0) {
             kmfree(cmd);
@@ -135,7 +142,7 @@ void shell() {
         bool executed = false;
         for (size_t i = 0; i < sizeof(commands) / sizeof(ShellCommand); i++) {
             if (strcmp(cmd, commands[i].name) == 0) {
-                commands[i].function();
+                commands[i].function(input);
                 executed = true;
                 break;
             }
