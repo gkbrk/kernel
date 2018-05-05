@@ -28,12 +28,7 @@ void shell_clear() {
     sendMessageToTask("terminal-driver", "clear");
 }
 
-void shell_help() {
-    terminal_writestring("help - display help menu\n");
-    terminal_writestring("clear - clear the screen\n");
-    terminal_writestring("test - print test message\n");
-    terminal_writestring("mem - display memory usage\n");
-}
+void shell_help();
 
 void test() {
     int i = 0;
@@ -99,6 +94,12 @@ ShellCommand commands[] = {
     {.name = "ps", .function = shell_ps},
     {.name = "msg", .function = shell_msg},
 };
+
+void shell_help() {
+    for (size_t i = 0; i < sizeof(commands) / sizeof(ShellCommand); i++) {
+        kprintf("%s\n", commands[i].name);
+    }
+}
 
 char *shell_read_line() {
     terminal_writestring("> ");
