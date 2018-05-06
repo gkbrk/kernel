@@ -62,8 +62,9 @@ size_t ata_read_sectors(ATADrive *drive, uint32_t sector, uint8_t sectorCount, c
         klog("Reading sector");
         for(int i = 0; i < 256; i++) {
             uint16_t data = inw(drive->io_port + ATA_DATA);
-            //kprintf("%d", data);
-            *(uint16_t *)(dest + i * 2) = data;
+            //kprintf("%d\n", i * 2);
+            *dest++ =   (unsigned char) data;
+            *dest++ =   (unsigned char) (data >> 8);
         }
         ata_wait_ready(drive);
     }

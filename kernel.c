@@ -7,8 +7,8 @@
 #include "kernel/shell.h"
 #include "kernel/libk/log.h"
 #include "kernel/libk/alloc.h"
-
 #include "kernel/scheduler.h"
+#include "kernel/fs/tarfs.h"
 
 static void time_task() {
     while (true) {
@@ -43,6 +43,8 @@ void kernel_main() {
 
     spawnTask(time_task, "time_display");
     spawnTask(shell, "shell");
+    spawnTask(tarfs_task, "tarfs");
+    sendMessageToTask("tarfs", "cat donate.md");
 
     while (true) yield();
 }

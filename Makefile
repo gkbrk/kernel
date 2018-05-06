@@ -22,7 +22,7 @@ clean:
 
 run:
 	make all
-	qemu-system-x86_64 -serial mon:stdio -kernel build/leonardo.bin -hda test_harddrive.raw
+	qemu-system-x86_64 -serial mon:stdio -kernel build/leonardo.bin -hda tar-drive.tar -d guest_errors
 
 iso:
 	make all

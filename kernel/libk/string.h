@@ -56,6 +56,11 @@ void* memcpy(void* restrict dstptr, const void* restrict srcptr, size_t size) {
 return dstptr;
 }
 
+char *strcat(char *dest, const char *src) {
+    strcpy(dest + strlen(dest), src);
+    return dest;
+}
+
 char *strsep(char **stringp, const char *delim) {
     char *s;
     const char *spanp;
