@@ -22,6 +22,13 @@ void loadDrivers() {
         driverDefinition d = drivers[i];
         if (d.isAvailable()) {
             d.initialize();
+
+            // Serial log
+            char log[256];
+            sprintf(log, "Loaded driver: %s", d.name);
+            klog(log);
+
+            // Terminal log
             terminal_setcolor(vga_entry_color(VGA_COLOR_MAGENTA, VGA_COLOR_BLACK));
             terminal_writestring(d.name);
             terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));

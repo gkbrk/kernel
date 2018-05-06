@@ -11,3 +11,11 @@ static inline uint8_t inb(uint16_t port) {
                    : "Nd"(port) );
     return ret;
 }
+
+static inline uint16_t inw(uint16_t port) {
+	uint16_t ret;
+	asm volatile("inw %%dx, %%ax"
+                    : "=a"(ret)
+                    : "d"(port) );
+	return ret;
+}

@@ -44,5 +44,10 @@ void kernel_main() {
     spawnTask(time_task, "time_display");
     spawnTask(shell, "shell");
 
+    char buf[2048];
+    ata_read_sectors(&ata_drives[0], 1, 1, buf);
+    kprintf("Size: %d\n", strlen(buf));
+    kprintf("%s\n", buf);
+
     while (true) yield();
 }

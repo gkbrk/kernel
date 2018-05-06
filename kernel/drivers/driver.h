@@ -6,6 +6,4 @@ typedef struct {
     bool (*initialize)(void);
 } driverDefinition;
 
-bool driver_true() {
-    return true;
-}
+bool driver_true();
