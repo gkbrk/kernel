@@ -81,7 +81,19 @@ void msg() {
 
 void shell_msg(char *args) {
     char *target = strsep(&args, " ");
-    sendMessageToTask(target, args);
+    char *message = strsep(&args, " ");
+
+    Task *t = findTaskByName(target);
+    if (t == NULL || t->name == NULL) return;
+    Message m;
+    memset(&m, '\0', sizeof(Message));
+    m.message = message;
+    message_put(&t->port, &m);
+    message_get_response(&m);
+    
+    if (!streq(m.response, "")) {
+        kprintf("%s\n", m.response);
+    }
 }
 
 ShellCommand commands[] = {
