@@ -88,10 +88,9 @@ void terminal_clear() {
 void terminal_task() {
     while (true) {
         Message *m = message_get(&runningTask->port);
+        klog(m->message);        
 
         char *cmd = strsep(&m->message, " ");
-
-        serial_printf("The message is: %s\n", cmd);
 
         if (streq(cmd, "clear")) {
             terminal_clear();
@@ -108,7 +107,7 @@ void terminal_task() {
             terminal_writestring(m->message);
         }
 
-        m->response = "";
+        if (m->response == NULL) m->response = "";
         yield();
     }
 }
