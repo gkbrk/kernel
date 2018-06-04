@@ -68,7 +68,7 @@ void tarfs_task() {
                         kmfree(buf);
                         buf = kmalloc(filesize);
                         ata_read_sectors(&ata_drives[0], sec + 1, filesize / 512 + 1, buf);
-                        kprintf("%s\n", buf);
+                        m->response = buf;
                         break;
                     }
 
@@ -79,8 +79,6 @@ void tarfs_task() {
                 prev_sum = sum(buf);
                 sec++;
             }
-            
-            kmfree(buf);
         }
 
         if (m->response == NULL) m->response = "";

@@ -130,3 +130,12 @@ void kprintf(const char * s, ...) {
     vsprintf(NULL, terminal_putchar, s, ap);
     va_end(ap);
 }
+
+size_t snprintf(char *s, size_t n, const char *format, ...) {
+    va_list ap;
+    va_start(ap, s);
+    vsprintf(s, NULL, format, ap);
+    va_end(ap);
+
+    return strlen(s);
+}

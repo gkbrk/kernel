@@ -44,7 +44,7 @@ void kernel_main() {
     spawnTask(time_task, "time_display");
     spawnTask(shell, "shell");
     spawnTask(tarfs_task, "tarfs");
-    sendMessageToTask("tarfs", "cat donate.md");
+    //shell_picol("cat script.tcl");
 
     while (true) yield();
 }

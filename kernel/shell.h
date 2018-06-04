@@ -7,6 +7,8 @@
 #include "kernel/libk/printf.h"
 #include "kernel/scheduler.h"
 
+#include "kernel/picol.h"
+
 typedef struct {
     char *name;
     void (*function)(char *args);
@@ -95,6 +97,26 @@ void shell_msg(char *args) {
     }
 }
 
+void shell_ls(char *args) {
+    char *target = strsep(&args, " ");
+
+    Task *t = findTaskByName("tarfs");
+    if (t == NULL || t->name == NULL) return;
+    Message m;
+    memset(&m, '\0', sizeof(Message));
+    m.message = "ls";
+    message_put(&t->port, &m);
+    message_get_response(&m);
+    
+    if (!streq(m.response, "")) {
+        kprintf("%s\n", m.response);
+    }
+}
+
+void shell_picol(char *args) {
+    runPicol("cat script.tcl");
+}
+
 ShellCommand commands[] = {
     {.name = "echo", .function = shell_echo},
     {.name = "clear", .function = shell_clear},
@@ -104,6 +126,8 @@ ShellCommand commands[] = {
     {.name = "exit", .function = exitTask},
     {.name = "ps", .function = shell_ps},
     {.name = "msg", .function = shell_msg},
+    {.name = "ls", .function = shell_ls},
+    {.name = "picol", .function = shell_picol},
 };
 
 void shell_help() {

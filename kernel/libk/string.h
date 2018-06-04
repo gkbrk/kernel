@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdarg.h>
+#include "kernel/libk/alloc.h"
 
 size_t strlen(const char* str) {
   size_t len = 0;
@@ -82,6 +83,17 @@ char *strsep(char **stringp, const char *delim) {
             }
         } while (sc != 0);
     }
+}
+
+char *strdup(const char *str) {
+	size_t siz;
+	char *copy;
+
+	siz = strlen(str) + 1;
+	if ((copy = malloc(siz)) == NULL)
+		return(NULL);
+	(void)memcpy(copy, str, siz);
+	return(copy);
 }
 
 /* reverse:  reverse string s in place */

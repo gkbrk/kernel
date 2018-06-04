@@ -1,5 +1,5 @@
 #pragma once
-#define KMALLOC_NUM_BLOCKS 150
+#define KMALLOC_NUM_BLOCKS 500
 #define KMALLOC_BLOCK_SIZE 4096
 
 typedef struct {
@@ -38,12 +38,34 @@ void *kmalloc(size_t size) {
     }
 }
 
+void *malloc(size_t size) {
+    return kmalloc(size);
+}
+
 void *kmfree(void *ptr) {
     for (int i = 0; i < KMALLOC_NUM_BLOCKS; i++) {
         if (allocation_table[i].ptr == ptr) {
             allocation_table[i].allocated = false;
         }
     }
+}
+
+void *free(void *ptr) {
+    kmfree(ptr);
+}
+
+void* alloc_cpy(void* restrict dstptr, const void* restrict srcptr, size_t size) {
+  unsigned char* dst = (unsigned char*) dstptr;
+  const unsigned char* src = (const unsigned char*) srcptr;
+  for (size_t i = 0; i < size; i++) {
+    dst[i] = src[i];
+}
+return dstptr;
+}
+
+void *realloc(void *ptr, size_t size) {
+    serial_printf("%d\n", size);
+    return ptr;
 }
 
 size_t get_mem_usage() {

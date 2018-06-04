@@ -47,7 +47,7 @@ char keyboardSpinLoop() {
         while (!(inb(0x64) & 1)) yield();
         char scancode = inb(0x60);
         if ((scancode & 128) == 128) continue;
-        char key = scanCodes[inb(0x60)];
+        char key = scanCodes[scancode];
         if (key) {
             return key;
         }
