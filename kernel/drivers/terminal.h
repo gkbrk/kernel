@@ -5,6 +5,7 @@
 #include "kernel/drivers/driver.h"
 #include "kernel/libk/messaging.h"
 #include "kernel/scheduler.h"
+#include "kernel/drivers/io.h"
 
 size_t terminal_row;
 size_t terminal_column;
@@ -85,6 +86,11 @@ void terminal_clear() {
     }
 }
 
+void terminal_cursor_disable() {
+	outb(0x3D4, 0x0A);
+	outb(0x3D5, 0x20);
+}
+
 void terminal_task() {
     while (true) {
         Message *m = message_get(&runningTask->port);
@@ -105,6 +111,12 @@ void terminal_task() {
             terminal_column = x;
         } else if (streq(cmd, "print")) {
             terminal_writestring(m->message);
+        } else if (streq(cmd, "cursor")) {
+            char *arg = strsep(&m->message, " ");
+
+            if (streq(arg, "disable")) {
+                terminal_cursor_disable();
+            }
         }
 
         if (m->response == NULL) m->response = "";
