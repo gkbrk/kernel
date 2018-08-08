@@ -91,6 +91,15 @@ void terminal_cursor_disable() {
 	outb(0x3D5, 0x20);
 }
 
+void terminal_move_cursor(int x, int y) {
+	uint16_t pos = y * VGA_WIDTH + x;
+ 
+	outb(0x3D4, 0x0F);
+	outb(0x3D5, (uint8_t) (pos & 0xFF));
+	outb(0x3D4, 0x0E);
+	outb(0x3D5, (uint8_t) ((pos >> 8) & 0xFF));
+}
+
 void terminal_task() {
     while (true) {
         Message *m = message_get(&runningTask->port);
@@ -105,7 +114,7 @@ void terminal_task() {
             char *yStr = strsep(&m->message, " ");
 
             size_t x = atoi(xStr);
-            size_t y = atoi(xStr);
+            size_t y = atoi(yStr);
 
             terminal_row = y;
             terminal_column = x;
@@ -116,6 +125,14 @@ void terminal_task() {
 
             if (streq(arg, "disable")) {
                 terminal_cursor_disable();
+            } else if (streq(arg, "setpos")) {
+                char *xStr = strsep(&m->message, " ");
+                char *yStr = strsep(&m->message, " ");
+
+                size_t x = atoi(xStr);
+                size_t y = atoi(yStr);
+
+                terminal_move_cursor(x, y);
             }
         }
 

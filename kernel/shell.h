@@ -137,12 +137,15 @@ void shell_help() {
 }
 
 char *shell_read_line() {
+    terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK));
     terminal_writestring("> ");
+    terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
     char *cmd = kmalloc(256);
     memset(cmd, '\0', 256);
     size_t i = 0;
 
     while (true) {
+        terminal_move_cursor(terminal_column, terminal_row);
         char key = keyboardSpinLoop();
         if (key == '\b') {
             if (i) { 
