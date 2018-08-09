@@ -11,21 +11,33 @@
 #include "kernel/fs/tarfs.h"
 
 static void time_task() {
+    size_t oldLen = 0;
+    
     while (true) {
         char *t = cmos_formatted_time();
+        size_t len = strlen(t);
+
         size_t old_col = terminal_column;
         size_t old_row = terminal_row;
 
-        terminal_row = 0;
-        terminal_column = VGA_WIDTH - 10;
-        terminal_writestring(t);
-        
-        for (size_t i = terminal_column; i < VGA_WIDTH; i++) {
-            terminal_putchar(' ');
+        if (oldLen != len) {
+            terminal_row = 0;
+            terminal_column = VGA_WIDTH - oldLen;
+            for (int x = VGA_WIDTH - oldLen; x < VGA_WIDTH; x++) {
+                terminal_putchar(' ');
+            }
         }
+
+        terminal_row = 0;
+        terminal_column = VGA_WIDTH - len;
+        terminal_setcolor(vga_entry_color(VGA_COLOR_BLACK, VGA_COLOR_WHITE));
+        terminal_writestring(t);
+        terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
 
         terminal_row = old_row;
         terminal_column = old_col;
+
+        oldLen = len;
 
         kmfree(t);
         yield();
