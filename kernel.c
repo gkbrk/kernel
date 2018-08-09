@@ -19,6 +19,10 @@ static void time_task() {
         terminal_row = 0;
         terminal_column = VGA_WIDTH - 10;
         terminal_writestring(t);
+        
+        for (size_t i = terminal_column; i < VGA_WIDTH; i++) {
+            terminal_putchar(' ');
+        }
 
         terminal_row = old_row;
         terminal_column = old_col;
