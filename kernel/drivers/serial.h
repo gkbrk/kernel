@@ -16,6 +16,7 @@ bool serial_init() {
     outb(COM1 + 4, 0x0B);    // IRQs enabled, RTS/DSR set
 
     klog("Serial port initialized");
+    return true;
 }
 
 bool serial_received() {
@@ -24,17 +25,17 @@ bool serial_received() {
 
 char serial_read() {
    while (serial_received() == 0) yield();
- 
+
    return inb(COM1);
 }
 
 int serial_sent() {
    return inb(COM1 + 5) & 0x20;
 }
- 
+
 void serial_write_char(char a) {
    while (serial_sent() == 0);
- 
+
    outb(COM1, a);
 }
 

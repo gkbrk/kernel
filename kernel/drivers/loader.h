@@ -7,6 +7,7 @@
 #include "kernel/drivers/cmos.h"
 #include "kernel/drivers/serial.h"
 #include "kernel/drivers/ata.h"
+#include "kernel/drivers/pcspeaker.h"
 
 void loadDrivers() {
     driverDefinition drivers[] = {
@@ -16,6 +17,7 @@ void loadDrivers() {
         CMOS_DRIVER,
         SERIAL_DRIVER,
         ATA_DRIVER,
+        PCSPEAKER_DRIVER,
     };
 
     for (int i = 0; i < sizeof(drivers) / sizeof(driverDefinition); i++) {

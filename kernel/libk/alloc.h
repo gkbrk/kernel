@@ -36,6 +36,8 @@ void *kmalloc(size_t size) {
             return allocation_table[i].ptr;
         }
     }
+
+    return NULL;
 }
 
 void *malloc(size_t size) {

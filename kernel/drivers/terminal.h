@@ -103,8 +103,8 @@ void terminal_move_cursor(int x, int y) {
 void terminal_task() {
     while (true) {
         Message *m = message_get(&runningTask->port);
-        klog(m->message);        
-        
+        klog(m->message);
+
         char *cmd = strsep(&m->message, " ");
 
         if (streq(cmd, "clear")) {
