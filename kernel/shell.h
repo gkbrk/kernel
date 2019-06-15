@@ -7,10 +7,9 @@
 #include "kernel/libk/printf.h"
 #include "kernel/scheduler.h"
 
-#include "kernel/picol.h"
-
 typedef struct {
     char *name;
+    char *desc;
     void (*function)(char *args);
 } ShellCommand;
 
@@ -113,26 +112,21 @@ void shell_ls(char *args) {
     }
 }
 
-void shell_picol(char *args) {
-    runPicol("cat script.tcl");
-}
-
 ShellCommand commands[] = {
-    {.name = "echo", .function = shell_echo},
-    {.name = "clear", .function = shell_clear},
-    {.name = "mem", .function = shell_memusage},
-    {.name = "help", .function = shell_help},
-    {.name = "task", .function = shell_spawn_test},
-    {.name = "exit", .function = exitTask},
-    {.name = "ps", .function = shell_ps},
-    {.name = "msg", .function = shell_msg},
-    {.name = "ls", .function = shell_ls},
-    {.name = "picol", .function = shell_picol},
+    {.name = "echo", .function = shell_echo, .desc = "Print text"},
+    {.name = "clear", .function = shell_clear, .desc = "Clears the console"},
+    {.name = "mem", .function = shell_memusage, .desc = "Print current memory usage"},
+    {.name = "help", .function = shell_help, .desc = "Get help on commands"},
+    {.name = "task", .function = shell_spawn_test, .desc = ""},
+    {.name = "exit", .function = exitTask, .desc = "Exit the shell"},
+    {.name = "ps", .function = shell_ps, .desc = "Process list"},
+    {.name = "msg", .function = shell_msg, .desc = "Send a message to a process"},
+    {.name = "ls", .function = shell_ls, .desc = "List files"},
 };
 
 void shell_help() {
     for (size_t i = 0; i < sizeof(commands) / sizeof(ShellCommand); i++) {
-        kprintf("%s\n", commands[i].name);
+        kprintf("%s - %s\n", commands[i].name, commands[i].desc);
     }
 }
 
