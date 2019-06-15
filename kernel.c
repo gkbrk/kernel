@@ -12,7 +12,7 @@
 
 static void time_task() {
     size_t oldLen = 0;
-    
+
     while (true) {
         char *t = cmos_formatted_time();
         size_t len = strlen(t);
@@ -57,7 +57,7 @@ void kernel_main() {
     klog("Booting kernel");
     terminal_writestring("Booting kernel...\n");
 
-    spawnTask(time_task, "time_display");
+    spawnTask(time_task, "time-display");
     spawnTask(shell, "shell");
     spawnTask(tarfs_task, "tarfs");
     //shell_picol("cat script.tcl");

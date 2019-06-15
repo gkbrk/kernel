@@ -66,6 +66,11 @@ void shell_ps(char *args) {
     }
 }
 
+void shell_pkill(char *args) {
+    Task *t = findTaskByName(args);
+    killTask(t);
+}
+
 void msg() {
     while (true) {
         Task *t = findTaskByName("logger");
@@ -90,7 +95,7 @@ void shell_msg(char *args) {
     m.message = args;
     message_put(&t->port, &m);
     message_get_response(&m);
-    
+
     if (!streq(m.response, "")) {
         kprintf("%s\n", m.response);
     }
@@ -106,7 +111,7 @@ void shell_ls(char *args) {
     m.message = "ls";
     message_put(&t->port, &m);
     message_get_response(&m);
-    
+
     if (!streq(m.response, "")) {
         kprintf("%s\n", m.response);
     }
@@ -141,6 +146,7 @@ ShellCommand commands[] = {
     {.name = "task", .function = shell_spawn_test, .desc = ""},
     {.name = "exit", .function = exitTask, .desc = "Exit the shell"},
     {.name = "ps", .function = shell_ps, .desc = "Process list"},
+    {.name = "pkill", .function = shell_pkill, .desc = "Kill a process"},
     {.name = "msg", .function = shell_msg, .desc = "Send a message to a process"},
     {.name = "ls", .function = shell_ls, .desc = "List files"},
     {.name = "cat", .function = shell_cat, .desc = "Print the contents of a file"},
@@ -164,7 +170,7 @@ char *shell_read_line() {
         terminal_move_cursor(terminal_column, terminal_row);
         char key = keyboardSpinLoop();
         if (key == '\b') {
-            if (i) { 
+            if (i) {
                 i--;
                 cmd[i] = '\0';
                 terminal_column--;

@@ -77,16 +77,18 @@ void spawnTask(void (*main)(), char *name) {
     t->name = name;
 }
 
-void exitTask() {
-    int id = 0;
-
+void killTask(Task *t) {
     for (int i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
-        if (runningTask == &tasks[i]) {
-            tasks[i - 1].next = tasks[i].next;
+        if (t == &tasks[i]) {
+            tasks[i-1].next = tasks[i].next;
             tasks[i].name = NULL;
             return;
         }
     }
+}
+
+void exitTask() {
+    killTask(runningTask);
 }
 
 Task *findTaskByName(char *name) {
