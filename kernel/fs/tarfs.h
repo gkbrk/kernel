@@ -29,7 +29,7 @@ size_t sum(char *buf) {
 void tarfs_task() {
     while (true) {
         Message *m = message_get(&runningTask->port);
-        klog(m->message);        
+        klog(m->message);
 
         char *cmd = strsep(&m->message, " ");
 
@@ -51,7 +51,7 @@ void tarfs_task() {
                 prev_sum = sum(buf);
                 sec++;
             }
-            
+
             kmfree(buf);
         } else if (streq(cmd, "cat")) {
             char *name = strsep(&m->message, " ");

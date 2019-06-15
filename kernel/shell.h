@@ -112,6 +112,27 @@ void shell_ls(char *args) {
     }
 }
 
+void shell_cat(char *args) {
+    Task *t = findTaskByName("tarfs");
+    if (t == NULL || t->name == NULL) return;
+
+    Message m;
+    memset(&m, '\0', sizeof(Message));
+    char *msg = kmalloc(4 + strlen(args));
+    m.message = msg;
+    memset(m.message, '\0', 4 + strlen(args));
+    sprintf(m.message, "cat %s", args);
+    message_put(&t->port, &m);
+    message_get_response(&m);
+
+    if (!streq(m.response, "")) {
+        kprintf("%s\n", m.response);
+        kmfree(m.response);
+    }
+
+    kmfree(msg);
+}
+
 ShellCommand commands[] = {
     {.name = "echo", .function = shell_echo, .desc = "Print text"},
     {.name = "clear", .function = shell_clear, .desc = "Clears the console"},
@@ -122,6 +143,7 @@ ShellCommand commands[] = {
     {.name = "ps", .function = shell_ps, .desc = "Process list"},
     {.name = "msg", .function = shell_msg, .desc = "Send a message to a process"},
     {.name = "ls", .function = shell_ls, .desc = "List files"},
+    {.name = "cat", .function = shell_cat, .desc = "Print the contents of a file"},
 };
 
 void shell_help() {

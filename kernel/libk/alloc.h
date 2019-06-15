@@ -1,5 +1,5 @@
 #pragma once
-#define KMALLOC_NUM_BLOCKS 500
+#define KMALLOC_NUM_BLOCKS 800
 #define KMALLOC_BLOCK_SIZE 4096
 
 typedef struct {

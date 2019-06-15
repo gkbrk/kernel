@@ -4,7 +4,7 @@
 #include "kernel/drivers/io.h"
 #include "kernel/libk/alloc.h"
 
-#define CURRENT_YEAR 2018
+#define CURRENT_YEAR 2019
 
 unsigned char cmos_second;
 unsigned char cmos_minute;
