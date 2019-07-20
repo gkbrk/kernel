@@ -37,12 +37,13 @@ void tarfs_task() {
             char *buf = kmalloc(512);
             uint8_t sec = 1;
             size_t prev_sum = 1;
+
             while (true) {
                 ata_read_sectors(&ata_drives[0], sec, 1, buf);
 
                 if (buf[156] == '0') {
                     size_t filesize = octaltoint(&buf[124]);
-                    kprintf("%s\n", buf);
+                    kprintf("[%d bytes] %s\n", filesize, buf);
 
                     sec += filesize / 512;
                 }

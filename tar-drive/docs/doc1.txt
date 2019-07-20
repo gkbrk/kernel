@@ -1,0 +1,3 @@
+This is the content of help.txt
+================================
+In the future, some helpful documentation will be put here.

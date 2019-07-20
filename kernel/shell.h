@@ -2,6 +2,7 @@
 
 #include "kernel/drivers/keyboard.h"
 #include "kernel/drivers/terminal.h"
+#include "kernel/drivers/vga.h"
 #include "kernel/libk/alloc.h"
 #include "kernel/libk/string.h"
 #include "kernel/libk/printf.h"
@@ -102,19 +103,21 @@ void shell_msg(char *args) {
 }
 
 void shell_ls(char *args) {
-    char *target = strsep(&args, " ");
-
     Task *t = findTaskByName("tarfs");
     if (t == NULL || t->name == NULL) return;
     Message m;
     memset(&m, '\0', sizeof(Message));
-    m.message = "ls";
+    char *msg = strdup("ls");
+    m.message = msg;
+
     message_put(&t->port, &m);
     message_get_response(&m);
 
     if (!streq(m.response, "")) {
         kprintf("%s\n", m.response);
     }
+
+    kmfree(msg);
 }
 
 void shell_cat(char *args) {
@@ -138,6 +141,36 @@ void shell_cat(char *args) {
     kmfree(msg);
 }
 
+void shell_read(char *args) {
+    Task *t = findTaskByName("tarfs");
+    if (t == NULL || t->name == NULL) return;
+
+    Message m;
+    memset(&m, '\0', sizeof(Message));
+    char *msg = kmalloc(4 + strlen(args));
+    m.message = msg;
+    memset(m.message, '\0', 4 + strlen(args));
+    sprintf(m.message, "cat %s", args);
+    message_put(&t->port, &m);
+    message_get_response(&m);
+
+    char *resp = &m.response;
+    char *line;
+    uint32_t i = 0;
+    while ((line = strsep(&m.response, "\n")) != NULL) {
+        kprintf("%s\n", line);
+        if (i >= VGA_HEIGHT - 3) {
+            char key = keyboardSpinLoop();
+            if (key == 'q') break;
+        }
+        i++;
+    }
+    kmfree(resp);
+
+    kmfree(msg);
+
+}
+
 ShellCommand commands[] = {
     {.name = "echo", .function = shell_echo, .desc = "Print text"},
     {.name = "clear", .function = shell_clear, .desc = "Clears the console"},
@@ -150,12 +183,16 @@ ShellCommand commands[] = {
     {.name = "msg", .function = shell_msg, .desc = "Send a message to a process"},
     {.name = "ls", .function = shell_ls, .desc = "List files"},
     {.name = "cat", .function = shell_cat, .desc = "Print the contents of a file"},
+    {.name = "read", .function = shell_read, .desc = "Read the contents of a file"},
 };
 
 void shell_help() {
     for (size_t i = 0; i < sizeof(commands) / sizeof(ShellCommand); i++) {
         kprintf("%s - %s\n", commands[i].name, commands[i].desc);
     }
+
+    kprintf("To get more information, please run the command "
+            "`read help.txt`\n");
 }
 
 char *shell_read_line() {

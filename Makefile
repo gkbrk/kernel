@@ -22,6 +22,7 @@ clean:
 
 run:
 	make all
+	cd tar-drive; tar cvf ../tar-drive.tar *
 	qemu-system-x86_64 -serial mon:stdio -kernel build/leonardo.bin -hda tar-drive.tar -d guest_errors -soundhw pcspk
 
 iso:
