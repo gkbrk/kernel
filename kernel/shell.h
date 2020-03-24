@@ -31,6 +31,8 @@ void shell_clear() { sendMessageToTask("terminal-driver", "clear"); }
 void shell_help();
 
 void shell_ps(char *args) {
+  (void)args;
+
   for (int i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
     Task *t = &tasks[i];
 

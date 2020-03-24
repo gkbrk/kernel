@@ -38,6 +38,7 @@ bool gdt_initialize() {
   encodeGdtEntry(&gdt_table[16], 0, 0xffffffff, 0x92);
   setGdt(&gdt_table, 23);
   reloadSegments();
+  return true;
 }
 
 driverDefinition GDT_DRIVER = {.name = "GDT Table",

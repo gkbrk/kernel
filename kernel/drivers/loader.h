@@ -15,7 +15,7 @@ void loadDrivers() {
       SERIAL_DRIVER,   ATA_DRIVER,      PCSPEAKER_DRIVER,
   };
 
-  for (int i = 0; i < sizeof(drivers) / sizeof(driverDefinition); i++) {
+  for (size_t i = 0; i < sizeof(drivers) / sizeof(driverDefinition); i++) {
     driverDefinition d = drivers[i];
     if (d.isAvailable()) {
       d.initialize();

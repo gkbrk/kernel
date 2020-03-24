@@ -63,8 +63,8 @@ void spawnTask(void (*main)(), char *name) {
   sprintf(log, "Spawning new task %s", name);
   klog(log);
 
-  Task *t;
-  Task *l;
+  Task *t = {0};
+  Task *l = {0};
 
   for (int i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
     if (tasks[i].next == &tasks[0]) {

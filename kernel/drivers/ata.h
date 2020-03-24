@@ -4,6 +4,7 @@
 
 #include "io.h"
 #include "kernel/drivers/driver.h"
+#include "kernel/libk/printf.h"
 #include "kernel/libk/messaging.h"
 #include "kernel/scheduler.h"
 

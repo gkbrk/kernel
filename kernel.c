@@ -23,7 +23,7 @@ static void time_task() {
         if (oldLen != len) {
             terminal_row = 0;
             terminal_column = VGA_WIDTH - oldLen;
-            for (int x = VGA_WIDTH - oldLen; x < VGA_WIDTH; x++) {
+            for (size_t x = VGA_WIDTH - oldLen; x < VGA_WIDTH; x++) {
                 terminal_putchar(' ');
             }
         }
@@ -60,7 +60,6 @@ void kernel_main() {
     spawnTask(time_task, "time-display");
     spawnTask(shell, "shell");
     spawnTask(tarfs_task, "tarfs");
-    //shell_picol("cat script.tcl");
 
     while (true) yield();
 }
