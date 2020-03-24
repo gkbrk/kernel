@@ -3,12 +3,12 @@ C_FILES = $(shell find kernel/ -type f -name '*.c')
 OBJ_FILES = $(patsubst kernel/%.c, build/%.o, $(C_FILES)) build/kernel.o
 
 CC = i686-elf-gcc
-CFLAGS=-c -I. -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+CFLAGS=-c -I. -std=gnu99 -ffreestanding -Os -Wall -Wextra -flto
 
 all: clean $(OBJ_FILES)
 	nasm -felf32 boot.asm -o build/boot.o
-	as -c kernel/switchTask.s -o build/switchTask.o
-	i686-elf-gcc -T linker.ld -o build/leonardo.bin -ffreestanding -O2 -nostdlib build/switchTask.o build/boot.o $(OBJ_FILES) -lgcc
+	as --32 -c kernel/switchTask.s -o build/switchTask.o
+	i686-elf-gcc -T linker.ld -o build/leonardo.bin -flto -ffreestanding -Os -nostdlib build/switchTask.o build/boot.o $(OBJ_FILES) -lgcc
 
 build/%.o: kernel/%.c
 	mkdir -p "$(@D)"
@@ -31,3 +31,8 @@ iso:
 	cp build/leonardo.bin build/iso/boot/leonardo.bin
 	echo "menuentry \"leonardo\" { multiboot /boot/leonardo.bin }" > build/iso/boot/grub/grub.cfg
 	grub-mkrescue -o build/iso/leonardo.iso build/iso
+
+format:
+	clang-format -i $(shell find kernel/ -type f -name '*.c')
+	clang-format -i $(shell find kernel/ -type f -name '*.h')
+.PHONY: format

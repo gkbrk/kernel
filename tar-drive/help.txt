@@ -9,26 +9,28 @@ just press 'q'. If the clock bothers you, run the command `pkill time-display`.
 The kernel consists of various systems, you can find a short guide in this
 file.
 
-# Multitasking
+1. Kernel internals
 
-At this point, the kernel supports cooperative multitasking. This means that
-multiple processes can run at the same time, and they are switched whenever
-they call yield().
+1.1. Multitasking
 
-# File access
+    At this point, the kernel supports cooperative multitasking. This means that
+    multiple processes can run at the same time, and they are switched whenever
+    they call yield().
 
-## ATA Driver
+1.2. File access
 
-The kernel is able to read data from ATA Disks. There is a driver process
-called ata-driver. But this is a low level interface, you can only read whole
-sectors with it. Other file system drivers build on top of ata-driver to
-provide file-level access.
+1.2.1. ATA Driver
 
-## tarfs
+    The kernel is able to read data from ATA Disks. There is a driver process
+    called ata-driver. But this is a low level interface, you can only read whole
+    sectors with it. Other file system drivers build on top of ata-driver to
+    provide file-level access.
 
-tarfs is the built-in filesystem. It can work with hard drives formatted as a
-tar file.
+1.2.2. tarfs
 
-# Serial port
+    tarfs is the built-in filesystem. It can work with hard drives formatted as a
+    tar file.
 
-The kernel regularly logs to the serial port.
+1.3. Serial port
+
+    The kernel regularly logs to the serial port.
