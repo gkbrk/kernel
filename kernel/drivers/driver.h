@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 typedef struct {
   char *name;
   bool (*isAvailable)(void);

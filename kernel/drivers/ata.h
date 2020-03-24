@@ -1,7 +1,11 @@
 #pragma once
+
+#include <stddef.h>
+
+#include "io.h"
 #include "kernel/drivers/driver.h"
 #include "kernel/libk/messaging.h"
-#include <stddef.h>
+#include "kernel/scheduler.h"
 
 #define ATA_PRIMARY_IO 0x1F0
 #define ATA_SECONDARY_IO 0x170

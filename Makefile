@@ -3,7 +3,8 @@ C_FILES = $(shell find kernel/ -type f -name '*.c')
 OBJ_FILES = $(patsubst kernel/%.c, build/%.o, $(C_FILES)) build/kernel.o
 
 CC = i686-elf-gcc
-CFLAGS=-c -I. -std=gnu99 -ffreestanding -Os -Wall -Wextra -flto
+CFLAGS=-c -I. -std=gnu99 -ffreestanding -Os -flto
+#CFLAGS += -Wall -Wextra -pedantic
 
 all: clean $(OBJ_FILES)
 	nasm -felf32 boot.asm -o build/boot.o

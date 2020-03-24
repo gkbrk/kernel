@@ -4,8 +4,4 @@
 #include "kernel/drivers/serial.h"
 #include "kernel/libk/alloc.h"
 
-void klog(char *s) {
-  char *t = cmos_formatted_time();
-  serial_printf("[%s] %s\n", t, s);
-  kmfree(t);
-}
+void klog(char *s);
