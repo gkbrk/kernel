@@ -31,13 +31,8 @@ void initTasking() {
   asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;"
                : "=m"(tasks[0].regs.eflags)::"%eax");
 
-  createTask(&tasks[1], task_empty, tasks[0].regs.eflags,
-             (uint32_t *)tasks[0].regs.cr3);
-  tasks[0].next = &tasks[1];
-  tasks[1].next = &tasks[0];
-
+  tasks[0].next = &tasks[0];
   tasks[0].name = "init";
-  tasks[1].name = "yielder";
 
   runningTask = &tasks[0];
 }
