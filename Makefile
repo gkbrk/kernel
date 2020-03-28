@@ -1,12 +1,22 @@
 export PATH := /i686-elf/bin:$(PATH)
-C_FILES = $(shell find kernel/ -type f -name '*.c')
-OBJ_FILES = $(patsubst kernel/%.c, build/%.o, $(C_FILES)) build/kernel.o
+C_FILES = $(shell find . -type f -name '*.c')
+OBJ_FILES = $(patsubst ./%.c, build/%.o, $(C_FILES)) build/kernel.o
+
+CPP_FILES = $(shell find . -type f -name '*.cpp')
+OBJ_FILES += $(patsubst ./%.cpp, build/%.o, $(CPP_FILES))
 
 CC = i686-elf-gcc
 CFLAGS=-std=gnu99 -ffreestanding -Os -flto
 CFLAGS += -Wall -Wextra -pedantic
 
+CXX = i686-elf-c++
+CXXFLAGS = -Os -flto
+CXXFLAGS += -Wall -Wextra -fno-exceptions -fno-rtti -ffreestanding
+
+.INTERMEDIATE: $(OBJ_FILES)
+
 all: build/leonardo.bin
+.PHONY: all
 
 build/leonardo.bin: $(OBJ_FILES) build/switchTask.o build/kernel.o build/boot.o
 	$(CC) -T linker.ld -nostdlib -o "$@" $(CFLAGS) $^ -lgcc
@@ -24,9 +34,13 @@ build/kernel.o: kernel.c
 	$(CC) $(CFLAGS) -I. -c "$<" -o "$@"
 
 
-build/%.o: kernel/%.c
+build/%.o: %.c
 	mkdir -p "$(@D)"
 	$(CC) $(CFLAGS) -I. -c "$<" -o "$@"
+
+build/%.o: %.cpp
+	mkdir -p "$(@D)"
+	$(CXX) $(CXXFLAGS) -I. -c "$<" -o "$@"
 
 clean:
 	@rm -rf build

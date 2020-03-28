@@ -8,6 +8,8 @@
 #include "kernel/libk/string.h"
 #include "kernel/scheduler.h"
 
+#include "leo/test.h"
+
 typedef struct {
   char *name;
   char *desc;
@@ -49,6 +51,10 @@ void shell_ps(char *args) {
 void shell_pkill(char *args) {
   Task *t = findTaskByName(args);
   killTask(t);
+}
+
+void shell_test_cpp(char *args) {
+  kprintf("Test number: %d\n", getTestNum());
 }
 
 void msg() {
@@ -169,6 +175,7 @@ ShellCommand commands[] = {
      .function = shell_msg,
      .desc = "Send a message to a process"},
     {.name = "ls", .function = shell_ls, .desc = "List files"},
+    {.name = "testcpp", .function = shell_test_cpp, .desc = "List files"},
     {.name = "cat",
      .function = shell_cat,
      .desc = "Print the contents of a file"},
