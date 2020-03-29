@@ -2,6 +2,7 @@
 
 #include "../leo/test.h"
 #include "drivers/keyboard.h"
+#include "libk/debug.h"
 #include "libk/messaging.h"
 #include "libk/printf.h"
 #include "libk/string.h"
@@ -162,7 +163,9 @@ void shell_read(char *args) {
 ShellCommand commands[] = {
     {"echo", "Print text", shell_echo},
     {"ls", "List files", shell_ls},
-    {"clear", "Clears the screen", shell_clear}
+    {"clear", "Clears the screen", shell_clear},
+    {"help", "Get help on commands", shell_help},
+    {"read", "Read the contents of a file", shell_read}
     /*
     {.name = "clear", .function = shell_clear, .desc = "Clears the console"},
     {.name = "mem",
@@ -194,6 +197,7 @@ void shell_help(char *args) {
 }
 
 char *shell_read_line() {
+  dbg() << "Reading a line";
   terminal_lock();
   terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK));
   terminal_writestring("> ");
@@ -252,6 +256,8 @@ void shell() {
       kmfree(cmd);
       continue;
     }
+
+    dbg() << "Executing command " << cmd;
 
     history.push(strdup(cmd));
     bool executed = false;

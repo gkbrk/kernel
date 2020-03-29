@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stddef.h>
 
 extern "C" void *kmalloc_forever(size_t size);
