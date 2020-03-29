@@ -1,0 +1,14 @@
+[Keyboard driver]
+- Return arrow key presses
+
+[Shell improvements]
+- Cursor movement support
+- Command history
+
+[Interrupts]
+- Interrupt support
+- Syscall
+- Automatic task switching
+
+[Cleanup]
+- Move code to namespaces
