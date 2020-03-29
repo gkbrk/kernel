@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #include "driver.h"
@@ -13,6 +14,9 @@ typedef struct {
   bool available;
   bool slave;
 } ATADrive;
+
+size_t ata_read_sectors(ATADrive *drive, uint32_t sector, uint8_t sectorCount,
+                        char *dest);
 
 extern ATADrive ata_drives[4];
 

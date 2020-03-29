@@ -53,9 +53,7 @@ void shell_pkill(char *args) {
   killTask(t);
 }
 
-void shell_test_cpp(char *args) {
-  kprintf("Test number: %d\n", getTestNum());
-}
+void shell_test_cpp(char *args) { kprintf("Test number: %d\n", getTestNum()); }
 
 void msg() {
   while (true) {

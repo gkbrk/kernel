@@ -11,10 +11,10 @@ typedef struct {
   void *ptr;
 } kmalloc_block;
 
-void *alloc_begin;
+extern void *alloc_begin;
 extern void *__KERNEL_END;
 
-kmalloc_block *allocation_table;
+extern kmalloc_block *allocation_table;
 
 void *kmalloc_forever(size_t size);
 void kmalloc_init();

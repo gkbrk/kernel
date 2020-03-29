@@ -1,11 +1,9 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdint.h>
 
-#include "kernel/libk/alloc.h"
-#include "kernel/libk/log.h"
-#include "kernel/libk/messaging.h"
-#include "kernel/libk/string.h"
+#include "libk/messaging.h"
 
 typedef struct {
   uint32_t eax, ebx, ecx, edx, esi, edi, esp, ebp, eip, eflags, cr3;

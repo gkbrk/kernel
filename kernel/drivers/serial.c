@@ -1,6 +1,9 @@
 #include <stdarg.h>
 #include <stddef.h>
 
+#include "../libk/log.h"
+#include "../libk/printf.h"
+#include "../scheduler.h"
 #include "driver.h"
 #include "io.h"
 #include "serial.h"

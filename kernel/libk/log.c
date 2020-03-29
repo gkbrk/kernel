@@ -1,7 +1,7 @@
 #include "log.h"
+#include "../drivers/cmos.h"
+#include "../drivers/serial.h"
 #include "alloc.h"
-#include "kernel/drivers/cmos.h"
-#include "kernel/drivers/serial.h"
 
 void klog(char *s) {
   char *t = cmos_formatted_time();

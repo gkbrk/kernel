@@ -1,5 +1,6 @@
 #include <stddef.h>
 
+#include "../scheduler.h"
 #include "messaging.h"
 
 Message *message_get(MessagePort *port) {

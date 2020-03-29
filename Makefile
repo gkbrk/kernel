@@ -1,5 +1,5 @@
 export PATH := /i686-elf/bin:$(PATH)
-C_FILES = $(shell find . -type f -name '*.c')
+C_FILES = $(shell find ./kernel/ -type f -name '*.c')
 OBJ_FILES = $(patsubst ./%.c, build/%.o, $(C_FILES)) build/kernel.o
 
 CPP_FILES = $(shell find . -type f -name '*.cpp')
@@ -18,8 +18,8 @@ CXXFLAGS += -Wall -Wextra -fno-exceptions -fno-rtti -ffreestanding
 all: build/leonardo.bin
 .PHONY: all
 
-build/leonardo.bin: $(OBJ_FILES) build/switchTask.o build/kernel.o build/boot.o
-	$(CC) -T linker.ld -nostdlib -o "$@" $(CFLAGS) $^ -lgcc
+build/leonardo.bin: $(OBJ_FILES) build/switchTask.o build/boot.o
+	$(CC) -T linker.ld -flto -nostdlib -Os -o "$@" $^ -lgcc
 
 build/boot.o: boot.asm
 	mkdir -p "$(@D)"
@@ -62,5 +62,10 @@ iso: all
 
 format:
 	clang-format -i $(shell find kernel/ -type f -name '*.c')
+	clang-format -i $(shell find kernel/ -type f -name '*.cpp')
 	clang-format -i $(shell find kernel/ -type f -name '*.h')
 .PHONY: format
+
+reload:
+	find . -type f -name '*.c' -or -name '*.cpp' -or -name '*.h' > QtCreator.files
+.PHONY: reload

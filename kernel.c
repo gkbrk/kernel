@@ -2,12 +2,14 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "kernel/drivers/loader.h"
-#include "kernel/drivers/keyboard.h"
-#include "kernel/shell.h"
 #include "kernel/libk/log.h"
+#include "kernel/drivers/loader.h"
+#include "kernel/shell.h"
 #include "kernel/libk/alloc.h"
 #include "kernel/scheduler.h"
+#include "kernel/drivers/terminal.h"
+#include "kernel/drivers/vga.h"
+#include "kernel/drivers/cmos.h"
 #include "kernel/fs/tarfs.h"
 
 static void time_task() {
@@ -52,6 +54,7 @@ void kernel_main() {
 
     klog("Loading drivers...");
     loadDrivers();
+    loadCppDrivers();
     klog("Drivers loaded");
 
     klog("Booting kernel");

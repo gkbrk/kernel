@@ -1,6 +1,9 @@
 #pragma once
 
-#include "kernel/drivers/driver.h"
+#include "driver.h"
+#include "terminal.h"
+#include <stddef.h>
+#include <stdint.h>
 
 void encodeGdtEntry(uint8_t *target, size_t base, size_t limit, uint8_t type) {
   // Check the limit to make sure that it can be encoded
@@ -30,7 +33,7 @@ void encodeGdtEntry(uint8_t *target, size_t base, size_t limit, uint8_t type) {
   target[5] = type;
 }
 
-static char gdt_table[24];
+static uint8_t gdt_table[24];
 
 bool gdt_initialize() {
   encodeGdtEntry(&gdt_table[0], 0, 0, 0);

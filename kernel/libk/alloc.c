@@ -1,6 +1,9 @@
 #include <stddef.h>
 
-#include "kernel/libk/alloc.h"
+#include "alloc.h"
+
+void *alloc_begin;
+kmalloc_block *allocation_table;
 
 void *kmalloc_forever(size_t size) {
   void *ptr = __KERNEL_END;

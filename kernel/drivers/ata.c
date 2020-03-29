@@ -1,8 +1,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "../libk/log.h"
+#include "../libk/printf.h"
+#include "../libk/string.h"
 #include "ata.h"
 #include "driver.h"
+#include "io.h"
 #include "kernel/libk/messaging.h"
 #include "kernel/scheduler.h"
 

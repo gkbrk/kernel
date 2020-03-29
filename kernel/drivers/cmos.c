@@ -1,9 +1,10 @@
 #include <stdint.h>
 
+#include "../libk/alloc.h"
+#include "../libk/string.h"
 #include "cmos.h"
 #include "driver.h"
 #include "io.h"
-#include "kernel/libk/string.h"
 
 static unsigned char cmos_second;
 static unsigned char cmos_minute;

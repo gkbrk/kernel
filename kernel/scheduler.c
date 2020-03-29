@@ -1,4 +1,10 @@
+#include <stdbool.h>
+
 #include "scheduler.h"
+
+#include "libk/alloc.h"
+#include "libk/log.h"
+#include "libk/string.h"
 
 Task *runningTask;
 Task tasks[20];
@@ -17,12 +23,6 @@ void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir) {
   task->next = 0;
 }
 
-static void task_empty() {
-  while (true) {
-    yield();
-  }
-}
-
 void initTasking() {
   // Get EFLAGS and CR3
   memset(tasks, '\0', sizeof(tasks));
@@ -36,6 +36,8 @@ void initTasking() {
 
   runningTask = &tasks[0];
 }
+
+extern void switchTask(Registers *r1, Registers *r2);
 
 void yield() {
   Task *last = runningTask;

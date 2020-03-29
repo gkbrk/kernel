@@ -1,4 +1,5 @@
 #include "string.h"
+#include "printf.h"
 
 size_t strlen(const char *str) {
   size_t len = 0;
