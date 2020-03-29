@@ -16,8 +16,12 @@ typedef struct Task {
   struct Task *next;
 } Task;
 
-Task *runningTask;
-Task tasks[20];
+extern Task *runningTask;
+extern Task tasks[20];
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void yield();
 void initTasking();
@@ -27,3 +31,7 @@ void spawnTask(void (*main)(), char *name);
 void exitTask();
 Task *findTaskByName(char *name);
 void sendMessageToTask(char *name, char *message);
+
+#ifdef __cplusplus
+}
+#endif

@@ -5,6 +5,8 @@ OBJ_FILES = $(patsubst ./%.c, build/%.o, $(C_FILES)) build/kernel.o
 CPP_FILES = $(shell find . -type f -name '*.cpp')
 OBJ_FILES += $(patsubst ./%.cpp, build/%.o, $(CPP_FILES))
 
+OBJ_FILES += build/arch/x86/irq_handlers.o
+
 CC = i686-elf-gcc
 CFLAGS=-std=gnu99 -ffreestanding -Os -flto
 CFLAGS += -Wall -Wextra -pedantic
@@ -33,7 +35,6 @@ build/kernel.o: kernel.c
 	mkdir -p "$(@D)"
 	$(CC) $(CFLAGS) -I. -c "$<" -o "$@"
 
-
 build/%.o: %.c
 	mkdir -p "$(@D)"
 	$(CC) $(CFLAGS) -I. -c "$<" -o "$@"
@@ -41,6 +42,10 @@ build/%.o: %.c
 build/%.o: %.cpp
 	mkdir -p "$(@D)"
 	$(CXX) $(CXXFLAGS) -I. -c "$<" -o "$@"
+
+build/arch/x86/irq_handlers.o: arch/x86/irq_handlers.S
+	mkdir -p "$(@D)"
+	nasm -felf32 $< -o "$@"
 
 clean:
 	@rm -rf build
@@ -61,9 +66,9 @@ iso: all
 .PHONY: iso
 
 format:
-	clang-format -i $(shell find kernel/ -type f -name '*.c')
-	clang-format -i $(shell find kernel/ -type f -name '*.cpp')
-	clang-format -i $(shell find kernel/ -type f -name '*.h')
+	clang-format -i $(shell find . -type f -name '*.c')
+	clang-format -i $(shell find . -type f -name '*.cpp')
+	clang-format -i $(shell find . -type f -name '*.h')
 .PHONY: format
 
 reload:

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "driver.h"
+#ifdef __cplusplus
+extern "C"
+#endif
 
-char keyboardSpinLoop();
-
-driverDefinition KEYBOARD_DRIVER;
+    char
+    keyboardSpinLoop();

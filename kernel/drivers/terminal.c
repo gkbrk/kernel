@@ -1,10 +1,21 @@
 #include "terminal.h"
 #include "../libk/log.h"
+#include "../scheduler.h"
 
 size_t terminal_row;
 size_t terminal_column;
 uint8_t terminal_color;
 volatile uint16_t *terminal_buffer;
+
+volatile bool locked = false;
+
+void terminal_lock() {
+  while (locked)
+    yield();
+  locked = true;
+}
+
+void terminal_unlock() { locked = false; }
 
 void terminal_setcolor(uint8_t color) { terminal_color = color; }
 

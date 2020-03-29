@@ -1,14 +1,12 @@
 #pragma once
 
-#include "kernel/drivers/keyboard.h"
-#include "kernel/drivers/terminal.h"
-#include "kernel/drivers/vga.h"
-#include "kernel/libk/alloc.h"
-#include "kernel/libk/printf.h"
-#include "kernel/libk/string.h"
-#include "kernel/scheduler.h"
-
-#include "leo/test.h"
+#include "drivers/keyboard.h"
+#include "drivers/terminal.h"
+#include "drivers/vga.h"
+#include "libk/alloc.h"
+#include "libk/printf.h"
+#include "libk/string.h"
+#include "scheduler.h"
 
 typedef struct {
   char *name;
@@ -192,27 +190,35 @@ void shell_help() {
 }
 
 char *shell_read_line() {
+  terminal_lock();
   terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK));
   terminal_writestring("> ");
   terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
+  terminal_unlock();
   char *cmd = kmalloc(256);
   memset(cmd, '\0', 256);
   size_t i = 0;
 
   while (true) {
+    terminal_lock();
     terminal_move_cursor(terminal_column, terminal_row);
+    terminal_unlock();
     char key = keyboardSpinLoop();
     if (key == '\b') {
       if (i) {
         i--;
         cmd[i] = '\0';
+        terminal_lock();
         terminal_column--;
         terminal_putchar(' ');
         terminal_column--;
+        terminal_unlock();
       }
       continue;
     }
+    terminal_lock();
     terminal_putchar(key);
+    terminal_unlock();
 
     if (key == '\n')
       break;

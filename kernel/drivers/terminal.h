@@ -17,6 +17,9 @@ extern uint8_t terminal_color;
  * dead stores. */
 extern volatile uint16_t *terminal_buffer;
 
+void terminal_lock();
+void terminal_unlock();
+
 void terminal_setcolor(uint8_t color);
 
 void terminal_putentryat(char c, uint8_t color, size_t x, size_t y);

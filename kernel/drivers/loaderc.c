@@ -5,14 +5,12 @@
 #include "ata.h"
 #include "cmos.h"
 #include "gdt.h"
-#include "keyboard.h"
 #include "serial.h"
 #include "terminal.h"
 
 void loadDrivers() {
   driverDefinition drivers[] = {
-      TERMINAL_DRIVER, KEYBOARD_DRIVER, GDT_DRIVER,
-      CMOS_DRIVER,     SERIAL_DRIVER,   ATA_DRIVER,
+      TERMINAL_DRIVER, GDT_DRIVER, CMOS_DRIVER, SERIAL_DRIVER, ATA_DRIVER,
   };
 
   for (size_t i = 0; i < sizeof(drivers) / sizeof(driverDefinition); i++) {

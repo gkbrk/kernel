@@ -2,8 +2,8 @@
 
 #include "scheduler.h"
 
+#include "drivers/serial.h"
 #include "libk/alloc.h"
-#include "libk/log.h"
 #include "libk/string.h"
 
 Task *runningTask;
