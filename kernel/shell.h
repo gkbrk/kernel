@@ -1,12 +1,13 @@
 #pragma once
 
+#include "../leo/test.h"
 #include "drivers/keyboard.h"
-#include "drivers/terminal.h"
-#include "drivers/vga.h"
-#include "libk/alloc.h"
+#include "libk/messaging.h"
 #include "libk/printf.h"
 #include "libk/string.h"
+#include "libk/vector.h"
 #include "scheduler.h"
+#include <stddef.h>
 
 typedef struct {
   char *name;
@@ -22,13 +23,13 @@ void shell_echo(char *arg) {
   }
 }
 
-void shell_memusage() {
+void shell_memusage(char *args) {
   kprintf("Current memory usage: %d bytes\n", get_mem_usage());
 }
 
-void shell_clear() { sendMessageToTask("terminal-driver", "clear"); }
+void shell_clear(char *args) { sendMessageToTask("terminal-driver", "clear"); }
 
-void shell_help();
+void shell_help(char *args);
 
 void shell_ps(char *args) {
   (void)args;
@@ -60,7 +61,8 @@ void msg() {
       yield();
     Message m;
     memset(&m, '\0', sizeof(Message));
-    m.message = "Hello!";
+    char *c = "Hello";
+    m.message = static_cast<volatile void *>(c);
     message_put(&t->port, &m);
     kprintf("Resp: %s\n", message_get_response(&m));
     exitTask();
@@ -80,7 +82,7 @@ void shell_msg(char *args) {
   message_put(&t->port, &m);
   message_get_response(&m);
 
-  if (!streq(m.response, "")) {
+  if (!streq((char *)(m.response), "")) {
     kprintf("%s\n", m.response);
   }
 }
@@ -97,7 +99,7 @@ void shell_ls(char *args) {
   message_put(&t->port, &m);
   message_get_response(&m);
 
-  if (!streq(m.response, "")) {
+  if (!streq((char *)m.response, "")) {
     kprintf("%s\n", m.response);
   }
 
@@ -111,16 +113,16 @@ void shell_cat(char *args) {
 
   Message m;
   memset(&m, '\0', sizeof(Message));
-  char *msg = kmalloc(4 + strlen(args));
+  char *msg = static_cast<char *>(kmalloc(4 + strlen(args)));
   m.message = msg;
-  memset(m.message, '\0', 4 + strlen(args));
-  sprintf(m.message, "cat %s", args);
+  memset((char *)m.message, '\0', 4 + strlen(args));
+  sprintf((char *)m.message, "cat %s", args);
   message_put(&t->port, &m);
   message_get_response(&m);
 
-  if (!streq(m.response, "")) {
+  if (!streq((char *)m.response, "")) {
     kprintf("%s\n", m.response);
-    kmfree(m.response);
+    kmfree((void *)m.response);
   }
 
   kmfree(msg);
@@ -133,17 +135,17 @@ void shell_read(char *args) {
 
   Message m;
   memset(&m, '\0', sizeof(Message));
-  char *msg = kmalloc(4 + strlen(args));
+  char *msg = static_cast<char *>(kmalloc(4 + strlen(args)));
   m.message = msg;
-  memset(m.message, '\0', 4 + strlen(args));
-  sprintf(m.message, "cat %s", args);
+  memset((char *)m.message, '\0', 4 + strlen(args));
+  sprintf((char *)m.message, "cat %s", args);
   message_put(&t->port, &m);
   message_get_response(&m);
 
-  char *resp = &m.response;
+  char *resp = (char *)m.response;
   char *line;
   uint32_t i = 0;
-  while ((line = strsep(&m.response, "\n")) != NULL) {
+  while ((line = strsep((char **)m.response, "\n")) != NULL) {
     kprintf("%s\n", line);
     if (i >= VGA_HEIGHT - 3) {
       char key = keyboardSpinLoop();
@@ -158,13 +160,15 @@ void shell_read(char *args) {
 }
 
 ShellCommand commands[] = {
-    {.name = "echo", .function = shell_echo, .desc = "Print text"},
+    {"echo", "Print text", shell_echo},
+    {"ls", "List files", shell_ls},
+    {"clear", "Clears the screen", shell_clear}
+    /*
     {.name = "clear", .function = shell_clear, .desc = "Clears the console"},
     {.name = "mem",
      .function = shell_memusage,
      .desc = "Print current memory usage"},
     {.name = "help", .function = shell_help, .desc = "Get help on commands"},
-    {.name = "exit", .function = exitTask, .desc = "Exit the shell"},
     {.name = "ps", .function = shell_ps, .desc = "Process list"},
     {.name = "pkill", .function = shell_pkill, .desc = "Kill a process"},
     {.name = "msg",
@@ -177,10 +181,10 @@ ShellCommand commands[] = {
      .desc = "Print the contents of a file"},
     {.name = "read",
      .function = shell_read,
-     .desc = "Read the contents of a file"},
+     .desc = "Read the contents of a file"},*/
 };
 
-void shell_help() {
+void shell_help(char *args) {
   for (size_t i = 0; i < sizeof(commands) / sizeof(ShellCommand); i++) {
     kprintf("%s - %s\n", commands[i].name, commands[i].desc);
   }
@@ -195,7 +199,7 @@ char *shell_read_line() {
   terminal_writestring("> ");
   terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
   terminal_unlock();
-  char *cmd = kmalloc(256);
+  char *cmd = static_cast<char *>(kmalloc(256));
   memset(cmd, '\0', 256);
   size_t i = 0;
 
@@ -236,6 +240,9 @@ void shell() {
           "##########################\n"
           "\n"
           "In order to read the quickstart guide, type `read help.txt`.\n");
+
+  Vector<char *> history;
+
   while (true) {
     char *input = shell_read_line();
 
@@ -246,6 +253,7 @@ void shell() {
       continue;
     }
 
+    history.push(strdup(cmd));
     bool executed = false;
     for (size_t i = 0; i < sizeof(commands) / sizeof(ShellCommand); i++) {
       if (strcmp(cmd, commands[i].name) == 0) {
@@ -253,6 +261,15 @@ void shell() {
         executed = true;
         break;
       }
+    }
+
+    if (streq("history", cmd)) {
+      history.forEach([](auto c) { kprintf("%s\n", c); });
+    }
+
+    if (streq("pop", cmd)) {
+      history.pop();
+      kprintf("%s\n", history.pop());
     }
 
     if (!executed) {

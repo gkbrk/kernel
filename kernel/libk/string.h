@@ -5,7 +5,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "kernel/libk/alloc.h"
+#include "alloc.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 size_t strlen(const char *str);
 int strcmp(const char *a, const char *b);
@@ -24,4 +28,8 @@ size_t atoi(const char *c);
 
 // Memory related functions
 void *memset(void *bufptr, int value, size_t size);
-void *memcpy(void *restrict dstptr, const void *restrict srcptr, size_t size);
+void *memcpy(void *dstptr, const void *srcptr, size_t size);
+
+#ifdef __cplusplus
+}
+#endif

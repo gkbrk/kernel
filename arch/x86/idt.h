@@ -8,7 +8,7 @@ struct IDT_entry {
   unsigned short int offset_higherbits;
 };
 
-struct IDT_entry IDT[256];
+extern struct IDT_entry IDT[256];
 
 #ifdef __cplusplus
 extern "C"

@@ -4,7 +4,15 @@
 
 #define CURRENT_YEAR 2020
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void cmos_update_time();
 char *cmos_formatted_time();
 
-driverDefinition CMOS_DRIVER;
+#ifdef __cplusplus
+}
+#endif
+
+extern driverDefinition CMOS_DRIVER;

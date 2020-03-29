@@ -1,6 +1,8 @@
 #include "idt.h"
 #include "../../kernel/drivers/io.h"
 
+struct IDT_entry IDT[256];
+
 extern "C" void idt_init() {
   extern int load_idt(void *);
   extern int irq0();

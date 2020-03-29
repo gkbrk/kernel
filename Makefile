@@ -31,10 +31,6 @@ build/switchTask.o: kernel/switchTask.s
 	mkdir -p "$(@D)"
 	as --32 -c "$<" -o "$@"
 
-build/kernel.o: kernel.c
-	mkdir -p "$(@D)"
-	$(CC) $(CFLAGS) -I. -c "$<" -o "$@"
-
 build/%.o: %.c
 	mkdir -p "$(@D)"
 	$(CC) $(CFLAGS) -I. -c "$<" -o "$@"

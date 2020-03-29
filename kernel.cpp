@@ -50,7 +50,7 @@ static void time_task() {
   }
 }
 
-void kernel_main() {
+extern "C" void kernel_main() {
   kmalloc_init();
   initTasking();
   klog("Starting scheduler/tasking");

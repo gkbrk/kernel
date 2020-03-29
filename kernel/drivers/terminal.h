@@ -17,6 +17,10 @@ extern uint8_t terminal_color;
  * dead stores. */
 extern volatile uint16_t *terminal_buffer;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void terminal_lock();
 void terminal_unlock();
 
@@ -38,4 +42,8 @@ void terminal_cursor_disable();
 
 void terminal_move_cursor(int x, int y);
 
-driverDefinition TERMINAL_DRIVER;
+#ifdef __cplusplus
+}
+#endif
+
+extern driverDefinition TERMINAL_DRIVER;
