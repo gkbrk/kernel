@@ -6,9 +6,7 @@
 - Command history
 
 [Interrupts]
-- Interrupt support
 - Syscall
-- Automatic task switching
 
 [Cleanup]
 - Move code to namespaces
