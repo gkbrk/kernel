@@ -9,10 +9,6 @@ char *PCSpeaker::name() { return m_name; }
 bool PCSpeaker::initialize() {
   Driver::initialize();
   klog("Initialized PC Speaker driver");
-  playFreq(300);
-  for (int i = 0; i < 99999; i++)
-    yield();
-  noSound();
   return true;
 }
 

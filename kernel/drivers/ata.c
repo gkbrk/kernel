@@ -2,13 +2,13 @@
 #include <stdint.h>
 
 #include "../libk/log.h"
+#include "../libk/messaging.h"
 #include "../libk/printf.h"
 #include "../libk/string.h"
+#include "../scheduler.h"
 #include "ata.h"
 #include "driver.h"
 #include "io.h"
-#include "kernel/libk/messaging.h"
-#include "kernel/scheduler.h"
 
 #define ATA_DATA 0
 #define ATA_ERROR 1
@@ -39,7 +39,7 @@ ATADrive ata_drives[4] = {
 };
 
 void ata_wait_ready(ATADrive *drive) {
-  while (inb(drive->io_port + ATA_STATUS) & ATA_ST_BSY != 0)
+  while ((inb(drive->io_port + ATA_STATUS) & ATA_ST_BSY) != 0)
     yield();
 }
 

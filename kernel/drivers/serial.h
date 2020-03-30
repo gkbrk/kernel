@@ -3,6 +3,8 @@
 #include "driver.h"
 #include <stddef.h>
 
+#define PING() serial_printf("%s:%s:%d\n", __func__, __FILE__, __LINE__)
+
 #define COM1 0x3f8
 
 #ifdef __cplusplus

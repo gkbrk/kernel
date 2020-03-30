@@ -3,8 +3,4 @@
 #include "alloc.h"
 #include "debug.h"
 
-extern "C" void klog(char *s) {
-  char *t = cmos_formatted_time();
-  dbg() << t << " " << s;
-  kmfree(t);
-}
+extern "C" void klog(char *s) { dbg() << s; }

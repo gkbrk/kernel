@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../leo/test.h"
 #include "drivers/keyboard.h"
 #include "libk/debug.h"
 #include "libk/messaging.h"
@@ -22,10 +21,6 @@ void shell_echo(char *arg) {
   } else {
     kprintf("\n");
   }
-}
-
-void shell_memusage(char *args) {
-  kprintf("Current memory usage: %d bytes\n", get_mem_usage());
 }
 
 void shell_clear(char *args) { sendMessageToTask("terminal-driver", "clear"); }
@@ -52,8 +47,6 @@ void shell_pkill(char *args) {
   Task *t = findTaskByName(args);
   killTask(t);
 }
-
-void shell_test_cpp(char *args) { kprintf("Test number: %d\n", getTestNum()); }
 
 void msg() {
   while (true) {
@@ -165,7 +158,10 @@ ShellCommand commands[] = {
     {"ls", "List files", shell_ls},
     {"clear", "Clears the screen", shell_clear},
     {"help", "Get help on commands", shell_help},
-    {"read", "Read the contents of a file", shell_read}
+    {"read", "Read the contents of a file", shell_read},
+    {"ps", "Process list", shell_ps},
+    {"msg", "Send a message to a process", shell_msg},
+    {"pkill", "Kill a process", shell_pkill}
     /*
     {.name = "clear", .function = shell_clear, .desc = "Clears the console"},
     {.name = "mem",

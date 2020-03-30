@@ -2,7 +2,6 @@
 
 #include "scheduler.h"
 
-#include "drivers/serial.h"
 #include "libk/alloc.h"
 #include "libk/string.h"
 
@@ -19,7 +18,7 @@ void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir) {
   task->regs.eflags = flags;
   task->regs.eip = (uint32_t)main;
   task->regs.cr3 = (uint32_t)pagedir;
-  task->regs.esp = (uint32_t)kmalloc_forever(1024); // Not implemented here
+  task->regs.esp = (uint32_t)kmalloc_forever(4096); // Not implemented here
   task->next = 0;
 }
 
@@ -56,9 +55,8 @@ void killTask(Task *t) {
 }
 
 void spawnTask(void (*main)(), char *name) {
-  char log[120];
-  sprintf(log, "Spawning new task %s", name);
-  klog(log);
+  klog("Spawning new task");
+  klog(name);
 
   Task *t = {0};
   Task *l = {0};

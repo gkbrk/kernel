@@ -2,6 +2,7 @@
 #include <stddef.h>
 
 #include "../drivers/ata.h"
+#include "../drivers/serial.h"
 #include "../libk/alloc.h"
 #include "../libk/log.h"
 #include "../libk/messaging.h"
@@ -30,8 +31,10 @@ static size_t sum(char *buf) {
 }
 
 void tarfs_task() {
+  klog("Task started");
   while (true) {
     Message *m = message_get(&runningTask->port);
+    serial_printf("strlen = %d\n", strlen(m->message));
     klog(m->message);
 
     char *cmd = strsep(&m->message, " ");

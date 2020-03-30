@@ -1,9 +1,25 @@
 #include "idt.h"
 #include "../../kernel/drivers/io.h"
+#include "../../kernel/libk/debug.h"
 
 struct IDT_entry IDT[256];
 
+extern "C" void interrupt_enable() { asm volatile("sti"); }
+
+extern "C" void interrupt_disable() { asm volatile("cli"); }
+
+void init_timer(uint32_t freq) {
+  dbg() << "Setting timer freq to " << freq;
+  uint32_t divisor = 1193180 / freq;
+  outb(0x43, 0x36);
+  uint8_t l = (uint8_t)(divisor & 0xFF);
+  uint8_t h = (uint8_t)((divisor >> 8) & 0xFF);
+  outb(0x40, l);
+  outb(0x40, h);
+}
+
 extern "C" void idt_init() {
+  dbg() << "IDT init";
   extern int load_idt(void *);
   extern int irq0();
   extern int irq1();

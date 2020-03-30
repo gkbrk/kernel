@@ -8,7 +8,8 @@ OBJ_FILES += $(patsubst ./%.cpp, build/%.o, $(CPP_FILES))
 OBJ_FILES += build/arch/x86/irq_handlers.o
 
 CC = i686-elf-gcc
-CFLAGS=-std=gnu99 -ffreestanding -Os -flto
+CFLAGS=-std=gnu99 -ffreestanding
+CFLAGS += -Os -flto
 CFLAGS += -Wall -Wextra -pedantic
 
 CXX = i686-elf-c++
@@ -51,7 +52,7 @@ tar-drive.tar: $(shell find tar-drive/ -type f)
 	cd tar-drive; tar cvf ../tar-drive.tar *
 
 run: all tar-drive.tar
-	qemu-system-x86_64 -serial mon:stdio -kernel build/leonardo.bin -hda tar-drive.tar -d guest_errors -soundhw pcspk
+	qemu-system-x86_64 -serial mon:stdio -kernel build/leonardo.bin -hda tar-drive.tar -d guest_errors -soundhw pcspk -d cpu_reset -m 512
 .PHONY: run
 
 iso: all

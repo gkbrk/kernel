@@ -24,6 +24,8 @@ _start:
     mov esp, stack_top ; Set the stack pointer
     
     extern kernel_main
+    push eax
+    push ebx
     call kernel_main
     
     cli

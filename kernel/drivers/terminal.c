@@ -7,7 +7,7 @@ size_t terminal_column;
 uint8_t terminal_color;
 volatile uint16_t *terminal_buffer;
 
-volatile bool locked = false;
+static volatile bool locked;
 
 void terminal_lock() {
   while (locked)

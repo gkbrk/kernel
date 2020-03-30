@@ -1,8 +1,7 @@
 #pragma once
 
+#include "alloc.h"
 #include <stddef.h>
-
-extern "C" void *kmalloc_forever(size_t size);
 
 template <typename T> class Vector {
 public:
@@ -11,8 +10,10 @@ public:
   Vector(size_t cap) {
     size = 0;
     capacity = cap;
-    values = static_cast<T *>(kmalloc_forever(cap * sizeof(T)));
+    values = static_cast<T *>(kmalloc(cap * sizeof(T)));
   }
+
+  ~Vector() { kmfree(values); }
 
   void push(T value) { values[size++] = value; }
 
