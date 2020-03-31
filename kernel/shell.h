@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Random.h"
 #include "drivers/keyboard.h"
 #include "libk/String.h"
 #include "libk/StringBuilder.h"
@@ -31,6 +32,14 @@ void shell_mem(char *args) {
   dbg() << "Memory usage: " << getMemUsage() << " bytes";
   terminal_lock();
   kprintf("Memory usage: %d bytes\n", getMemUsage());
+  terminal_unlock();
+}
+
+void shell_rand(char *) {
+  auto num = Kernel::random_prng<int16_t>();
+
+  terminal_lock();
+  kprintf("Your random number is %d\n", num);
   terminal_unlock();
 }
 
@@ -156,7 +165,8 @@ ShellCommand commands[] = {
     {"ps", "Process list", shell_ps},
     {"msg", "Send a message to a process", shell_msg},
     {"pkill", "Kill a process", shell_pkill},
-    {"mem", "Display memory usage", shell_mem}
+    {"mem", "Display memory usage", shell_mem},
+    {"rand", "Generate a random number", shell_rand}
     /*
     {.name = "clear", .function = shell_clear, .desc = "Clears the console"},
     {.name = "mem",
