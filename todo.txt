@@ -1,12 +1,21 @@
 [Keyboard driver]
 - Return arrow key presses
+- Key buffer instead of polling
 
 [Shell improvements]
 - Cursor movement support
 - Command history
 
+[libk]
+- Realloc support for Vectors
+
+[Scheduler]
+- Replace static Task array with a Vector
+- Push current task to end of Vector on yield
+
 [Interrupts]
 - Syscall
+- Notify keyboard driver on IRQ
 
 [Cleanup]
 - Move code to namespaces
