@@ -10,6 +10,7 @@
 #include "kernel/drivers/terminal.h"
 #include "kernel/drivers/vga.h"
 #include "kernel/fs/tarfs.h"
+#include "kernel/libk/String.h"
 #include "kernel/libk/alloc.h"
 #include "kernel/libk/debug.h"
 #include "kernel/libk/log.h"
@@ -20,8 +21,8 @@ static void time_task() {
   size_t oldLen = 0;
 
   while (true) {
-    char *t = cmos_formatted_time();
-    size_t len = strlen(t);
+    String t = cmos_formatted_string();
+    size_t len = t.length();
 
     terminal_lock();
     size_t old_col = terminal_column;
@@ -39,7 +40,7 @@ static void time_task() {
     terminal_row = 0;
     terminal_column = VGA_WIDTH - len;
     terminal_setcolor(vga_entry_color(VGA_COLOR_BLACK, VGA_COLOR_WHITE));
-    terminal_writestring(t);
+    terminal_writestring(t.c_str());
     terminal_setcolor(old_color);
 
     terminal_row = old_row;
@@ -48,7 +49,6 @@ static void time_task() {
 
     oldLen = len;
 
-    kmfree(t);
     yield();
   }
 }
@@ -67,7 +67,7 @@ extern "C" void kernel_main(multiboot_info_t *mb, unsigned int magic) {
   }
 
   // Skip from the start of memory
-  alloc_begin += 1024 * 1024 * 15;
+  alloc_begin += 1024 * 1024 * 150;
   alloc_start = alloc_begin;
 
   kmalloc_init();
@@ -94,11 +94,12 @@ extern "C" void kernel_main(multiboot_info_t *mb, unsigned int magic) {
   size_t iter = 0;
   while (true) {
     iter++;
-    if (iter % 50000 == 0)
+    if (false && iter % 50000 == 0)
       dbg() << "Mem usage: "
             << ((long unsigned int)alloc_begin -
                 (long unsigned int)alloc_start) /
-                   1024 / 1024;
+                   1024
+            << " KB";
     yield();
   }
 }

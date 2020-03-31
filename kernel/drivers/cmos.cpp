@@ -1,5 +1,6 @@
 #include <stdint.h>
 
+#include "../libk/StringBuilder.h"
 #include "../libk/alloc.h"
 #include "../libk/string.h"
 #include "cmos.h"
@@ -121,13 +122,20 @@ void cmos_update_time() {
   }
 }
 
-char *cmos_formatted_time() {
+String cmos_formatted_string() {
   cmos_update_time(); // Update time
-  char *str = kmalloc(64);
+  StringBuilder b;
+  b.append((size_t)cmos_hour);
+  b.append(":");
+  b.append((size_t)cmos_minute);
+  b.append(":");
+  b.append((size_t)cmos_second);
+  return b.to_string();
+}
 
-  sprintf(str, "%d:%d:%d", cmos_hour, cmos_minute, cmos_second);
-
-  return str;
+extern "C" char *cmos_formatted_time() {
+  String t = cmos_formatted_string();
+  return strdup(t.c_str());
 }
 
 static bool cmos_init() {
@@ -135,5 +143,7 @@ static bool cmos_init() {
   return true;
 }
 
+static bool dt() { return true; }
+
 driverDefinition CMOS_DRIVER = {
-    .name = "CMOS Chip", .isAvailable = driver_true, .initialize = cmos_init};
+    .name = "CMOS Chip", .isAvailable = dt, .initialize = cmos_init};

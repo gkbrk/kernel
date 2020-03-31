@@ -6,12 +6,12 @@
 Message *message_get(MessagePort *port) {
   while (port->status == 0)
     yield();
-  void *msg = port->message;
+  volatile void *msg = port->message;
   port->status = 0;
   return msg;
 }
 
-void message_put(MessagePort *port, void *message) {
+void message_put(volatile MessagePort *port, void *message) {
   while (port->status != 0)
     yield();
   port->message = message;

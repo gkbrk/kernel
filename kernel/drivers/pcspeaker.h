@@ -6,11 +6,8 @@
 
 class PCSpeaker : public Driver {
 public:
-  char *name() override;
+  const char *name() override { return "PC Speaker"; };
   bool initialize() override;
   void playFreq(uint32_t freq);
   void noSound();
-
-private:
-  char *m_name = "PC Speaker";
 };

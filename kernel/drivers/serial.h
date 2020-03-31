@@ -11,6 +11,8 @@
 extern "C" {
 #endif
 
+void serial_lock();
+void serial_unlock();
 char serial_read();
 void serial_write_char(char a);
 void serial_write(const char *data, size_t size);

@@ -1,10 +1,8 @@
 #include "pcspeaker.h"
+#include "../libk/log.h"
 #include "io.h"
 
-extern "C" void klog(char *c);
 extern "C" void yield();
-
-char *PCSpeaker::name() { return m_name; }
 
 bool PCSpeaker::initialize() {
   Driver::initialize();

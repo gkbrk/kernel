@@ -5,6 +5,11 @@
 #define CURRENT_YEAR 2020
 
 #ifdef __cplusplus
+
+#include "../libk/String.h"
+
+String cmos_formatted_string();
+
 extern "C" {
 #endif
 

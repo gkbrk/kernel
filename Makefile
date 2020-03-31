@@ -14,6 +14,7 @@ CFLAGS += -Wall -Wextra -pedantic
 
 CXX = i686-elf-c++
 CXXFLAGS = -Os -flto
+CXXFLAGS += -DDEBUG
 CXXFLAGS += -Wall -Wextra -fno-exceptions -fno-rtti -ffreestanding
 
 .INTERMEDIATE: $(OBJ_FILES)
@@ -52,7 +53,7 @@ tar-drive.tar: $(shell find tar-drive/ -type f)
 	cd tar-drive; tar cvf ../tar-drive.tar *
 
 run: all tar-drive.tar
-	qemu-system-x86_64 -serial mon:stdio -kernel build/leonardo.bin -hda tar-drive.tar -d guest_errors -soundhw pcspk -d cpu_reset -m 512
+	qemu-system-x86_64 -serial mon:stdio -kernel build/leonardo.bin -hda tar-drive.tar -d guest_errors -soundhw pcspk -d cpu_reset -m 1024
 .PHONY: run
 
 iso: all

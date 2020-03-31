@@ -3,6 +3,7 @@
 #include "scheduler.h"
 
 #include "libk/alloc.h"
+#include "libk/log.h"
 #include "libk/string.h"
 
 Task *runningTask;
@@ -54,7 +55,7 @@ void killTask(Task *t) {
   }
 }
 
-void spawnTask(void (*main)(), char *name) {
+void spawnTask(void (*main)(), const char *name) {
   klog("Spawning new task");
   klog(name);
 

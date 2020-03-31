@@ -21,6 +21,8 @@ public:
 
   T get(size_t index) { return values[index]; }
 
+  T operator[](size_t index) { return get(index); }
+
   void clear() { size = 0; }
 
   template <typename F> void forEach(F lambda) {

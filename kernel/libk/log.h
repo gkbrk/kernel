@@ -5,4 +5,4 @@ extern "C"
 #endif
 
     void
-    klog(char *s);
+    klog(const char *s);

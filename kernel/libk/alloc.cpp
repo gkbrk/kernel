@@ -2,7 +2,18 @@
 
 #include "../drivers/serial.h"
 #include "alloc.h"
+#include "assert.h"
 #include "string.h"
+
+static volatile bool lock = false;
+
+static void mem_lock() {
+  while (lock)
+    ;
+  lock = true;
+}
+
+static void mem_unlock() { lock = false; }
 
 struct AllocTableItem {
   bool free;
@@ -24,24 +35,31 @@ extern "C" void kmalloc_init() {
 }
 
 void *kmalloc(size_t size) {
+  mem_lock();
   for (size_t i = 0; i < 4096; i++) {
     AllocTableItem *item = &allocTable[i];
     if (item->free) {
       item->free = false;
+      mem_unlock();
       return item->ptr;
     }
   }
+  mem_unlock();
+  ASSERT(false);
   return NULL;
 }
 
 extern "C" void kmfree(void *ptr) {
+  mem_lock();
   for (size_t i = 0; i < 4096; i++) {
     AllocTableItem *item = &allocTable[i];
     if (item->ptr == ptr) {
       item->free = true;
+      mem_unlock();
       return;
     }
   }
+  mem_unlock();
 }
 
 void kfree(void *ptr) { kmfree(ptr); }

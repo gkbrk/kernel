@@ -2,44 +2,30 @@
 
 #include "../drivers/serial.h"
 #include "../scheduler.h"
+#include "MemoryView.h"
+#include "String.h"
 #include "string.h"
 #include "vector.h"
 
 class DebugPrinter {
 public:
-  DebugPrinter() {}
-  ~DebugPrinter() {
+  DebugPrinter() {
+    serial_lock();
     serial_writestring("\033[33m[");
     serial_writestring(runningTask->name);
     serial_writestring("]\033[0m ");
-    m_buffer.forEach([](auto c) {
-      serial_writestring(c);
-      kmfree(c);
-    });
+  }
+
+  ~DebugPrinter() {
     serial_write_char('\n');
+    serial_unlock();
   }
 
-  DebugPrinter &operator<<(char *str) {
-    m_buffer.push(strdup(str));
-    return *this;
-  }
-
-  DebugPrinter &operator<<(size_t num) {
-    char buf[64] = {0};
-    itoa(num, buf);
-    m_buffer.push(strdup(buf));
-    return *this;
-  }
-
-  DebugPrinter &operator<<(void *ptr) {
-    char buf[64] = {0};
-    sprintf(buf, "%u", ptr);
-    m_buffer.push(strdup(buf));
-    return *this;
-  }
-
-private:
-  Vector<char *> m_buffer;
+  void write(char c) const { serial_write_char(c); }
 };
 
-DebugPrinter dbg();
+const DebugPrinter &operator<<(const DebugPrinter &, const char *);
+const DebugPrinter &operator<<(const DebugPrinter &, const String &);
+const DebugPrinter &operator<<(const DebugPrinter &, size_t);
+
+const DebugPrinter dbg();

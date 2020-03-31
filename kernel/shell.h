@@ -1,6 +1,8 @@
 #pragma once
 
 #include "drivers/keyboard.h"
+#include "libk/String.h"
+#include "libk/StringBuilder.h"
 #include "libk/debug.h"
 #include "libk/messaging.h"
 #include "libk/printf.h"
@@ -10,8 +12,8 @@
 #include <stddef.h>
 
 typedef struct {
-  char *name;
-  char *desc;
+  const char *name;
+  const char *desc;
   void (*function)(char *args);
 } ShellCommand;
 
@@ -34,7 +36,7 @@ void shell_ps(char *args) {
     Task *t = &tasks[i];
 
     if (t->name != NULL) {
-      char *c = "";
+      const char *c = "";
       if (runningTask == t) {
         c = "[current task]";
       }
@@ -46,22 +48,6 @@ void shell_ps(char *args) {
 void shell_pkill(char *args) {
   Task *t = findTaskByName(args);
   killTask(t);
-}
-
-void msg() {
-  while (true) {
-    Task *t = findTaskByName("logger");
-    if (t == NULL || t->name == NULL)
-      yield();
-    Message m;
-    memset(&m, '\0', sizeof(Message));
-    char *c = "Hello";
-    m.message = static_cast<volatile void *>(c);
-    message_put(&t->port, &m);
-    kprintf("Resp: %s\n", message_get_response(&m));
-    exitTask();
-    yield();
-  }
 }
 
 void shell_msg(char *args) {
@@ -192,16 +178,14 @@ void shell_help(char *args) {
           "`read help.txt`\n");
 }
 
-char *shell_read_line() {
+String shell_read_line() {
   dbg() << "Reading a line";
   terminal_lock();
   terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK));
   terminal_writestring("> ");
   terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
   terminal_unlock();
-  char *cmd = static_cast<char *>(kmalloc(256));
-  memset(cmd, '\0', 256);
-  size_t i = 0;
+  StringBuilder cmd;
 
   while (true) {
     terminal_lock();
@@ -209,9 +193,8 @@ char *shell_read_line() {
     terminal_unlock();
     char key = keyboardSpinLoop();
     if (key == '\b') {
-      if (i) {
-        i--;
-        cmd[i] = '\0';
+      if (cmd.length() > 0) {
+        cmd.unsafe_set_length(cmd.length() - 1);
         terminal_lock();
         terminal_column--;
         terminal_putchar(' ');
@@ -224,13 +207,14 @@ char *shell_read_line() {
     terminal_putchar(key);
     terminal_unlock();
 
-    if (key == '\n')
+    if (key == '\n') {
       break;
-    cmd[i] = key;
-    i++;
+    } else {
+      cmd.append(key);
+    }
   }
 
-  return cmd;
+  return cmd.to_string();
 }
 
 void shell() {
@@ -241,43 +225,50 @@ void shell() {
           "\n"
           "In order to read the quickstart guide, type `read help.txt`.\n");
 
-  Vector<char *> history;
+  Vector<String> history;
 
   while (true) {
-    char *input = shell_read_line();
+    String input = shell_read_line();
+    dbg() << "Input: " << input;
 
-    char *cmd = strsep(&input, " ");
+    auto parts = input.split_at(' ');
 
-    if (strcmp(cmd, "") == 0) {
-      kmfree(cmd);
+    auto cmd = parts.first();
+
+    dbg() << "Command = " << cmd;
+
+    if (cmd == "") {
       continue;
     }
 
     dbg() << "Executing command " << cmd;
 
-    history.push(strdup(cmd));
+    history.push(cmd);
+
     bool executed = false;
     for (size_t i = 0; i < sizeof(commands) / sizeof(ShellCommand); i++) {
-      if (strcmp(cmd, commands[i].name) == 0) {
-        commands[i].function(input);
+      if (cmd == commands[i].name) {
+        commands[i].function(parts.second().c_str());
         executed = true;
         break;
       }
     }
 
-    if (streq("history", cmd)) {
+    if (cmd == "history") {
       history.forEach([](auto c) { kprintf("%s\n", c); });
     }
 
-    if (streq("pop", cmd)) {
+    if (cmd == "pop") {
       history.pop();
-      kprintf("%s\n", history.pop());
+      kprintf("%s\n", history.pop().c_str());
     }
 
     if (!executed) {
-      kprintf("Unknown command %s. Try typing \"help\".\n", cmd);
+      StringBuilder b;
+      b.append("Unknown command ");
+      b.append(cmd);
+      b.append(". Try typing \"help\".\n");
+      kprintf("%s", b.to_string().c_str());
     }
-
-    kmfree(cmd);
   }
 }
