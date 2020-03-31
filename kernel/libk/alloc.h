@@ -7,6 +7,8 @@ extern void *alloc_start;
 extern void *alloc_begin;
 
 #ifdef __cplusplus
+size_t getMemUsage();
+
 extern "C" {
 #endif
 

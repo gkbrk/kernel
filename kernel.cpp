@@ -67,7 +67,7 @@ extern "C" void kernel_main(multiboot_info_t *mb, unsigned int magic) {
   }
 
   // Skip from the start of memory
-  alloc_begin += 1024 * 1024 * 150;
+  alloc_begin += 1024 * 1024 * 5;
   alloc_start = alloc_begin;
 
   kmalloc_init();
@@ -82,7 +82,7 @@ extern "C" void kernel_main(multiboot_info_t *mb, unsigned int magic) {
 
   klog("Loading IDT, here we go");
   idt_init();
-  init_timer(1024);
+  init_timer(50);
 
   klog("Booting kernel");
   terminal_writestring("Booting kernel...\n");

@@ -1,6 +1,5 @@
 #include <stddef.h>
 
-#include "../drivers/serial.h"
 #include "alloc.h"
 #include "assert.h"
 #include "string.h"
@@ -23,22 +22,36 @@ struct AllocTableItem {
 
 static AllocTableItem *allocTable;
 
+static const size_t numBlocks = 8096;
+
 extern "C" void kmalloc_init() {
   allocTable = static_cast<AllocTableItem *>(
-      kmalloc_forever(4096 * sizeof(AllocTableItem)));
+      kmalloc_forever(numBlocks * sizeof(AllocTableItem)));
 
-  for (size_t i = 0; i < 4096; i++) {
+  for (size_t i = 0; i < numBlocks; i++) {
     allocTable[i].free = true;
-    allocTable[i].size = 8096;
-    allocTable[i].ptr = kmalloc_forever(8096);
+    allocTable[i].size = i;
+    allocTable[i].ptr = kmalloc_forever(i);
   }
+}
+
+size_t getMemUsage() {
+  size_t used = 0;
+  mem_lock();
+  for (size_t i = 0; i < numBlocks; i++) {
+    AllocTableItem *item = &allocTable[i];
+    if (!item->free)
+      used += item->size;
+  }
+  mem_unlock();
+  return used;
 }
 
 void *kmalloc(size_t size) {
   mem_lock();
-  for (size_t i = 0; i < 4096; i++) {
+  for (size_t i = 0; i < numBlocks; i++) {
     AllocTableItem *item = &allocTable[i];
-    if (item->free) {
+    if (item->size >= size && item->free) {
       item->free = false;
       mem_unlock();
       return item->ptr;
@@ -51,7 +64,7 @@ void *kmalloc(size_t size) {
 
 extern "C" void kmfree(void *ptr) {
   mem_lock();
-  for (size_t i = 0; i < 4096; i++) {
+  for (size_t i = 0; i < numBlocks; i++) {
     AllocTableItem *item = &allocTable[i];
     if (item->ptr == ptr) {
       item->free = true;

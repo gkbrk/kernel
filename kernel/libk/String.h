@@ -69,6 +69,7 @@ public:
 
   bool operator==(String &other) { return streq(m_value, other.c_str()); }
   bool operator==(String other) { return streq(m_value, other.c_str()); }
+  bool operator==(const char *other) const { return streq(m_value, other); }
 
   MemoryView as_view() { return MemoryView(m_value, m_size); }
 

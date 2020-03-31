@@ -27,6 +27,13 @@ void shell_echo(char *arg) {
 
 void shell_clear(char *args) { sendMessageToTask("terminal-driver", "clear"); }
 
+void shell_mem(char *args) {
+  dbg() << "Memory usage: " << getMemUsage() << " bytes";
+  terminal_lock();
+  kprintf("Memory usage: %d bytes\n", getMemUsage());
+  terminal_unlock();
+}
+
 void shell_help(char *args);
 
 void shell_ps(char *args) {
@@ -147,7 +154,8 @@ ShellCommand commands[] = {
     {"read", "Read the contents of a file", shell_read},
     {"ps", "Process list", shell_ps},
     {"msg", "Send a message to a process", shell_msg},
-    {"pkill", "Kill a process", shell_pkill}
+    {"pkill", "Kill a process", shell_pkill},
+    {"mem", "Display memory usage", shell_mem}
     /*
     {.name = "clear", .function = shell_clear, .desc = "Clears the console"},
     {.name = "mem",
