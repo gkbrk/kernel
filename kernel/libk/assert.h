@@ -9,6 +9,9 @@
       serial_lock();                                                           \
       serial_writestring("ASSERTION FAILED\n");                                \
       serial_printf("%s:%s:%d\n", __func__, __FILE__, __LINE__);               \
-      serial_unlock();                                                         \
+      asm("cli");                                                              \
+      asm("hlt");                                                              \
     }                                                                          \
   } while (0)
+
+#define ASSERT_NOT_REACHED ASSERT(false)

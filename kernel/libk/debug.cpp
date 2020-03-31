@@ -1,7 +1,23 @@
 #include "debug.h"
 #include "../drivers/serial.h"
+#include "../scheduler.h"
+#include "assert.h"
 
 const DebugPrinter dbg() { return DebugPrinter(); }
+
+DebugPrinter::DebugPrinter() {
+  serial_lock();
+  serial_writestring("\033[33m[");
+  serial_writestring(runningTask->name);
+  serial_writestring("]\033[0m ");
+}
+
+DebugPrinter::~DebugPrinter() {
+  serial_write_char('\n');
+  serial_unlock();
+}
+
+void DebugPrinter::write(char c) const { serial_write_char(c); }
 
 const DebugPrinter &operator<<(const DebugPrinter &printer, char c) {
   printer.write(c);
@@ -9,6 +25,7 @@ const DebugPrinter &operator<<(const DebugPrinter &printer, char c) {
 }
 
 const DebugPrinter &operator<<(const DebugPrinter &printer, const char *str) {
+  ASSERT(str != NULL);
   for (size_t i = 0; i < strlen(str); i++)
     printer.write(str[i]);
   return printer;

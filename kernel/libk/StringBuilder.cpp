@@ -1,6 +1,7 @@
 #include "StringBuilder.h"
 #include "String.h"
 #include "alloc.h"
+#include "assert.h"
 #include "debug.h"
 
 StringBuilder::StringBuilder() {
@@ -12,6 +13,7 @@ StringBuilder::~StringBuilder() { kmfree(m_buffer); }
 
 void StringBuilder::append(char c) {
   m_buffer = static_cast<char *>(kmrealloc(m_buffer, m_size + 1));
+  ASSERT(m_buffer != NULL);
   m_buffer[m_size] = c;
   m_size++;
 }
@@ -25,7 +27,6 @@ void StringBuilder::append(const char *str) {
 void StringBuilder::append(String str) {
   for (size_t i = 0; i < str.length(); i++) {
     append(str[i]);
-    dbg() << "Appending " << str.get(i);
   }
 }
 
@@ -39,4 +40,7 @@ String StringBuilder::to_string() const { return String(m_buffer, m_size); }
 
 size_t StringBuilder::length() const { return m_size; }
 
-void StringBuilder::unsafe_set_length(size_t length) { m_size = length; }
+void StringBuilder::unsafe_set_length(size_t length) {
+  ASSERT(length <= m_size);
+  m_size = length;
+}

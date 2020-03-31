@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../drivers/serial.h"
 #include "../scheduler.h"
+#include "assert.h"
 
 class Spinlock {
 public:
@@ -13,7 +13,10 @@ public:
     m_locked = true;
   }
 
-  void unlock() { m_locked = false; }
+  void unlock() {
+    ASSERT(m_locked);
+    m_locked = false;
+  }
 
 private:
   volatile bool m_locked;

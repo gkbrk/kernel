@@ -1,5 +1,7 @@
 #pragma once
 
+#include "assert.h"
+
 template <typename T> class Option {
 public:
   Option(T val) {
@@ -17,7 +19,10 @@ public:
     }
   }
 
-  T value() { return m_val; }
+  T value() {
+    ASSERT(m_has_value);
+    return m_val;
+  }
 
   bool is_some() { return m_has_value; }
 

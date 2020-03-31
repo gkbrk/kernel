@@ -15,7 +15,7 @@ struct AllocTableItem {
 
 static AllocTableItem *allocTable;
 
-static const size_t numBlocks = 4096;
+static const size_t numBlocks = 8192;
 
 extern "C" void kmalloc_init() {
   allocTable = static_cast<AllocTableItem *>(
@@ -53,7 +53,7 @@ extern "C" void *kmalloc(size_t size) {
     }
   }
   lock.unlock();
-  ASSERT(false);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -93,11 +93,13 @@ extern "C" void *kmrealloc(void *ptr, size_t size) {
     }
   }
   lock.unlock();
-  ASSERT(false);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
 extern "C" void kmfree(void *ptr) {
+  if (ptr == NULL)
+    return;
   lock.lock();
   for (size_t i = 0; i < numBlocks; i++) {
     AllocTableItem *item = &allocTable[i];
@@ -108,6 +110,7 @@ extern "C" void kmfree(void *ptr) {
     }
   }
   lock.unlock();
+  ASSERT_NOT_REACHED;
 }
 
 void kfree(void *ptr) { kmfree(ptr); }

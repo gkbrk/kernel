@@ -75,6 +75,7 @@ void shell_msg(char *args) {
 }
 
 void shell_ls(char *args) {
+  ASSERT_NOT_REACHED;
   Task *t = findTaskByName("tarfs");
   if (t == NULL || t->name == NULL)
     return;

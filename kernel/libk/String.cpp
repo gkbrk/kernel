@@ -7,6 +7,7 @@
 
 String::String(const char *str, size_t size) {
   m_value = static_cast<char *>(kmalloc(size + 1));
+  ASSERT(m_value != NULL);
   memcpy(m_value, str, size);
   m_value[size] = 0;
   m_size = size;
