@@ -1,5 +1,20 @@
 #include "StringBuilder.h"
 #include "String.h"
+#include "alloc.h"
+#include "debug.h"
+
+StringBuilder::StringBuilder() {
+  m_size = 0;
+  m_buffer = NULL;
+}
+
+StringBuilder::~StringBuilder() { kmfree(m_buffer); }
+
+void StringBuilder::append(char c) {
+  m_buffer = static_cast<char *>(kmrealloc(m_buffer, m_size + 1));
+  m_buffer[m_size] = c;
+  m_size++;
+}
 
 void StringBuilder::append(const char *str) {
   for (size_t i = 0; i < strlen(str); i++) {
@@ -10,6 +25,7 @@ void StringBuilder::append(const char *str) {
 void StringBuilder::append(String str) {
   for (size_t i = 0; i < str.length(); i++) {
     append(str[i]);
+    dbg() << "Appending " << str.get(i);
   }
 }
 
@@ -18,3 +34,9 @@ void StringBuilder::append(size_t num) {
   itoa(num, buf);
   append(buf);
 }
+
+String StringBuilder::to_string() const { return String(m_buffer, m_size); }
+
+size_t StringBuilder::length() const { return m_size; }
+
+void StringBuilder::unsafe_set_length(size_t length) { m_size = length; }

@@ -19,8 +19,12 @@
 
 static void time_task() {
   size_t oldLen = 0;
+  size_t iter = 0;
 
   while (true) {
+    iter++;
+    if (iter % 5000000 != 0)
+      continue;
     String t = cmos_formatted_string();
     size_t len = t.length();
 

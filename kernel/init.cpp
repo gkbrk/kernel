@@ -3,6 +3,7 @@
 #include "drivers/loader.h"
 #include "drivers/serial.h"
 #include "libk/alloc.h"
+#include "libk/debug.h"
 #include "libk/log.h"
 #include "scheduler.h"
 #include <stdint.h>
@@ -43,10 +44,10 @@ extern "C" void init(multiboot_info_t *mb, unsigned int magic) {
   klog("Loading IDT, here we go");
   idt_init();
 
-  serial_printf("Start ctors at %p\n", &start_ctors);
-  serial_printf("End ctors at %p\n", &end_ctors);
+  dbg() << "Start ctors at " << &start_ctors;
+  dbg() << "End ctors at " << &end_ctors;
   for (ctor_func_t *ctor = &start_ctors; ctor < &end_ctors; ctor++) {
-    serial_writestring("Calling init on a thing\n");
+    dbg() << "Calling global constructor at " << ctor;
     (*ctor)();
   }
 

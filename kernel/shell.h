@@ -276,7 +276,8 @@ void shell() {
       b.append("Unknown command ");
       b.append(cmd);
       b.append(". Try typing \"help\".\n");
-      kprintf("%s", b.to_string().c_str());
+      b.to_string().print();
+      // kprintf("%s", s.c_str());
     }
   }
 }

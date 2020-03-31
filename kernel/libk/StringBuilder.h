@@ -1,32 +1,21 @@
 #pragma once
 
-#include "MemoryView.h"
 #include "String.h"
 
 class StringBuilder {
 public:
-  StringBuilder() {
-    m_size = 0;
-    m_buffer = static_cast<char *>(kmalloc(0));
-  }
+  StringBuilder();
+  ~StringBuilder();
 
-  ~StringBuilder() { kmfree(m_buffer); }
-
-  void append(char c) {
-    m_buffer = static_cast<char *>(kmrealloc(m_buffer, m_size + 1));
-    m_buffer[m_size] = c;
-    m_size++;
-  }
-
+  void append(char);
   void append(const char *);
   void append(String);
   void append(size_t);
 
-  String to_string() { return String(m_buffer, m_size); }
+  String to_string() const;
+  size_t length() const;
 
-  size_t length() { return m_size; }
-
-  void unsafe_set_length(size_t new_length) { m_size = new_length; }
+  void unsafe_set_length(size_t);
 
 private:
   char *m_buffer;
