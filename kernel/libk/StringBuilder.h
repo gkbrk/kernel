@@ -5,16 +5,15 @@
 
 class StringBuilder {
 public:
-  StringBuilder() : StringBuilder(64) {}
-
-  StringBuilder(size_t size) : m_capacity{size}, m_size{0} {
-    m_buffer = static_cast<char *>(kmalloc(size));
+  StringBuilder() {
+    m_size = 0;
+    m_buffer = static_cast<char *>(kmalloc(0));
   }
 
   ~StringBuilder() { kmfree(m_buffer); }
 
   void append(char c) {
-    ASSERT(m_size + 1 <= m_capacity);
+    m_buffer = static_cast<char *>(kmrealloc(m_buffer, m_size + 1));
     m_buffer[m_size] = c;
     m_size++;
   }
@@ -31,6 +30,5 @@ public:
 
 private:
   char *m_buffer;
-  size_t m_capacity;
   size_t m_size;
 };

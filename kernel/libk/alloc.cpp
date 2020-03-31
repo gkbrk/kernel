@@ -22,7 +22,7 @@ struct AllocTableItem {
 
 static AllocTableItem *allocTable;
 
-static const size_t numBlocks = 8096;
+static const size_t numBlocks = 4096;
 
 extern "C" void kmalloc_init() {
   allocTable = static_cast<AllocTableItem *>(
@@ -47,12 +47,54 @@ size_t getMemUsage() {
   return used;
 }
 
-void *kmalloc(size_t size) {
+extern "C" void *kmalloc(size_t size) {
+  if (size == 0)
+    return NULL;
   mem_lock();
   for (size_t i = 0; i < numBlocks; i++) {
     AllocTableItem *item = &allocTable[i];
     if (item->size >= size && item->free) {
       item->free = false;
+      mem_unlock();
+      return item->ptr;
+    }
+  }
+  mem_unlock();
+  ASSERT(false);
+  return NULL;
+}
+
+template <typename T> static T min(T v1, T v2) {
+  if (v1 <= v2) {
+    return v1;
+  } else {
+    return v2;
+  }
+}
+
+extern "C" void *kmrealloc(void *ptr, size_t size) {
+  if (ptr == NULL)
+    return kmalloc(size);
+
+  mem_lock();
+  AllocTableItem *existing = NULL;
+
+  for (size_t i = 0; i < numBlocks; i++) {
+    AllocTableItem *item = &allocTable[i];
+    if (item->ptr == ptr && !item->free) {
+      existing = item;
+      break;
+    }
+  }
+
+  ASSERT(existing != NULL);
+
+  for (size_t i = 0; i < numBlocks; i++) {
+    AllocTableItem *item = &allocTable[i];
+    if (item->size >= size && item->free) {
+      item->free = false;
+      memcpy(item->ptr, ptr, min(existing->size, item->size));
+      existing->free = true;
       mem_unlock();
       return item->ptr;
     }
