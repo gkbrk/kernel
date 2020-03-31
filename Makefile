@@ -23,7 +23,8 @@ all: build/leonardo.bin
 .PHONY: all
 
 build/leonardo.bin: $(OBJ_FILES) build/switchTask.o build/boot.o
-	$(CC) -T linker.ld -flto -nostdlib -Os -o "$@" $^ -lgcc
+	$(CC) -T linker.ld -flto -nostdlib -fno-stack-protector \
+	-Os -o "$@" $^ -lgcc
 
 build/boot.o: boot.asm
 	mkdir -p "$(@D)"

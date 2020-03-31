@@ -2,17 +2,10 @@
 
 #include "alloc.h"
 #include "assert.h"
+#include "spinlock.h"
 #include "string.h"
 
-static volatile bool lock = false;
-
-static void mem_lock() {
-  while (lock)
-    ;
-  lock = true;
-}
-
-static void mem_unlock() { lock = false; }
+static Spinlock lock;
 
 struct AllocTableItem {
   bool free;
@@ -37,29 +30,29 @@ extern "C" void kmalloc_init() {
 
 size_t getMemUsage() {
   size_t used = 0;
-  mem_lock();
+  lock.lock();
   for (size_t i = 0; i < numBlocks; i++) {
     AllocTableItem *item = &allocTable[i];
     if (!item->free)
       used += item->size;
   }
-  mem_unlock();
+  lock.unlock();
   return used;
 }
 
 extern "C" void *kmalloc(size_t size) {
   if (size == 0)
     return NULL;
-  mem_lock();
+  lock.lock();
   for (size_t i = 0; i < numBlocks; i++) {
     AllocTableItem *item = &allocTable[i];
     if (item->size >= size && item->free) {
       item->free = false;
-      mem_unlock();
+      lock.unlock();
       return item->ptr;
     }
   }
-  mem_unlock();
+  lock.unlock();
   ASSERT(false);
   return NULL;
 }
@@ -76,7 +69,7 @@ extern "C" void *kmrealloc(void *ptr, size_t size) {
   if (ptr == NULL)
     return kmalloc(size);
 
-  mem_lock();
+  lock.lock();
   AllocTableItem *existing = NULL;
 
   for (size_t i = 0; i < numBlocks; i++) {
@@ -95,26 +88,26 @@ extern "C" void *kmrealloc(void *ptr, size_t size) {
       item->free = false;
       memcpy(item->ptr, ptr, min(existing->size, item->size));
       existing->free = true;
-      mem_unlock();
+      lock.unlock();
       return item->ptr;
     }
   }
-  mem_unlock();
+  lock.unlock();
   ASSERT(false);
   return NULL;
 }
 
 extern "C" void kmfree(void *ptr) {
-  mem_lock();
+  lock.lock();
   for (size_t i = 0; i < numBlocks; i++) {
     AllocTableItem *item = &allocTable[i];
     if (item->ptr == ptr) {
       item->free = true;
-      mem_unlock();
+      lock.unlock();
       return;
     }
   }
-  mem_unlock();
+  lock.unlock();
 }
 
 void kfree(void *ptr) { kmfree(ptr); }

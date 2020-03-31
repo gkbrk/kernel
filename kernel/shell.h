@@ -39,7 +39,7 @@ void shell_help(char *args);
 void shell_ps(char *args) {
   (void)args;
 
-  for (int i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
+  for (size_t i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
     Task *t = &tasks[i];
 
     if (t->name != NULL) {

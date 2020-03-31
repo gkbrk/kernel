@@ -1,17 +1,20 @@
 #pragma once
 
+#include "../drivers/serial.h"
 #include "../scheduler.h"
 
 class Spinlock {
 public:
+  Spinlock() : m_locked{false} {}
+
   void lock() {
-    while (locked)
+    while (m_locked)
       yield();
-    locked = true;
+    m_locked = true;
   }
 
-  void unlock() { locked = false; }
+  void unlock() { m_locked = false; }
 
 private:
-  volatile bool locked = true;
+  volatile bool m_locked;
 };
