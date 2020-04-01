@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-extern void *alloc_start;
 extern void *alloc_begin;
 
 #ifdef __cplusplus

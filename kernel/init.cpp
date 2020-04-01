@@ -28,7 +28,6 @@ extern "C" void init(multiboot_info_t *mb, unsigned int magic) {
 
   // Skip from the start of memory
   alloc_begin += 1024 * 1024 * 5;
-  alloc_start = alloc_begin;
 
   kmalloc_init();
 

@@ -17,6 +17,14 @@ static AllocTableItem *allocTable;
 
 static const size_t numBlocks = 8192;
 
+void *alloc_begin;
+
+extern "C" void *kmalloc_forever(size_t size) {
+  void *ptr = alloc_begin;
+  alloc_begin += size;
+  return ptr;
+}
+
 extern "C" void kmalloc_init() {
   allocTable = static_cast<AllocTableItem *>(
       kmalloc_forever(numBlocks * sizeof(AllocTableItem)));
