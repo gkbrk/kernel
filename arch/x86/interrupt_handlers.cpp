@@ -4,7 +4,10 @@
 
 void endOfInterrupt() { outb(0x20, 0x20); }
 
-extern "C" void irq0_handler(void) { endOfInterrupt(); }
+extern "C" void irq0_handler(void) {
+  schedulerTimerTick(100);
+  endOfInterrupt();
+}
 
 extern "C" void irq1_handler(void) { endOfInterrupt(); }
 

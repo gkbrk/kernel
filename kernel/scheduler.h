@@ -11,7 +11,8 @@ typedef struct {
 
 typedef struct Task {
   Registers regs;
-  char *name;
+  const char *name;
+  float remainingSleep;
   volatile MessagePort port;
   struct Task *next;
 } Task;
@@ -24,6 +25,8 @@ extern "C" {
 #endif
 
 void yield();
+void schedulerTimerTick(size_t freq);
+void sleep(float duration);
 void initTasking();
 void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir);
 void killTask(Task *t);

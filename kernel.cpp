@@ -53,7 +53,15 @@ static void time_task() {
 
     oldLen = len;
 
-    yield();
+    sleep(1);
+  }
+}
+
+void memory_stats() {
+  while (true) {
+    size_t bytes = getMemUsage();
+    dbg() << "Current memory usage is " << bytes << " bytes";
+    sleep(3);
   }
 }
 
@@ -62,18 +70,10 @@ extern "C" void kernel_main() {
   terminal_writestring("Booting kernel...\n");
 
   spawnTask(time_task, "time-display");
+  spawnTask(memory_stats, "memory-stats");
   spawnTask(shell, "shell");
   spawnTask(tarfs_task, "tarfs");
 
-  size_t iter = 0;
-  while (true) {
-    iter++;
-    if (false && iter % 50000 == 0)
-      dbg() << "Mem usage: "
-            << ((long unsigned int)alloc_begin -
-                (long unsigned int)alloc_start) /
-                   1024
-            << " KB";
+  while (true)
     yield();
-  }
 }

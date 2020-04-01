@@ -51,5 +51,5 @@ extern "C" void init(multiboot_info_t *mb, unsigned int magic) {
     (*ctor)();
   }
 
-  init_timer(50);
+  init_timer(100);
 }

@@ -9,6 +9,16 @@
 Task *runningTask;
 Task tasks[20];
 
+void schedulerTimerTick(size_t freq) {
+  for (size_t i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
+    if (tasks[i].remainingSleep >= (1.0 / freq)) {
+      tasks[i].remainingSleep -= (1.0 / freq);
+    } else {
+      tasks[i].remainingSleep = 0;
+    }
+  }
+}
+
 void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir) {
   task->regs.eax = 0;
   task->regs.ebx = 0;
@@ -37,12 +47,24 @@ void initTasking() {
   runningTask = &tasks[0];
 }
 
-extern void switchTask(Registers *r1, Registers *r2);
+extern "C" void switchTask(Registers *r1, Registers *r2);
 
 void yield() {
   Task *last = runningTask;
-  runningTask = runningTask->next;
+
+  while (true) {
+    runningTask = runningTask->next;
+    if (runningTask->remainingSleep == 0) {
+      break;
+    }
+  }
+
   switchTask(&last->regs, &runningTask->regs);
+}
+
+void sleep(float duration) {
+  runningTask->remainingSleep += duration;
+  yield();
 }
 
 void killTask(Task *t) {
@@ -75,6 +97,7 @@ void spawnTask(void (*main)(), const char *name) {
   l->next = t;
   t->next = &tasks[0];
   t->name = name;
+  t->remainingSleep = 0;
 }
 
 void exitTask() { killTask(runningTask); }
