@@ -5,6 +5,8 @@
 #include "alloc.h"
 #include "assert.h"
 
+String::String(const String &other) : String::String(other.m_value, other.m_size){}
+
 String::String(const char *str, size_t size) {
   m_value = static_cast<char *>(kmalloc(size + 1));
   ASSERT(m_value != NULL);

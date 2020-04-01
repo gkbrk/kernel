@@ -75,7 +75,9 @@ String TarFS::readFile(const char *name) const {
         buf = static_cast<uint8_t *>(kmalloc(filesize));
 
         Drivers::ataDrives[0].read_sectors(sec + 1, filesize / 512 + 1, buf);
-        return String((char *)buf, filesize);
+        String s((char *)buf, filesize);
+        kmfree(buf);
+        return s;
         break;
       }
 

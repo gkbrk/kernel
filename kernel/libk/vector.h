@@ -15,6 +15,12 @@ public:
     ASSERT(m_values != NULL);
   }
 
+  Vector(const Vector& other) : Vector(other.m_capacity) {
+      for (size_t i = 0; i < other.m_size; i++) {
+          push(other[i]);
+      }
+  }
+
   ~Vector() { kmfree(m_values); }
 
   void push(T value) {

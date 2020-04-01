@@ -237,8 +237,6 @@ void shell() {
           "\n"
           "In order to read the quickstart guide, type `read help.txt`.\n");
 
-  Vector<String> history;
-
   while (true) {
     String input = shell_read_line();
     dbg() << "Input: " << input;
@@ -247,15 +245,11 @@ void shell() {
 
     auto cmd = parts.first();
 
-    dbg() << "Command = " << cmd;
-
     if (cmd == "") {
       continue;
     }
 
     dbg() << "Executing command " << cmd;
-
-    history.push(cmd);
 
     bool executed = false;
     for (size_t i = 0; i < sizeof(commands) / sizeof(ShellCommand); i++) {
@@ -264,15 +258,6 @@ void shell() {
         executed = true;
         break;
       }
-    }
-
-    if (cmd == "history") {
-      history.forEach([](auto c) { kprintf("%s\n", c); });
-    }
-
-    if (cmd == "pop") {
-      history.pop();
-      kprintf("%s\n", history.pop().c_str());
     }
 
     if (!executed) {

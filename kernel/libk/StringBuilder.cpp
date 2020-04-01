@@ -9,6 +9,12 @@ StringBuilder::StringBuilder() {
   m_buffer = NULL;
 }
 
+StringBuilder::StringBuilder(const StringBuilder& other) {
+    m_buffer = static_cast<char*>(kmalloc(other.m_size));
+    memcpy(m_buffer, other.m_buffer, other.m_size);
+    m_size = other.m_size;
+}
+
 StringBuilder::~StringBuilder() { kmfree(m_buffer); }
 
 void StringBuilder::append(char c) {

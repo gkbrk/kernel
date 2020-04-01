@@ -5,6 +5,7 @@
 class StringBuilder {
 public:
   StringBuilder();
+  StringBuilder(const StringBuilder&);
   ~StringBuilder();
 
   void append(char);
