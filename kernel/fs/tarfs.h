@@ -1,11 +1,25 @@
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "../libk/String.h"
+#include "../libk/vector.h"
 
-void tarfs_task();
+namespace Kernel::Filesystem {
 
-#ifdef __cplusplus
-}
-#endif
+class TarFS {
+public:
+  static TarFS *inst() {
+    if (s_inst == nullptr) {
+      s_inst = new TarFS;
+    }
+    return s_inst;
+  }
+
+  Vector<String> listFiles() const;
+  String readFile(const char *name) const;
+
+private:
+  TarFS() {}
+  static TarFS *s_inst;
+};
+
+} // namespace Kernel::Filesystem

@@ -62,7 +62,6 @@ extern "C" void kernel_main() {
   spawnTask(time_task, "time-display");
   spawnTask(memory_stats, "memory-stats");
   spawnTask(shell, "shell");
-  spawnTask(tarfs_task, "tarfs");
 
   Kernel::Drivers::PCSpeaker::playFreq(300, 0.1);
 

@@ -1,5 +1,4 @@
 #include "../libk/debug.h"
-#include "ata.h"
 #include "cmos.h"
 #include "cppdriver.h"
 #include "driver.h"
@@ -8,12 +7,7 @@
 
 namespace Kernel::Drivers {
 extern "C" void loadDrivers() {
-  driverDefinition drivers[] = {
-      GDT_DRIVER,
-      CMOS_DRIVER,
-      SERIAL_DRIVER,
-      ATA_DRIVER,
-  };
+  driverDefinition drivers[] = {GDT_DRIVER, CMOS_DRIVER, SERIAL_DRIVER};
 
   for (size_t i = 0; i < sizeof(drivers) / sizeof(driverDefinition); i++) {
     driverDefinition d = drivers[i];

@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "drivers/keyboard.h"
 #include "drivers/terminal.h"
+#include "drivers/pcspeaker.h"
 #include "libk/String.h"
 #include "libk/StringBuilder.h"
 #include "libk/debug.h"
@@ -10,6 +11,7 @@
 #include "libk/printf.h"
 #include "libk/string.h"
 #include "libk/vector.h"
+#include "fs/tarfs.h"
 #include "scheduler.h"
 #include <stddef.h>
 
@@ -86,46 +88,29 @@ void shell_msg(char *args) {
   }
 }
 
-void shell_ls(char *args) {
-  ASSERT_NOT_REACHED;
-  Task *t = findTaskByName("tarfs");
-  if (t == NULL || t->name == NULL)
-    return;
-  Message m;
-  memset(&m, '\0', sizeof(Message));
-  char *msg = strdup("ls");
-  m.message = msg;
+void shell_ls(char *) {
+    auto files = Filesystem::TarFS::inst()->listFiles();
 
-  message_put(&t->port, &m);
-  message_get_response(&m);
-
-  if (!streq((char *)m.response, "")) {
-    kprintf("%s\n", m.response);
-  }
-
-  kmfree(msg);
+    files.forEach([](auto file) {
+        file.print();
+        Drivers::VGATerminal::write("\n");
+    });
 }
 
-void shell_cat(char *args) {
-  Task *t = findTaskByName("tarfs");
-  if (t == NULL || t->name == NULL)
-    return;
+void shell_playMelody(char *file) {
+    auto contents = Filesystem::TarFS::inst()->readFile(file);
 
-  Message m;
-  memset(&m, '\0', sizeof(Message));
-  char *msg = static_cast<char *>(kmalloc(4 + strlen(args)));
-  m.message = msg;
-  memset((char *)m.message, '\0', 4 + strlen(args));
-  sprintf((char *)m.message, "cat %s", args);
-  message_put(&t->port, &m);
-  message_get_response(&m);
+    for (size_t i = 0; i < contents.length(); i++) {
+        Drivers::PCSpeaker::playFreq(contents[i], 0.2);
+    }
 
-  if (!streq((char *)m.response, "")) {
-    kprintf("%s\n", m.response);
-    kmfree((void *)m.response);
-  }
+    Drivers::PCSpeaker::noSound();
+}
 
-  kmfree(msg);
+void shell_cat(char *file) {
+    auto contents = Filesystem::TarFS::inst()->readFile(file);
+
+    contents.print();
 }
 
 void shell_read(char *args) {
@@ -169,7 +154,9 @@ ShellCommand commands[] = {
     {"msg", "Send a message to a process", shell_msg},
     {"pkill", "Kill a process", shell_pkill},
     {"mem", "Display memory usage", shell_mem},
-    {"rand", "Generate a random number", shell_rand}
+    {"rand", "Generate a random number", shell_rand},
+    {"play", "Play a melody", shell_playMelody},
+    {"cat", "Print the contents of a file", shell_cat}
     /*
     {.name = "clear", .function = shell_clear, .desc = "Clears the console"},
     {.name = "mem",

@@ -1,23 +1,28 @@
 #pragma once
 
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#include "driver.h"
+namespace Kernel::Drivers {
 
-#define ATA_PRIMARY_IO 0x1F0
-#define ATA_SECONDARY_IO 0x170
+class ATADrive {
+public:
+  ATADrive(uint16_t io_port, bool available, bool slave)
+      : m_io_port{io_port}, m_available{available}, m_slave{slave} {}
 
-typedef struct {
-  uint16_t io_port;
-  bool available;
-  bool slave;
-} ATADrive;
+  size_t read_sectors(uint32_t sector, uint8_t sectorCount, uint8_t *dest);
+  bool is_ready() const;
+  void wait_ready() const;
 
-size_t ata_read_sectors(ATADrive *drive, uint32_t sector, uint8_t sectorCount,
-                        char *dest);
+  static const uint16_t PRIMARY_IO = 0x1F0;
+  static const uint16_t SECONDARY_IO = 0x170;
 
-extern ATADrive ata_drives[4];
+private:
+  uint16_t m_io_port;
+  bool m_available;
+  bool m_slave;
+};
 
-extern driverDefinition ATA_DRIVER;
+extern ATADrive ataDrives[4];
+
+} // namespace Kernel::Drivers
