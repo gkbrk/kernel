@@ -39,7 +39,6 @@ extern "C" void init(multiboot_info_t *mb, unsigned int magic) {
 
   klog("Loading drivers...");
   loadDrivers();
-  loadCppDrivers();
   klog("Drivers loaded");
 
   klog("Loading IDT, here we go");

@@ -1,14 +1,8 @@
 #include "pcspeaker.h"
-#include "../libk/log.h"
+#include "../scheduler.h"
 #include "io.h"
 
-extern "C" void yield();
-
-bool PCSpeaker::initialize() {
-  Driver::initialize();
-  klog("Initialized PC Speaker driver");
-  return true;
-}
+namespace Kernel::Drivers {
 
 void PCSpeaker::playFreq(uint32_t freq) {
   // Set the PIT to the desired frequency
@@ -24,7 +18,15 @@ void PCSpeaker::playFreq(uint32_t freq) {
   }
 }
 
+void PCSpeaker::playFreq(uint32_t freq, float duration) {
+  playFreq(freq);
+  sleep(duration);
+  noSound();
+}
+
 void PCSpeaker::noSound() {
   uint8_t tmp = inb(0x61) & 0xFC;
   outb(0x61, tmp);
 }
+
+} // namespace Kernel::Drivers

@@ -6,6 +6,7 @@
 #include "arch/x86/idt.h"
 #include "kernel/drivers/cmos.h"
 #include "kernel/drivers/loader.h"
+#include "kernel/drivers/pcspeaker.h"
 #include "kernel/drivers/serial.h"
 #include "kernel/drivers/terminal.h"
 #include "kernel/drivers/vga.h"
@@ -62,6 +63,8 @@ extern "C" void kernel_main() {
   spawnTask(memory_stats, "memory-stats");
   spawnTask(shell, "shell");
   spawnTask(tarfs_task, "tarfs");
+
+  Kernel::Drivers::PCSpeaker::playFreq(300, 0.1);
 
   while (true)
     yield();

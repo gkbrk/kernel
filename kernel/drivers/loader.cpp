@@ -32,9 +32,3 @@ extern "C" void loadDrivers() {
   }
 }
 } // namespace Kernel::Drivers
-
-extern "C" void loadCppDrivers() {
-  PCSpeaker a;
-  if (a.isAvailable())
-    a.initialize();
-}

@@ -2,12 +2,13 @@
 
 #include <stdint.h>
 
-#include "cppdriver.h"
+namespace Kernel::Drivers {
 
-class PCSpeaker : public Driver {
+class PCSpeaker {
 public:
-  const char *name() override { return "PC Speaker"; };
-  bool initialize() override;
-  void playFreq(uint32_t freq);
-  void noSound();
+  static void playFreq(uint32_t freq);
+  static void playFreq(uint32_t freq, float duration);
+  static void noSound();
 };
+
+} // namespace Kernel::Drivers
