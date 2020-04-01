@@ -5,10 +5,13 @@
 #include <stddef.h>
 #include <stdint.h>
 
+extern "C" void reloadSegments();
+extern "C" void setGdt(void *, size_t);
+
 void encodeGdtEntry(uint8_t *target, size_t base, size_t limit, uint8_t type) {
   // Check the limit to make sure that it can be encoded
   if ((limit > 65536) && (limit & 0xFFF) != 0xFFF) {
-    terminal_writestring("You can't do that!\n");
+    Kernel::Drivers::VGATerminal::write("You can't do that!\n");
   }
   if (limit > 65536) {
     // Adjust granularity if required
@@ -44,6 +47,7 @@ bool gdt_initialize() {
   return true;
 }
 
-driverDefinition GDT_DRIVER = {.name = "GDT Table",
-                               .isAvailable = driver_true,
-                               .initialize = gdt_initialize};
+static bool dt() { return true; }
+
+driverDefinition GDT_DRIVER = {
+    .name = "GDT Table", .isAvailable = dt, .initialize = gdt_initialize};

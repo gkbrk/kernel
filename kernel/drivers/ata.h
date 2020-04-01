@@ -20,4 +20,4 @@ size_t ata_read_sectors(ATADrive *drive, uint32_t sector, uint8_t sectorCount,
 
 extern ATADrive ata_drives[4];
 
-driverDefinition ATA_DRIVER;
+extern driverDefinition ATA_DRIVER;

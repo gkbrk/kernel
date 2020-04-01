@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../drivers/terminal.h"
 #include "string.h"
 #include <stdarg.h>
 #include <stdint.h>

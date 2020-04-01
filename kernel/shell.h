@@ -2,6 +2,7 @@
 
 #include "Random.h"
 #include "drivers/keyboard.h"
+#include "drivers/terminal.h"
 #include "libk/String.h"
 #include "libk/StringBuilder.h"
 #include "libk/debug.h"
@@ -11,6 +12,8 @@
 #include "libk/vector.h"
 #include "scheduler.h"
 #include <stddef.h>
+
+using namespace Kernel;
 
 typedef struct {
   const char *name;
@@ -26,21 +29,21 @@ void shell_echo(char *arg) {
   }
 }
 
-void shell_clear(char *args) { sendMessageToTask("terminal-driver", "clear"); }
+void shell_clear(char *) { Drivers::VGATerminal::clear(); }
 
 void shell_mem(char *args) {
   dbg() << "Memory usage: " << getMemUsage() << " bytes";
-  terminal_lock();
+  Drivers::VGATerminal::lock();
   kprintf("Memory usage: %d bytes\n", getMemUsage());
-  terminal_unlock();
+  Drivers::VGATerminal::unlock();
 }
 
 void shell_rand(char *) {
   auto num = Kernel::random_prng<int16_t>();
 
-  terminal_lock();
+  Drivers::VGATerminal::lock();
   kprintf("Your random number is %d\n", num);
-  terminal_unlock();
+  Drivers::VGATerminal::unlock();
 }
 
 void shell_help(char *args);
@@ -144,7 +147,7 @@ void shell_read(char *args) {
   uint32_t i = 0;
   while ((line = strsep((char **)m.response, "\n")) != NULL) {
     kprintf("%s\n", line);
-    if (i >= VGA_HEIGHT - 3) {
+    if (i >= Drivers::TextVGA::WIDTH - 3) {
       char key = keyboardSpinLoop();
       if (key == 'q')
         break;
@@ -199,32 +202,35 @@ void shell_help(char *args) {
 
 String shell_read_line() {
   dbg() << "Reading a line";
-  terminal_lock();
-  terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK));
-  terminal_writestring("> ");
-  terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-  terminal_unlock();
+  Drivers::VGATerminal::lock();
+  Drivers::TextVGA::setColor(Drivers::TextVGA::color::LIGHT_BLUE,
+                             Drivers::TextVGA::color::BLACK);
+  Drivers::VGATerminal::write("> ");
+  Drivers::TextVGA::setColor(Drivers::TextVGA::color::WHITE,
+                             Drivers::TextVGA::color::BLACK);
+  Drivers::VGATerminal::unlock();
   StringBuilder cmd;
 
   while (true) {
-    terminal_lock();
-    terminal_move_cursor(terminal_column, terminal_row);
-    terminal_unlock();
+    Drivers::VGATerminal::lock();
+    Drivers::TextVGA::moveCursor(Drivers::VGATerminal::col,
+                                 Drivers::VGATerminal::row);
+    Drivers::VGATerminal::unlock();
     char key = keyboardSpinLoop();
     if (key == '\b') {
       if (cmd.length() > 0) {
         cmd.unsafe_set_length(cmd.length() - 1);
-        terminal_lock();
-        terminal_column--;
-        terminal_putchar(' ');
-        terminal_column--;
-        terminal_unlock();
+        Drivers::VGATerminal::lock();
+        Drivers::VGATerminal::col--;
+        Drivers::VGATerminal::write(' ');
+        Drivers::VGATerminal::col--;
+        Drivers::VGATerminal::unlock();
       }
       continue;
     }
-    terminal_lock();
-    terminal_putchar(key);
-    terminal_unlock();
+    Drivers::VGATerminal::lock();
+    Drivers::VGATerminal::write(key);
+    Drivers::VGATerminal::unlock();
 
     if (key == '\n') {
       break;

@@ -1,4 +1,5 @@
 #include "printf.h"
+#include "../drivers/terminal.h"
 
 static int is_format_letter(char c) {
   return c == 'c' || c == 'd' || c == 'i' || c == 'e' || c == 'E' || c == 'f' ||
@@ -15,6 +16,7 @@ static void vsprintf_helper(char *str, void (*putchar)(char),
   uint32_t uval;
   uint32_t size = 8;
   uint32_t i;
+  uint32_t len;
   int size_override = 0;
   memset(buf, 0, 512);
 
@@ -44,7 +46,7 @@ static void vsprintf_helper(char *str, void (*putchar)(char),
           }
           itoa(uval, buf);
         }
-        uint32_t len = strlen(buf);
+        len = strlen(buf);
         // If use did not specify width, then just use len = width
         if (!size_override)
           size = len;
@@ -125,7 +127,7 @@ void vsprintf(char *str, void (*putchar)(char), const char *format,
 void kprintf(const char *s, ...) {
   va_list ap;
   va_start(ap, s);
-  vsprintf(NULL, terminal_putchar, s, ap);
+  vsprintf(NULL, Kernel::Drivers::VGATerminal::write, s, ap);
   va_end(ap);
 }
 

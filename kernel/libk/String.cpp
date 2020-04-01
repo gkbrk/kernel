@@ -44,6 +44,6 @@ Pair<String, String> String::split_at(char sep) {
 
 void String::print() const {
   for (size_t i = 0; i < m_size; i++) {
-    terminal_putchar(m_value[i]);
+    Kernel::Drivers::VGATerminal::write(m_value[i]);
   }
 }

@@ -2,6 +2,7 @@
 #include "../arch/x86/idt.h"
 #include "drivers/loader.h"
 #include "drivers/serial.h"
+#include "drivers/terminal.h"
 #include "libk/alloc.h"
 #include "libk/debug.h"
 #include "libk/log.h"
@@ -34,6 +35,7 @@ extern "C" void init(multiboot_info_t *mb, unsigned int magic) {
   initTasking();
   klog("Starting scheduler/tasking");
   klog("Kernel memory allocator initialized");
+  Kernel::Drivers::VGATerminal::clear();
 
   klog("Loading drivers...");
   loadDrivers();
