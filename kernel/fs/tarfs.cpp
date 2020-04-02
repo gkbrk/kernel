@@ -89,7 +89,8 @@ String TarFS::readFile(const char *name) const {
     prev_sum = sum(buf);
     sec++;
   }
-  return nullptr;
+
+  return String(NULL, 0);
 }
 
 TarFS *TarFS::s_inst;

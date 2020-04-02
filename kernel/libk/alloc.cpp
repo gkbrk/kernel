@@ -31,8 +31,8 @@ extern "C" void kmalloc_init() {
 
   for (size_t i = 0; i < numBlocks; i++) {
     allocTable[i].free = true;
-    allocTable[i].size = i;
-    allocTable[i].ptr = kmalloc_forever(i);
+    allocTable[i].size = i + 1;
+    allocTable[i].ptr = kmalloc_forever(i + 1);
   }
 }
 
@@ -77,12 +77,14 @@ extern "C" void *kmrealloc(void *ptr, size_t size) {
   if (ptr == NULL)
     return kmalloc(size);
 
+  ASSERT(size > 0);
+
   lock.lock();
   AllocTableItem *existing = NULL;
 
   for (size_t i = 0; i < numBlocks; i++) {
     AllocTableItem *item = &allocTable[i];
-    if (item->ptr == ptr && !item->free) {
+    if (item->ptr == ptr) {
       existing = item;
       break;
     }

@@ -15,13 +15,36 @@ public:
     ASSERT(m_values != NULL);
   }
 
-  Vector(const Vector& other) : Vector(other.m_capacity) {
-      for (size_t i = 0; i < other.m_size; i++) {
-          push(other[i]);
-      }
+  Vector(const Vector &other) : Vector(other.m_capacity) {
+    for (size_t i = 0; i < other.m_size; i++) {
+      push(other[i]);
+    }
   }
 
-  ~Vector() { kmfree(m_values); }
+  ~Vector() {
+    for (size_t i = 0; i < m_size; i++) {
+      m_values[i].~T();
+    }
+
+    kmfree(m_values);
+  }
+
+  Vector &operator=(const Vector &other) {
+    if (this != &other) {
+      for (size_t i = 0; i < m_size; i++) {
+        m_values[i].~T();
+      }
+      kmfree(m_values);
+      m_size = other.m_size;
+      m_capacity = other.m_capacity;
+
+      m_values = (T *)kmalloc(m_size * sizeof(T));
+      for (size_t i = 0; i < other.m_size; i++) {
+        push(other[i]);
+      }
+    }
+    return *this;
+  }
 
   void push(T value) {
     ASSERT(m_size < m_capacity);

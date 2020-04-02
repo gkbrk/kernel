@@ -2,8 +2,9 @@
 
 #include "Random.h"
 #include "drivers/keyboard.h"
-#include "drivers/terminal.h"
 #include "drivers/pcspeaker.h"
+#include "drivers/terminal.h"
+#include "fs/tarfs.h"
 #include "libk/String.h"
 #include "libk/StringBuilder.h"
 #include "libk/debug.h"
@@ -11,7 +12,6 @@
 #include "libk/printf.h"
 #include "libk/string.h"
 #include "libk/vector.h"
-#include "fs/tarfs.h"
 #include "scheduler.h"
 #include <stddef.h>
 
@@ -89,28 +89,28 @@ void shell_msg(char *args) {
 }
 
 void shell_ls(char *) {
-    auto files = Filesystem::TarFS::inst()->listFiles();
+  auto files = Filesystem::TarFS::inst()->listFiles();
 
-    files.forEach([](auto file) {
-        file.print();
-        Drivers::VGATerminal::write("\n");
-    });
+  files.forEach([](auto file) {
+    file.print();
+    Drivers::VGATerminal::write("\n");
+  });
 }
 
 void shell_playMelody(char *file) {
-    auto contents = Filesystem::TarFS::inst()->readFile(file);
+  auto contents = Filesystem::TarFS::inst()->readFile(file);
 
-    for (size_t i = 0; i < contents.length(); i++) {
-        Drivers::PCSpeaker::playFreq(contents[i], 0.2);
-    }
+  for (size_t i = 0; i < contents.length(); i++) {
+    Drivers::PCSpeaker::playFreq(contents[i], 0.2);
+  }
 
-    Drivers::PCSpeaker::noSound();
+  Drivers::PCSpeaker::noSound();
 }
 
 void shell_cat(char *file) {
-    auto contents = Filesystem::TarFS::inst()->readFile(file);
+  auto contents = Filesystem::TarFS::inst()->readFile(file);
 
-    contents.print();
+  contents.print();
 }
 
 void shell_read(char *args) {

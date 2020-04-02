@@ -4,9 +4,11 @@
 
 class StringBuilder {
 public:
-  StringBuilder();
-  StringBuilder(const StringBuilder&);
+  explicit StringBuilder();
+  StringBuilder(const StringBuilder &);
   ~StringBuilder();
+
+  StringBuilder &operator=(const StringBuilder &);
 
   void append(char);
   void append(const char *);
