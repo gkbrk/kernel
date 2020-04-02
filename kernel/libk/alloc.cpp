@@ -85,6 +85,7 @@ extern "C" void *kmrealloc(void *ptr, size_t size) {
   for (size_t i = 0; i < numBlocks; i++) {
     AllocTableItem *item = &allocTable[i];
     if (item->ptr == ptr) {
+      ASSERT(!item->free);
       existing = item;
       break;
     }
