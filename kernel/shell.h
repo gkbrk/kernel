@@ -113,35 +113,28 @@ void shell_cat(char *file) {
   contents.print();
 }
 
-void shell_read(char *args) {
-  Task *t = findTaskByName("tarfs");
-  if (t == NULL || t->name == NULL)
-    return;
+void shell_read(char *path) {
+  auto contents = Filesystem::TarFS::inst()->readFile(path);
 
-  Message m;
-  memset(&m, '\0', sizeof(Message));
-  char *msg = static_cast<char *>(kmalloc(4 + strlen(args)));
-  m.message = msg;
-  memset((char *)m.message, '\0', 4 + strlen(args));
-  sprintf((char *)m.message, "cat %s", args);
-  message_put(&t->port, &m);
-  message_get_response(&m);
+  size_t i = 0;
+  while (true) {
+    auto parts = contents.split_at('\n');
+    auto line = parts.first();
+    contents = parts.second();
 
-  char *resp = (char *)m.response;
-  char *line;
-  uint32_t i = 0;
-  while ((line = strsep((char **)m.response, "\n")) != NULL) {
-    kprintf("%s\n", line);
-    if (i >= Drivers::TextVGA::WIDTH - 3) {
+    line.print();
+    Drivers::VGATerminal::write('\n');
+
+    if (contents.length() == 0)
+      break;
+
+    if (i >= Drivers::TextVGA::HEIGHT - 3) {
       char key = keyboardSpinLoop();
       if (key == 'q')
         break;
     }
     i++;
   }
-  kmfree(resp);
-
-  kmfree(msg);
 }
 
 ShellCommand commands[] = {

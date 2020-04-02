@@ -25,6 +25,7 @@ String::String(const String &other) {
 
 String &String::operator=(const String &other) {
   if (this != &other) {
+    kmfree(m_value);
     m_value = NULL;
     m_value = static_cast<char *>(kmrealloc(m_value, other.m_size + 1));
     ASSERT(m_value != NULL);
