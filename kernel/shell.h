@@ -2,6 +2,7 @@
 
 #include "Random.h"
 #include "drivers/keyboard.h"
+#include "drivers/machine.h"
 #include "drivers/pcspeaker.h"
 #include "drivers/terminal.h"
 #include "fs/tarfs.h"
@@ -137,6 +138,8 @@ void shell_read(char *path) {
   }
 }
 
+void shell_shutdown(char *) { Drivers::Machine::shutdown(); }
+
 ShellCommand commands[] = {
     {"echo", "Print text", shell_echo},
     {"ls", "List files", shell_ls},
@@ -149,7 +152,8 @@ ShellCommand commands[] = {
     {"mem", "Display memory usage", shell_mem},
     {"rand", "Generate a random number", shell_rand},
     {"play", "Play a melody", shell_playMelody},
-    {"cat", "Print the contents of a file", shell_cat}
+    {"cat", "Print the contents of a file", shell_cat},
+    {"shutdown", "Shut down machine", shell_shutdown}
     /*
     {.name = "clear", .function = shell_clear, .desc = "Clears the console"},
     {.name = "mem",
