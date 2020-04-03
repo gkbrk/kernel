@@ -3,9 +3,10 @@
 - Key buffer instead of polling
 
 [File system]
-- Fix ATA driver
-- Fix tarfs
-- Make a program to play melodies from files
+- Mount filesystem classes to mountpoints
+- TarFS file write support
+- File attribute type for the listFiles method
+- Stream file contents instead of reading it all into a buffer
 
 [Shell improvements]
 - Cursor movement support
@@ -21,3 +22,6 @@
 [Interrupts]
 - Syscall
 - Notify keyboard driver on IRQ
+
+[Process runtime]
+- Simple bytecode interpreter
