@@ -66,5 +66,5 @@ extern "C" void kernel_main() {
   Kernel::Drivers::PCSpeaker::playFreq(300, 0.1);
 
   while (true)
-    yield();
+    sleep(1.0);
 }

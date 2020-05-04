@@ -22,13 +22,14 @@ extern "C" void init(multiboot_info_t *mb, unsigned int magic) {
          (long unsigned int)mb->mmap_addr + mb->mmap_length) {
     if (memmap->type == 1 && memmap->len > maxMem) {
       alloc_begin = (void *)memmap->addr;
+      maxMem = memmap->len;
     }
     memmap = (multiboot_memory_map_t *)((long unsigned int)memmap +
                                         memmap->size + sizeof(memmap->size));
   }
 
   // Skip from the start of memory
-  alloc_begin += 1024 * 1024 * 5;
+  alloc_begin += 1024 * 1024 * 1;
 
   kmalloc_init();
 

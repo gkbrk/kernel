@@ -45,6 +45,13 @@ void initTasking() {
   tasks[0].name = "init";
 
   runningTask = &tasks[0];
+
+  spawnTask(
+      []() {
+        while (true)
+          yield();
+      },
+      "idle-task");
 }
 
 extern "C" void switchTask(Registers *r1, Registers *r2);
