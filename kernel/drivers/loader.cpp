@@ -1,4 +1,5 @@
 #include "../libk/debug.h"
+#include "BGA.h"
 #include "cmos.h"
 #include "cppdriver.h"
 #include "driver.h"
@@ -24,5 +25,7 @@ extern "C" void loadDrivers() {
       VGATerminal::write(" driver is loaded...\n");
     }
   }
+
+  loadDriver<BGA>();
 }
 } // namespace Kernel::Drivers

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Random.h"
+#include "drivers/BGA.h"
 #include "drivers/keyboard.h"
 #include "drivers/machine.h"
 #include "drivers/pcspeaker.h"
@@ -98,6 +99,17 @@ void shell_ls(char *) {
   });
 }
 
+void shell_vga(char *) {
+  Drivers::VGATerminal::write("Going to VGA-land\n");
+  Drivers::BGA *bga = Drivers::BGA::inst();
+  bga->setResolution(800, 600);
+  for (size_t y = 0; y < 600; y++) {
+    for (size_t x = 0; x < 800; x++) {
+      bga->setPixel(x, y, x % 255, y % 255, y % 255);
+    }
+  }
+}
+
 void shell_playMelody(char *file) {
   auto contents = Filesystem::TarFS::inst()->readFile(file);
 
@@ -153,7 +165,8 @@ ShellCommand commands[] = {
     {"rand", "Generate a random number", shell_rand},
     {"play", "Play a melody", shell_playMelody},
     {"cat", "Print the contents of a file", shell_cat},
-    {"shutdown", "Shut down machine", shell_shutdown}
+    {"shutdown", "Shut down machine", shell_shutdown},
+    {"vga", "VGA test", shell_vga}
     /*
     {.name = "clear", .function = shell_clear, .desc = "Clears the console"},
     {.name = "mem",

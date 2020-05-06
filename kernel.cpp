@@ -59,7 +59,7 @@ extern "C" void kernel_main() {
   klog("Booting kernel");
   Kernel::Drivers::VGATerminal::write("Booting kernel...\n");
 
-  spawnTask(time_task, "time-display");
+  // spawnTask(time_task, "time-display");
   spawnTask(memory_stats, "memory-stats");
   spawnTask(shell, "shell");
 

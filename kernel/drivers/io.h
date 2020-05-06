@@ -3,6 +3,18 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
+
+namespace Kernel::Drivers::IO {
+
+// 8-bit IO
+uint8_t in8(uint16_t);
+void out8(uint16_t, uint8_t);
+
+// 16-bit IO
+uint16_t in16(uint16_t);
+void out16(uint16_t, uint16_t);
+} // namespace Kernel::Drivers::IO
+
 extern "C" {
 #endif
 
