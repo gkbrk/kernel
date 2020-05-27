@@ -38,9 +38,8 @@ extern yield
 irq0:
   pusha
   call irq0_handler
-  sti
-  call yield
   popa
+  iret
  
 irq1:
   pusha

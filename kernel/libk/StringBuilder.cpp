@@ -1,33 +1,15 @@
 #include "StringBuilder.h"
+#include "../drivers/serial.h"
 #include "String.h"
 #include "alloc.h"
 #include "assert.h"
-#include "debug.h"
 
 StringBuilder::StringBuilder() {
   m_size = 0;
   m_buffer = NULL;
 }
 
-StringBuilder::StringBuilder(const StringBuilder &other) {
-  m_buffer = static_cast<char *>(kmalloc(other.m_size));
-  memcpy(m_buffer, other.m_buffer, other.m_size);
-  m_size = other.m_size;
-}
-
 StringBuilder::~StringBuilder() { kmfree(m_buffer); }
-
-StringBuilder &StringBuilder::operator=(const StringBuilder &other) {
-  if (this != &other) {
-    kmfree(m_buffer);
-    m_size = other.m_size;
-
-    m_buffer = static_cast<char *>(kmalloc(m_size));
-    memcpy(m_buffer, other.m_buffer, m_size);
-  }
-
-  return *this;
-}
 
 void StringBuilder::append(char c) {
   m_buffer = static_cast<char *>(kmrealloc(m_buffer, m_size + 1));

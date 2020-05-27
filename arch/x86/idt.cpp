@@ -8,6 +8,8 @@ extern "C" void interrupt_enable() { asm volatile("sti"); }
 
 extern "C" void interrupt_disable() { asm volatile("cli"); }
 
+extern "C" void hlt() { asm volatile("hlt"); }
+
 void init_timer(uint32_t freq) {
   dbg() << "Setting timer freq to " << freq;
   uint32_t divisor = 1193180 / freq;

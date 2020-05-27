@@ -3,8 +3,11 @@
 #include "scheduler.h"
 
 #include "libk/alloc.h"
+#include "libk/debug.h"
 #include "libk/log.h"
 #include "libk/string.h"
+
+#include "../arch/x86/idt.h"
 
 Task *runningTask;
 Task tasks[20];
@@ -42,16 +45,10 @@ void initTasking() {
                : "=m"(tasks[0].regs.eflags)::"%eax");
 
   tasks[0].next = &tasks[0];
-  tasks[0].name = "init";
+  tasks[0].name = "kmain";
+  tasks[0].remainingSleep = 0;
 
   runningTask = &tasks[0];
-
-  spawnTask(
-      []() {
-        while (true)
-          yield();
-      },
-      "idle-task");
 }
 
 extern "C" void switchTask(Registers *r1, Registers *r2);
@@ -107,7 +104,10 @@ void spawnTask(void (*main)(), const char *name) {
   t->remainingSleep = 0;
 }
 
-void exitTask() { killTask(runningTask); }
+void exitTask() {
+  killTask(runningTask);
+  yield();
+}
 
 Task *findTaskByName(char *name) {
   for (int i = 0; i < sizeof(tasks) / sizeof(Task); i++) {

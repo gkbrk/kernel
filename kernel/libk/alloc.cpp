@@ -1,9 +1,12 @@
 #include <stddef.h>
 
+#include "../drivers/serial.h"
 #include "alloc.h"
 #include "assert.h"
 #include "spinlock.h"
 #include "string.h"
+
+#include "debug.h"
 
 static Spinlock lock;
 
@@ -18,10 +21,12 @@ static AllocTableItem *allocTable;
 static const size_t numBlocks = 8192;
 
 void *alloc_begin;
+void *alloc_end;
 
 extern "C" void *kmalloc_forever(size_t size) {
   void *ptr = alloc_begin;
   alloc_begin += size;
+  ASSERT(alloc_begin < alloc_end);
   return ptr;
 }
 
@@ -41,8 +46,9 @@ size_t getMemUsage() {
   lock.lock();
   for (size_t i = 0; i < numBlocks; i++) {
     AllocTableItem *item = &allocTable[i];
-    if (!item->free)
+    if (!item->free) {
       used += item->size;
+    }
   }
   lock.unlock();
   return used;
@@ -65,7 +71,7 @@ extern "C" void *kmalloc(size_t size) {
   return NULL;
 }
 
-template <typename T> static T min(T v1, T v2) {
+template <typename T> static constexpr T min(T v1, T v2) {
   if (v1 <= v2) {
     return v1;
   } else {
@@ -96,6 +102,7 @@ extern "C" void *kmrealloc(void *ptr, size_t size) {
   for (size_t i = 0; i < numBlocks; i++) {
     AllocTableItem *item = &allocTable[i];
     if (item->size >= size && item->free) {
+      ASSERT(item->ptr != existing->ptr);
       item->free = false;
       memcpy(item->ptr, ptr, min(existing->size, item->size));
       existing->free = true;
@@ -115,6 +122,7 @@ extern "C" void kmfree(void *ptr) {
   for (size_t i = 0; i < numBlocks; i++) {
     AllocTableItem *item = &allocTable[i];
     if (item->ptr == ptr) {
+      ASSERT(!item->free);
       item->free = true;
       lock.unlock();
       return;
@@ -127,17 +135,10 @@ extern "C" void kmfree(void *ptr) {
 void kfree(void *ptr) { kmfree(ptr); }
 
 void *operator new(size_t size) { return kmalloc(size); }
-
-void operator delete(void *ptr) { return kfree(ptr); }
-
-void operator delete(void *ptr, size_t) { return kfree(ptr); }
-
+void operator delete(void *ptr) { return kmfree(ptr); }
+void operator delete(void *ptr, size_t) { return kmfree(ptr); }
 void *operator new[](size_t size) { return kmalloc(size); }
-
-void operator delete[](void *ptr) { return kfree(ptr); }
-
-void operator delete[](void *ptr, size_t) { return kfree(ptr); }
-
+void operator delete[](void *ptr) { return kmfree(ptr); }
+void operator delete[](void *ptr, size_t) { return kmfree(ptr); }
 void *operator new(size_t, void *ptr) { return ptr; }
-
 void *operator new[](size_t, void *ptr) { return ptr; }

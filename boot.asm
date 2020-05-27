@@ -22,14 +22,10 @@ section .text
 global _start
 _start:
     mov esp, stack_top ; Set the stack pointer
-    extern kernel_main
+    extern init
     push eax
     push ebx
-    extern init
     call init
-    call kernel_main
-    
-    cli
 .hang:
     hlt
     jmp .hang

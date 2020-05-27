@@ -4,6 +4,13 @@
 #include "StringBuilder.h"
 #include "alloc.h"
 #include "assert.h"
+#include "debug.h"
+
+template <typename T> constexpr static void swap(T &a, T &b) {
+  T tmp = a;
+  a = b;
+  b = tmp;
+}
 
 String::String(const char *str, size_t size) {
   m_value = static_cast<char *>(kmalloc(size + 1));
@@ -23,17 +30,9 @@ String::String(const String &other) {
   m_value[m_size] = 0;
 }
 
-String &String::operator=(const String &other) {
-  if (this != &other) {
-    kmfree(m_value);
-    m_value = NULL;
-    m_value = static_cast<char *>(kmrealloc(m_value, other.m_size + 1));
-    ASSERT(m_value != NULL);
-    memcpy(m_value, other.m_value, other.m_size);
-    m_value[other.m_size] = 0;
-    m_size = other.m_size;
-  }
-
+String &String::operator=(String other) {
+  swap(m_value, other.m_value);
+  swap(m_size, other.m_size);
   return *this;
 }
 

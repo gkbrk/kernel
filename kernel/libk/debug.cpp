@@ -38,7 +38,7 @@ const DebugPrinter &operator<<(const DebugPrinter &printer, const String str) {
 }
 
 const DebugPrinter &operator<<(const DebugPrinter &printer, size_t num) {
-  char buf[64];
+  char buf[64] = {0};
   itoa(num, buf);
   printer << buf;
   return printer;

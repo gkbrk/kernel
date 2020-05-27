@@ -56,7 +56,7 @@ void shell_ps(char *args) {
   (void)args;
 
   for (size_t i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
-    Task *t = &tasks[i];
+    volatile Task *t = &tasks[i];
 
     if (t->name != NULL) {
       const char *c = "";
@@ -94,7 +94,7 @@ void shell_ls(char *) {
   auto files = Filesystem::TarFS::inst()->listFiles();
 
   files.forEach([](auto file) {
-    file.print();
+    file->print();
     Drivers::VGATerminal::write("\n");
   });
 }

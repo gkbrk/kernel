@@ -14,22 +14,28 @@ typedef void (*ctor_func_t)();
 extern "C" ctor_func_t start_ctors;
 extern "C" ctor_func_t end_ctors;
 
+extern "C" void *__KERNEL_END;
+
+extern "C" void kernel_main();
+
 extern "C" void init(multiboot_info_t *mb, unsigned int magic) {
   uint64_t maxMem = 0;
 
   multiboot_memory_map_t *memmap = (multiboot_memory_map_t *)mb->mmap_addr;
   while ((long unsigned int)memmap <
          (long unsigned int)mb->mmap_addr + mb->mmap_length) {
-    if (memmap->type == 1 && memmap->len > maxMem) {
+    if (memmap->type == 1 && memmap->len >= maxMem) {
       alloc_begin = (void *)memmap->addr;
+      alloc_end = alloc_begin + memmap->len;
       maxMem = memmap->len;
     }
     memmap = (multiboot_memory_map_t *)((long unsigned int)memmap +
                                         memmap->size + sizeof(memmap->size));
   }
 
-  // Skip from the start of memory
-  alloc_begin += 1024 * 1024 * 1;
+  if (&__KERNEL_END > alloc_begin && &__KERNEL_END < alloc_end) {
+    alloc_begin = &__KERNEL_END;
+  }
 
   kmalloc_init();
 
@@ -53,4 +59,11 @@ extern "C" void init(multiboot_info_t *mb, unsigned int magic) {
   }
 
   init_timer(100);
+
+  kernel_main();
+
+  while (1) {
+    hlt();
+    yield();
+  }
 }

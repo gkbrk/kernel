@@ -4,6 +4,7 @@
 #include <stddef.h>
 
 extern void *alloc_begin;
+extern void *alloc_end;
 
 #ifdef __cplusplus
 size_t getMemUsage();
@@ -19,4 +20,13 @@ void kmfree(void *ptr);
 
 #ifdef __cplusplus
 }
+
+void *operator new(size_t);
+void operator delete(void *);
+void operator delete(void *, size_t);
+void *operator new[](size_t);
+void operator delete[](void *);
+void operator delete[](void *, size_t);
+void *operator new(size_t, void *);
+void *operator new[](size_t, void *);
 #endif

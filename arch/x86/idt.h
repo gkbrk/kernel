@@ -19,6 +19,7 @@ extern "C" {
 void idt_init();
 void interrupt_enable();
 void interrupt_disable();
+void hlt();
 void init_timer(uint32_t freq);
 
 #ifdef __cplusplus

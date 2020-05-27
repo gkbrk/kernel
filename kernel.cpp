@@ -56,15 +56,19 @@ void memory_stats() {
 }
 
 extern "C" void kernel_main() {
-  klog("Booting kernel");
-  Kernel::Drivers::VGATerminal::write("Booting kernel...\n");
+  spawnTask(
+      []() {
+        dbg() << "Enter kernel main";
+        klog("Booting kernel");
+        Kernel::Drivers::VGATerminal::write("Booting kernel...\n");
 
-  // spawnTask(time_task, "time-display");
-  spawnTask(memory_stats, "memory-stats");
-  spawnTask(shell, "shell");
+        spawnTask(time_task, "time-display");
+        spawnTask(memory_stats, "memory-stats");
+        spawnTask(shell, "shell");
 
-  Kernel::Drivers::PCSpeaker::playFreq(300, 0.1);
+        Kernel::Drivers::PCSpeaker::playFreq(300, 0.1);
 
-  while (true)
-    sleep(1.0);
+        exitTask();
+      },
+      "init");
 }

@@ -5,10 +5,10 @@
 class StringBuilder {
 public:
   explicit StringBuilder();
-  StringBuilder(const StringBuilder &);
   ~StringBuilder();
 
-  StringBuilder &operator=(const StringBuilder &);
+  StringBuilder(const StringBuilder &) = delete;
+  StringBuilder &operator=(const StringBuilder &) = delete;
 
   void append(char);
   void append(const char *);

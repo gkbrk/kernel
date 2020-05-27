@@ -4,6 +4,12 @@
 #include "assert.h"
 #include <stddef.h>
 
+template <typename T> constexpr static void swap(T &a, T &b) {
+  T tmp = a;
+  a = b;
+  b = tmp;
+}
+
 template <typename T> class Vector {
 public:
   Vector() : Vector(32) {}
@@ -11,7 +17,7 @@ public:
   Vector(size_t cap) {
     m_size = 0;
     m_capacity = cap;
-    m_values = static_cast<T *>(kmalloc(cap * sizeof(T)));
+    m_values = (T **)kmalloc(cap * sizeof(T));
     ASSERT(m_values != NULL);
   }
 
@@ -23,42 +29,39 @@ public:
 
   ~Vector() {
     for (size_t i = 0; i < m_size; i++) {
-      m_values[i].~T();
+      delete m_values[i];
     }
 
     kmfree(m_values);
   }
 
-  Vector &operator=(const Vector &other) {
-    if (this != &other) {
-      for (size_t i = 0; i < m_size; i++) {
-        m_values[i].~T();
-      }
-      kmfree(m_values);
-      m_size = other.m_size;
-      m_capacity = other.m_capacity;
+  Vector &operator=(Vector other) {
+    swap(m_size, other.m_size);
+    swap(m_capacity, other.m_capacity);
+    swap(m_values, other.m_values);
+    return *this;
+  }
 
-      m_values = (T *)kmalloc(m_size * sizeof(T));
-      for (size_t i = 0; i < other.m_size; i++) {
-        push(other[i]);
-      }
-    }
+  Vector &operator=(Vector &&other) {
+    swap(m_size, other->m_size);
+    swap(m_capacity, other->m_capacity);
+    swap(m_values, other->m_values);
     return *this;
   }
 
   void push(T value) {
     ASSERT(m_size < m_capacity);
-    m_values[m_size++] = value;
+    m_values[m_size++] = new T(value);
   }
 
-  T pop() {
+  T &pop() {
     ASSERT(m_size > 0);
     return m_values[--m_size];
   }
 
   T get(size_t index) const {
     ASSERT(index < m_size);
-    return m_values[index];
+    return *m_values[index];
   }
 
   T operator[](size_t index) const { return get(index); }
@@ -74,5 +77,5 @@ public:
 private:
   size_t m_size;
   size_t m_capacity;
-  T *m_values;
+  T **m_values;
 };

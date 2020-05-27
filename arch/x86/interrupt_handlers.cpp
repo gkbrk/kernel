@@ -1,6 +1,7 @@
 #include "../../kernel/drivers/io.h"
 #include "../../kernel/drivers/serial.h"
 #include "../../kernel/scheduler.h"
+#include "idt.h"
 
 void endOfInterrupt() { outb(0x20, 0x20); }
 

@@ -6,11 +6,12 @@
 
 class String {
 public:
+  String() {}
   explicit String(const char *str, size_t size);
   ~String();
 
   String(const String &);
-  String &operator=(const String &);
+  String &operator=(String);
 
   char *c_str();
   void print() const;

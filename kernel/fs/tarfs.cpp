@@ -30,7 +30,7 @@ namespace Kernel::Filesystem {
 Vector<String> TarFS::listFiles() const {
   Vector<String> files;
 
-  uint8_t *buf = static_cast<uint8_t *>(kmalloc(512));
+  uint8_t *buf = (uint8_t *)(kmalloc(512));
   uint8_t sec = 1;
   size_t prev_sum = 1;
 
