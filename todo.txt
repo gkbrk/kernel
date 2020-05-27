@@ -8,6 +8,14 @@
 - File attribute type for the listFiles method
 - Stream file contents instead of reading it all into a buffer
 
+[Graphics]
+- Framebuffer
+- Double buffering
+
+[Devices]
+- Mouse driver
+- Ethernet card
+
 [Shell improvements]
 - Cursor movement support
 - Command history
