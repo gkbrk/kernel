@@ -103,10 +103,37 @@ void shell_vga(char *) {
   Drivers::VGATerminal::write("Going to VGA-land\n");
   Drivers::BGA *bga = Drivers::BGA::inst();
   bga->setResolution(800, 600);
-  for (size_t y = 0; y < 600; y++) {
-    for (size_t x = 0; x < 800; x++) {
-      bga->setPixel(x, y, x % 255, y % 255, y % 255);
+
+  int boxX = 0;
+  int boxY = 0;
+
+  while (1) {
+    for (size_t y = 0; y < 600; y++) {
+      for (size_t x = 0; x < 800; x++) {
+        bga->setPixel(x, y, x % 100, y % 100, y % 100);
+      }
     }
+
+    for (int x = boxX - 10; x < boxX + 10; x++)
+      for (int y = boxY - 10; y < boxY + 10; y++)
+        if (x >= 0 && x <= 800 && y >= 0 && y <= 600)
+          bga->setPixel(x, y, 255, 50, 50);
+
+    char key = keyboardSpinLoop();
+
+    if (key == 'w')
+      boxY -= 30;
+    if (key == 'a')
+      boxX -= 30;
+    if (key == 's')
+      boxY += 30;
+    if (key == 'd')
+      boxX += 30;
+
+    boxX %= 800;
+    boxY %= 600;
+
+    dbg("game") << "X: " << boxX << " Y: " << boxY;
   }
 }
 

@@ -3,12 +3,13 @@
 #include "../scheduler.h"
 #include "assert.h"
 
-const DebugPrinter dbg() { return DebugPrinter(); }
+const DebugPrinter dbg() { return dbg(runningTask->name); }
+const DebugPrinter dbg(const char *name) { return DebugPrinter(name); }
 
-DebugPrinter::DebugPrinter() {
+DebugPrinter::DebugPrinter(const char *name) {
   serial_lock();
   serial_writestring("\033[33m[");
-  serial_writestring(runningTask->name);
+  serial_writestring(name);
   serial_writestring("]\033[0m ");
 }
 
@@ -38,6 +39,13 @@ const DebugPrinter &operator<<(const DebugPrinter &printer, const String str) {
 }
 
 const DebugPrinter &operator<<(const DebugPrinter &printer, size_t num) {
+  char buf[64] = {0};
+  itoa(num, buf);
+  printer << buf;
+  return printer;
+}
+
+const DebugPrinter &operator<<(const DebugPrinter &printer, int num) {
   char buf[64] = {0};
   itoa(num, buf);
   printer << buf;
