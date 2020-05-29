@@ -10,7 +10,6 @@
 #include "libk/String.h"
 #include "libk/StringBuilder.h"
 #include "libk/debug.h"
-#include "libk/messaging.h"
 #include "libk/printf.h"
 #include "libk/string.h"
 #include "libk/vector.h"
@@ -71,23 +70,6 @@ void shell_ps(char *args) {
 void shell_pkill(char *args) {
   Task *t = findTaskByName(args);
   killTask(t);
-}
-
-void shell_msg(char *args) {
-  char *target = strsep(&args, " ");
-
-  Task *t = findTaskByName(target);
-  if (t == NULL || t->name == NULL)
-    return;
-  Message m;
-  memset(&m, '\0', sizeof(Message));
-  m.message = args;
-  message_put(&t->port, &m);
-  message_get_response(&m);
-
-  if (!streq((char *)(m.response), "")) {
-    kprintf("%s\n", m.response);
-  }
 }
 
 void shell_ls(char *) {
@@ -186,7 +168,6 @@ ShellCommand commands[] = {
     {"help", "Get help on commands", shell_help},
     {"read", "Read the contents of a file", shell_read},
     {"ps", "Process list", shell_ps},
-    {"msg", "Send a message to a process", shell_msg},
     {"pkill", "Kill a process", shell_pkill},
     {"mem", "Display memory usage", shell_mem},
     {"rand", "Generate a random number", shell_rand},

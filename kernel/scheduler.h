@@ -3,8 +3,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "libk/messaging.h"
-
 typedef struct {
   uint32_t eax, ebx, ecx, edx, esi, edi, esp, ebp, eip, eflags, cr3;
 } Registers;
@@ -13,7 +11,6 @@ typedef struct Task {
   Registers regs;
   const char *name;
   float remainingSleep;
-  volatile MessagePort port;
   struct Task *next;
 } Task;
 

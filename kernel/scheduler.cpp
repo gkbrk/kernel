@@ -120,14 +120,3 @@ Task *findTaskByName(char *name) {
 
   return NULL;
 }
-
-void sendMessageToTask(char *name, char *message) {
-  Task *t = findTaskByName(name);
-  if (t == NULL || t->name == NULL)
-    return;
-  Message m;
-  memset(&m, '\0', sizeof(Message));
-  m.message = message;
-  message_put(&t->port, &m);
-  message_get_response(&m);
-}
