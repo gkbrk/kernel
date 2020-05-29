@@ -60,8 +60,11 @@ void shell_ps(char *) {
       if (currentTask == t) {
         c = "[current task]";
       }
-      kprintf("%s %s -> %s\n", t->name(), c, t->next->name());
+      kprintf("%s %s -> %s\n", t->name()->c_str(), c, t->next->name()->c_str());
     }
+    t = t->next;
+    if (t == currentTask)
+      break;
   }
 }
 

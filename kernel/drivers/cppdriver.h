@@ -21,7 +21,7 @@ template <typename T> void loadDriver() {
   if (driver->isAvailable()) {
     dbg() << name << " is available. Loading...";
     if (driver->initialize()) {
-      dbg() << "Initialized " << name << "successfully.";
+      dbg() << "Initialized " << name << " successfully.";
     } else {
       dbg() << "Could not initialize " << name;
     }

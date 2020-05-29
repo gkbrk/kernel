@@ -29,7 +29,7 @@ rule gas
   command = as --32 -c \$in -o \$out
 
 rule link
-  command = i686-elf-gcc -T linker.ld -flto -nostdlib $
+  command = i686-elf-gcc -T linker.ld -Os -flto -s -nostdlib $
             -fno-stack-protector -Os -o \$out \$in -lgcc
 
 rule tar

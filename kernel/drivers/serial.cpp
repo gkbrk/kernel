@@ -3,22 +3,28 @@
 
 #include "../libk/log.h"
 #include "../libk/printf.h"
+#include "../libk/spinlock.h"
 #include "../scheduler.h"
-#include "driver.h"
 #include "io.h"
 #include "serial.h"
 
-static volatile bool lock = false;
+static Spinlock lock;
 
-void serial_lock() {
-  while (lock)
-    ;
-  lock = true;
+namespace Kernel::Drivers {
+
+static Serial s_inst;
+
+Serial::Serial() {}
+
+Serial *Serial::inst() {
+    return &s_inst;
 }
 
-void serial_unlock() { lock = false; }
+bool Serial::isAvailable() {
+    return true;
+}
 
-static bool serial_init() {
+bool Serial::initialize() {
   outb(COM1 + 1, 0x00); // Disable all interrupts
   outb(COM1 + 3, 0x80); // Enable DLAB (set baud rate divisor)
   outb(COM1 + 0, 0x03); // Set divisor to 3 (lo byte) 38400 baud
@@ -26,10 +32,14 @@ static bool serial_init() {
   outb(COM1 + 3, 0x03); // 8 bits, no parity, one stop bit
   outb(COM1 + 2, 0xC7); // Enable FIFO, clear them, with 14-byte threshold
   outb(COM1 + 4, 0x0B); // IRQs enabled, RTS/DSR set
-
-  klog("Serial port initialized");
   return true;
 }
+
+} // namespace Kernel::Drivers
+
+void serial_lock() { lock.lock(); }
+
+void serial_unlock() { lock.unlock(); }
 
 static bool serial_received() { return inb(COM1 + 5) & 1; }
 
@@ -63,8 +73,3 @@ void serial_printf(const char *s, ...) {
   vsprintf(NULL, serial_write_char, s, ap);
   va_end(ap);
 }
-
-static bool dt() { return true; }
-
-driverDefinition SERIAL_DRIVER = {
-    .name = "Serial Port", .isAvailable = dt, .initialize = serial_init};

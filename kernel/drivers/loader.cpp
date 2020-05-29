@@ -8,7 +8,7 @@
 
 namespace Kernel::Drivers {
 extern "C" void loadDrivers() {
-  driverDefinition drivers[] = {GDT_DRIVER, CMOS_DRIVER, SERIAL_DRIVER};
+  driverDefinition drivers[] = {GDT_DRIVER, CMOS_DRIVER};
 
   for (size_t i = 0; i < sizeof(drivers) / sizeof(driverDefinition); i++) {
     driverDefinition d = drivers[i];
@@ -27,5 +27,6 @@ extern "C" void loadDrivers() {
   }
 
   loadDriver<BGA>();
+  loadDriver<Serial>();
 }
 } // namespace Kernel::Drivers

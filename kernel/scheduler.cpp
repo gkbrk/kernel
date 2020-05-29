@@ -57,13 +57,7 @@ void schedulerTimerTick(size_t freq) {
 }
 
 void initTasking() {
-  uint32_t cr3, eflags;
-
-  asm volatile("movl %%cr3, %%eax; movl %%eax, %0;" : "=m"(cr3)::"%eax");
-  asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;"
-               : "=m"(eflags)::"%eax");
-
-  Task *t = new Task(nullptr, eflags, cr3);
+  Task *t = new Task(nullptr, 0, 0);
   t->setName("kmain");
   t->next = t;
   currentTask = t;

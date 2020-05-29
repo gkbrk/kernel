@@ -43,7 +43,7 @@ static void time_task() {
 
     oldLen = len;
 
-    sleep(1);
+    sleep(0.5);
   }
 }
 
@@ -51,7 +51,7 @@ void memory_stats() {
   while (true) {
     size_t bytes = getMemUsage();
     dbg() << "Current memory usage is " << bytes << " bytes";
-    sleep(3);
+    sleep(5);
   }
 }
 

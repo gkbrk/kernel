@@ -1,15 +1,30 @@
 #pragma once
 
-#include "driver.h"
+#include "../libk/TypeName.h"
 #include <stddef.h>
-
-#define PING() serial_printf("%s:%s:%d\n", __func__, __FILE__, __LINE__)
 
 #define COM1 0x3f8
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace Kernel::Drivers {
+
+class Serial {
+public:
+  Serial();
+  static Serial *inst();
+
+  bool isAvailable();
+  bool initialize();
+
+private:
+};
+
+} // namespace Kernel::Drivers
+
+namespace Libk {
+
+GEN_TYPENAME(Kernel::Drivers::Serial);
+
+}
 
 void serial_lock();
 void serial_unlock();
@@ -18,9 +33,3 @@ void serial_write_char(char a);
 void serial_write(const char *data, size_t size);
 void serial_writestring(const char *data);
 void serial_printf(const char *s, ...);
-
-#ifdef __cplusplus
-}
-#endif
-
-extern driverDefinition SERIAL_DRIVER;
