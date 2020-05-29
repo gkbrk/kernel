@@ -37,7 +37,7 @@ static BGA *s_inst;
 static volatile uint8_t *bankBuffer = (uint8_t *)VBE_DISPI_BANK_ADDRESS;
 static uint16_t currentBank;
 
-BGA::BGA() {}
+BGA::BGA() { m_fb = nullptr; }
 
 BGA *BGA::inst() {
   if (s_inst == nullptr) {
@@ -68,21 +68,27 @@ static void setRes(size_t width, size_t height) {
 bool BGA::setResolution(size_t width, size_t height) {
   m_width = width;
   m_height = height;
+  m_fb = (uint8_t *)kmalloc_forever(width * height * 3);
   setRes(width, height);
   return true;
 }
 
 void BGA::setPixel(size_t x, size_t y, uint8_t r, uint8_t g, uint8_t b) {
   size_t index = m_width * 3 * y + x * 3;
-  size_t bank = index / 65536;
-  index -= bank * 65536;
-  if (bank != currentBank) {
-    writeRegister(VBE_DISPI_INDEX_BANK, bank);
-    currentBank = bank;
-  }
-  bankBuffer[index + 0] = b;
-  bankBuffer[index + 1] = g;
-  bankBuffer[index + 2] = r;
+  m_fb[index + 0] = b;
+  m_fb[index + 1] = g;
+  m_fb[index + 2] = r;
+}
+
+void BGA::flip() const {
+    size_t bank = 0;
+    const size_t len = m_width * m_height * 3;
+    size_t index = 0;
+    while (index < len) {
+        writeRegister(VBE_DISPI_INDEX_BANK, bank++);
+        memcpy((void*)bankBuffer, m_fb + index, 65536);
+        index += 65536;
+    }
 }
 
 } // namespace Kernel::Drivers

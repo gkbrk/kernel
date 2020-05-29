@@ -3,6 +3,7 @@
 #include "../libk/StringBuilder.h"
 #include "../libk/alloc.h"
 #include "../libk/string.h"
+#include "../scheduler.h"
 #include "cmos.h"
 #include "driver.h"
 #include "io.h"
@@ -52,7 +53,7 @@ void cmos_update_time() {
   //       to avoid getting dodgy/inconsistent values due to RTC updates
 
   while (get_update_in_progress_flag())
-    ; // Make sure an update isn't in progress
+    yield(); // Make sure an update isn't in progress
   cmos_second = get_RTC_register(0x00);
   cmos_minute = get_RTC_register(0x02);
   cmos_hour = get_RTC_register(0x04);
@@ -83,6 +84,7 @@ void cmos_update_time() {
     if (century_register != 0) {
       century = get_RTC_register(century_register);
     }
+    yield();
   } while ((last_second != cmos_second) || (last_minute != cmos_minute) ||
            (last_hour != cmos_hour) || (last_day != cmos_day) ||
            (last_month != cmos_month) || (last_year != cmos_year) ||

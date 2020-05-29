@@ -101,6 +101,7 @@ void shell_vga(char *) {
         if (x >= 0 && x <= 800 && y >= 0 && y <= 600)
           bga->setPixel(x, y, 255, 50, 50);
 
+    bga->flip();
     char key = keyboardSpinLoop();
 
     if (key == 'w')
