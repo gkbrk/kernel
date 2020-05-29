@@ -9,7 +9,6 @@
 - Stream file contents instead of reading it all into a buffer
 
 [Graphics]
-- Framebuffer
 - Double buffering
 
 [Devices]
@@ -24,7 +23,6 @@
 - Realloc support for Vectors
 
 [Scheduler]
-- Replace static Task array with a Vector
 - Push current task to end of Vector on yield
 
 [Interrupts]
