@@ -1,11 +1,7 @@
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace Kernel::Drivers {
 
 void loadDrivers();
 
-#ifdef __cplusplus
 }
-#endif

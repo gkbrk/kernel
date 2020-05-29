@@ -16,13 +16,9 @@ static Serial s_inst;
 
 Serial::Serial() {}
 
-Serial *Serial::inst() {
-    return &s_inst;
-}
+Serial *Serial::inst() { return &s_inst; }
 
-bool Serial::isAvailable() {
-    return true;
-}
+bool Serial::isAvailable() { return true; }
 
 bool Serial::initialize() {
   outb(COM1 + 1, 0x00); // Disable all interrupts

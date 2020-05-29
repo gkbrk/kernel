@@ -175,14 +175,11 @@ ShellCommand commands[] = {
     {"rand", "Generate a random number", shell_rand},
     {"play", "Play a melody", shell_playMelody},
     {"cat", "Print the contents of a file", shell_cat},
-    {"shutdown", "Shut down machine", [](char*) {
-         Drivers::Machine::shutdown();
-     }},
+    {"shutdown", "Shut down machine",
+     [](char *) { Drivers::Machine::shutdown(); }},
     {"vga", "VGA test", shell_vga},
-    {"uname", "", [](char*) {
-         kprintf("unnamed kernel compiled on %s\n", __DATE__);
-     }}
-};
+    {"uname", "",
+     [](char *) { kprintf("unnamed kernel compiled on %s\n", __DATE__); }}};
 
 void shell_help(char *) {
   for (size_t i = 0; i < sizeof(commands) / sizeof(ShellCommand); i++) {

@@ -1,14 +1,15 @@
 #include "../libk/debug.h"
 #include "BGA.h"
+#include "GDT.h"
 #include "cmos.h"
 #include "cppdriver.h"
 #include "driver.h"
-#include "gdt.h"
 #include "pcspeaker.h"
+#include "terminal.h"
 
 namespace Kernel::Drivers {
-extern "C" void loadDrivers() {
-  driverDefinition drivers[] = {GDT_DRIVER, CMOS_DRIVER};
+void loadDrivers() {
+  driverDefinition drivers[] = {CMOS_DRIVER};
 
   for (size_t i = 0; i < sizeof(drivers) / sizeof(driverDefinition); i++) {
     driverDefinition d = drivers[i];
@@ -26,7 +27,8 @@ extern "C" void loadDrivers() {
     }
   }
 
-  loadDriver<BGA>();
+  loadDriver<GDT>();
   loadDriver<Serial>();
+  loadDriver<BGA>();
 }
 } // namespace Kernel::Drivers

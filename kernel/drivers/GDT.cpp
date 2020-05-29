@@ -1,17 +1,18 @@
-#pragma once
-
-#include "driver.h"
-#include "terminal.h"
+#include "GDT.h"
+#include "../libk/assert.h"
 #include <stddef.h>
 #include <stdint.h>
+
+namespace Kernel::Drivers {
 
 extern "C" void reloadSegments();
 extern "C" void setGdt(void *, size_t);
 
-void encodeGdtEntry(uint8_t *target, size_t base, size_t limit, uint8_t type) {
+static void encodeGdtEntry(uint8_t *target, size_t base, size_t limit,
+                           uint8_t type) {
   // Check the limit to make sure that it can be encoded
   if ((limit > 65536) && (limit & 0xFFF) != 0xFFF) {
-    Kernel::Drivers::VGATerminal::write("You can't do that!\n");
+    ASSERT_NOT_REACHED;
   }
   if (limit > 65536) {
     // Adjust granularity if required
@@ -36,9 +37,16 @@ void encodeGdtEntry(uint8_t *target, size_t base, size_t limit, uint8_t type) {
   target[5] = type;
 }
 
+GDT s_inst;
 static uint8_t gdt_table[24];
 
-bool gdt_initialize() {
+GDT::GDT() {}
+
+GDT *GDT::inst() { return &s_inst; }
+
+bool GDT::isAvailable() { return true; }
+
+bool GDT::initialize() {
   encodeGdtEntry(&gdt_table[0], 0, 0, 0);
   encodeGdtEntry(&gdt_table[8], 0, 0xffffffff, 0x9A);
   encodeGdtEntry(&gdt_table[16], 0, 0xffffffff, 0x92);
@@ -47,7 +55,4 @@ bool gdt_initialize() {
   return true;
 }
 
-static bool dt() { return true; }
-
-driverDefinition GDT_DRIVER = {
-    .name = "GDT Table", .isAvailable = dt, .initialize = gdt_initialize};
+} // namespace Kernel::Drivers
