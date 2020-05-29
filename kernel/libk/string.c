@@ -28,7 +28,7 @@ bool streq(const char *str1, const char *str2) {
 
 char *strcpy(char *dest, const char *src) {
   char *save = dest;
-  while (*dest++ = *src++)
+  while ((*dest++ = *src++))
     ;
   return save;
 }

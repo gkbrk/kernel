@@ -1,18 +1,11 @@
 #include "printf.h"
 #include "../drivers/terminal.h"
 
-static int is_format_letter(char c) {
-  return c == 'c' || c == 'd' || c == 'i' || c == 'e' || c == 'E' || c == 'f' ||
-         c == 'g' || c == 'G' || c == 'o' || c == 's' || c == 'u' || c == 'x' ||
-         c == 'X' || c == 'p' || c == 'n';
-}
-
 static void vsprintf_helper(char *str, void (*putchar)(char),
                             const char *format, uint32_t *pos, va_list arg) {
   char c;
-  int sign, ival, sys;
+  int sign, ival;
   char buf[512];
-  char width_str[10];
   uint32_t uval;
   uint32_t size = 8;
   uint32_t i;
@@ -30,11 +23,6 @@ static void vsprintf_helper(char *str, void (*putchar)(char),
       case 'u':
       case 'x':
       case 'p':
-        if (c == 'd' || c == 'u')
-          sys = 10;
-        else
-          sys = 16;
-
         if (c == 'u') {
           uval = ival = va_arg(arg, uint64_t);
           u64toa(uval, buf);
@@ -131,9 +119,9 @@ void kprintf(const char *s, ...) {
   va_end(ap);
 }
 
-size_t snprintf(char *s, size_t n, const char *format, ...) {
+size_t snprintf(char *s, size_t, const char *format, ...) {
   va_list ap;
-  va_start(ap, s);
+  va_start(ap, format);
   vsprintf(s, NULL, format, ap);
   va_end(ap);
 

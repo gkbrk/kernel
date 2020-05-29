@@ -89,6 +89,7 @@ void killTask(Task *t) {
     p = p->next;
 
   p->next = t->next;
+  delete t;
 }
 
 void spawnTask(void (*main)(), const char *name) {

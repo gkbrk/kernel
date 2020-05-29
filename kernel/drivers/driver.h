@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 typedef struct {
-  char *name;
+  const char *name;
   bool (*isAvailable)(void);
   bool (*initialize)(void);
 } driverDefinition;

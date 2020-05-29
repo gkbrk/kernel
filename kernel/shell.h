@@ -34,7 +34,7 @@ void shell_echo(char *arg) {
 
 void shell_clear(char *) { Drivers::VGATerminal::clear(); }
 
-void shell_mem(char *args) {
+void shell_mem(char *) {
   dbg() << "Memory usage: " << getMemUsage() << " bytes";
   Drivers::VGATerminal::lock();
   kprintf("Memory usage: %d bytes\n", getMemUsage());
@@ -68,7 +68,7 @@ void shell_ps(char *) {
   }
 }
 
-void shell_pkill(char *args) {
+void shell_pkill(char *) {
   return; /*
  Task *t = findTaskByName(args);
  killTask(t);*/
@@ -163,8 +163,6 @@ void shell_read(char *path) {
   }
 }
 
-void shell_shutdown(char *) { Drivers::Machine::shutdown(); }
-
 ShellCommand commands[] = {
     {"echo", "Print text", shell_echo},
     {"ls", "List files", shell_ls},
@@ -177,30 +175,16 @@ ShellCommand commands[] = {
     {"rand", "Generate a random number", shell_rand},
     {"play", "Play a melody", shell_playMelody},
     {"cat", "Print the contents of a file", shell_cat},
-    {"shutdown", "Shut down machine", shell_shutdown},
-    {"vga", "VGA test", shell_vga}
-    /*
-    {.name = "clear", .function = shell_clear, .desc = "Clears the console"},
-    {.name = "mem",
-     .function = shell_memusage,
-     .desc = "Print current memory usage"},
-    {.name = "help", .function = shell_help, .desc = "Get help on commands"},
-    {.name = "ps", .function = shell_ps, .desc = "Process list"},
-    {.name = "pkill", .function = shell_pkill, .desc = "Kill a process"},
-    {.name = "msg",
-     .function = shell_msg,
-     .desc = "Send a message to a process"},
-    {.name = "ls", .function = shell_ls, .desc = "List files"},
-    {.name = "testcpp", .function = shell_test_cpp, .desc = "List files"},
-    {.name = "cat",
-     .function = shell_cat,
-     .desc = "Print the contents of a file"},
-    {.name = "read",
-     .function = shell_read,
-     .desc = "Read the contents of a file"},*/
+    {"shutdown", "Shut down machine", [](char*) {
+         Drivers::Machine::shutdown();
+     }},
+    {"vga", "VGA test", shell_vga},
+    {"uname", "", [](char*) {
+         kprintf("unnamed kernel compiled on %s\n", __DATE__);
+     }}
 };
 
-void shell_help(char *args) {
+void shell_help(char *) {
   for (size_t i = 0; i < sizeof(commands) / sizeof(ShellCommand); i++) {
     kprintf("%s - %s\n", commands[i].name, commands[i].desc);
   }

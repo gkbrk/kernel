@@ -2,9 +2,10 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
-extern void *alloc_begin;
-extern void *alloc_end;
+extern uint8_t *alloc_begin;
+extern uint8_t *alloc_end;
 
 #ifdef __cplusplus
 size_t getMemUsage();

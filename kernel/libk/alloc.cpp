@@ -20,8 +20,8 @@ static AllocTableItem *allocTable;
 
 static const size_t numBlocks = 8192;
 
-void *alloc_begin;
-void *alloc_end;
+uint8_t *alloc_begin;
+uint8_t *alloc_end;
 
 extern "C" void *kmalloc_forever(size_t size) {
   void *ptr = alloc_begin;

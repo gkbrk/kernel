@@ -11,9 +11,12 @@
 [Graphics]
 - Double buffering
 
-[Devices]
+[Drivers]
 - Mouse driver
 - Ethernet card
+- Migrate CMOS to cppdriver
+- Migrate GDT to cppdriver
+- Remove old C driver loader
 
 [Shell improvements]
 - Cursor movement support

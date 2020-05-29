@@ -20,8 +20,6 @@ static unsigned char get_RTC_register(int reg) {
   return inb(0x71);
 }
 
-static char get_RTC_second() { return get_RTC_register(0x00); }
-
 static inline uint64_t rdtsc() {
   uint64_t ret;
   asm volatile("rdtsc" : "=A"(ret));
