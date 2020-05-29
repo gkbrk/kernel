@@ -81,14 +81,14 @@ void BGA::setPixel(size_t x, size_t y, uint8_t r, uint8_t g, uint8_t b) {
 }
 
 void BGA::flip() const {
-    size_t bank = 0;
-    const size_t len = m_width * m_height * 3;
-    size_t index = 0;
-    while (index < len) {
-        writeRegister(VBE_DISPI_INDEX_BANK, bank++);
-        memcpy((void*)bankBuffer, m_fb + index, 65536);
-        index += 65536;
-    }
+  size_t bank = 0;
+  const size_t len = m_width * m_height * 3;
+  size_t index = 0;
+  while (index < len) {
+    writeRegister(VBE_DISPI_INDEX_BANK, bank++);
+    memcpy((void *)bankBuffer, m_fb + index, 65536);
+    index += 65536;
+  }
 }
 
 } // namespace Kernel::Drivers

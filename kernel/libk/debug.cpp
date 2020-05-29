@@ -3,7 +3,7 @@
 #include "../scheduler.h"
 #include "assert.h"
 
-const DebugPrinter dbg() { return dbg(runningTask->name); }
+const DebugPrinter dbg() { return dbg(currentTask->name()->c_str()); }
 const DebugPrinter dbg(const char *name) { return DebugPrinter(name); }
 
 DebugPrinter::DebugPrinter(const char *name) {

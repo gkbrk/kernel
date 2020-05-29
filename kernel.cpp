@@ -66,7 +66,7 @@ extern "C" void kernel_main() {
         spawnTask(memory_stats, "memory-stats");
         spawnTask(shell, "shell");
 
-        Kernel::Drivers::PCSpeaker::playFreq(300, 0.1);
+        // Kernel::Drivers::PCSpeaker::playFreq(300, 0.1);
 
         exitTask();
       },

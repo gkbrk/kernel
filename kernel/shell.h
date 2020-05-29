@@ -51,25 +51,24 @@ void shell_rand(char *) {
 
 void shell_help(char *args);
 
-void shell_ps(char *args) {
-  (void)args;
+void shell_ps(char *) {
+  Task *t = currentTask;
 
-  for (size_t i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
-    volatile Task *t = &tasks[i];
-
-    if (t->name != NULL) {
+  while (1) {
+    if (t->name() != NULL) {
       const char *c = "";
-      if (runningTask == t) {
+      if (currentTask == t) {
         c = "[current task]";
       }
-      kprintf("Task %d -> %s %s -> %s\n", i, t->name, c, t->next->name);
+      kprintf("%s %s -> %s\n", t->name(), c, t->next->name());
     }
   }
 }
 
 void shell_pkill(char *args) {
-  Task *t = findTaskByName(args);
-  killTask(t);
+  return; /*
+ Task *t = findTaskByName(args);
+ killTask(t);*/
 }
 
 void shell_ls(char *) {
@@ -82,7 +81,7 @@ void shell_ls(char *) {
 }
 
 void shell_vga(char *) {
-  Drivers::VGATerminal::write("Going to VGA-land\n");
+  dbg() << "Going to VGA-land";
   Drivers::BGA *bga = Drivers::BGA::inst();
   bga->setResolution(800, 600);
 
@@ -124,7 +123,8 @@ void shell_playMelody(char *file) {
   auto contents = Filesystem::TarFS::inst()->readFile(file);
 
   for (size_t i = 0; i < contents.length(); i++) {
-    Drivers::PCSpeaker::playFreq(contents[i], 0.2);
+    Drivers::PCSpeaker::playFreq(contents[i]);
+    sleep(0.2);
   }
 
   Drivers::PCSpeaker::noSound();

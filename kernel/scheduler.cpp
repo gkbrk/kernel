@@ -1,122 +1,116 @@
 #include <stdbool.h>
 
-#include "scheduler.h"
+#include "Task.h"
 
+#include "libk/String.h"
 #include "libk/alloc.h"
 #include "libk/debug.h"
 #include "libk/log.h"
 #include "libk/string.h"
+#include "libk/vector.h"
 
 #include "../arch/x86/idt.h"
 
-Task *runningTask;
-Task tasks[20];
+Task::Task(void (*main)(), uint32_t flags, uint32_t pagedir) {
+  regs.eax = 0;
+  regs.ebx = 0;
+  regs.ecx = 0;
+  regs.edx = 0;
+  regs.esi = 0;
+  regs.edi = 0;
+  regs.eflags = flags;
+  regs.eip = (uint32_t)main;
+  regs.cr3 = (uint32_t)pagedir;
+  regs.esp = (uint32_t)kmalloc_forever(4096);
+}
+
+String *Task::name() const { return m_name; }
+
+void Task::setName(const char *name) {
+  m_name = new String(name, strlen(name));
+}
+
+void Task::addRemainingSleep(double amount) { m_remaining_sleep += amount; }
+
+void Task::setRemainingSleep(double amount) { m_remaining_sleep = amount; }
+
+double Task::remainingSleep() const { return m_remaining_sleep; }
+
+Task *currentTask;
 
 void schedulerTimerTick(size_t freq) {
-  for (size_t i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
-    if (tasks[i].remainingSleep >= (1.0 / freq)) {
-      tasks[i].remainingSleep -= (1.0 / freq);
+  double amount = 1.0 / freq;
+
+  Task *t = currentTask;
+
+  while (1) {
+    if (t->remainingSleep() >= amount) {
+      t->addRemainingSleep(-amount);
     } else {
-      tasks[i].remainingSleep = 0;
+      t->setRemainingSleep(0);
     }
+    t = t->next;
+
+    if (t == currentTask)
+      break;
   }
 }
 
-void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir) {
-  task->regs.eax = 0;
-  task->regs.ebx = 0;
-  task->regs.ecx = 0;
-  task->regs.edx = 0;
-  task->regs.esi = 0;
-  task->regs.edi = 0;
-  task->regs.eflags = flags;
-  task->regs.eip = (uint32_t)main;
-  task->regs.cr3 = (uint32_t)pagedir;
-  task->regs.esp = (uint32_t)kmalloc_forever(4096); // Not implemented here
-  task->next = 0;
-}
-
 void initTasking() {
-  // Get EFLAGS and CR3
-  memset(tasks, '\0', sizeof(tasks));
-  asm volatile("movl %%cr3, %%eax; movl %%eax, %0;"
-               : "=m"(tasks[0].regs.cr3)::"%eax");
+  uint32_t cr3, eflags;
+
+  asm volatile("movl %%cr3, %%eax; movl %%eax, %0;" : "=m"(cr3)::"%eax");
   asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;"
-               : "=m"(tasks[0].regs.eflags)::"%eax");
+               : "=m"(eflags)::"%eax");
 
-  tasks[0].next = &tasks[0];
-  tasks[0].name = "kmain";
-  tasks[0].remainingSleep = 0;
-
-  runningTask = &tasks[0];
+  Task *t = new Task(nullptr, eflags, cr3);
+  t->setName("kmain");
+  t->next = t;
+  currentTask = t;
 }
 
 extern "C" void switchTask(Registers *r1, Registers *r2);
 
 void yield() {
-  Task *last = runningTask;
+  Task *last = currentTask;
 
   while (true) {
-    runningTask = runningTask->next;
-    if (runningTask->remainingSleep == 0) {
+    currentTask = currentTask->next;
+    if (currentTask->remainingSleep() == 0) {
       break;
     }
   }
 
-  switchTask(&last->regs, &runningTask->regs);
+  switchTask(&last->regs, &currentTask->regs);
 }
 
 void sleep(float duration) {
-  runningTask->remainingSleep += duration;
+  currentTask->addRemainingSleep(duration);
   yield();
 }
 
 void killTask(Task *t) {
-  for (int i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
-    if (t == &tasks[i]) {
-      tasks[i - 1].next = tasks[i].next;
-      tasks[i].name = NULL;
-      return;
-    }
-  }
+  Task *p = t;
+  while (p->next != t)
+    p = p->next;
+
+  p->next = t->next;
 }
 
 void spawnTask(void (*main)(), const char *name) {
   klog("Spawning new task");
   klog(name);
 
-  Task *t = {0};
-  Task *l = {0};
+  Task *t = new Task(main, currentTask->regs.eflags, currentTask->regs.cr3);
 
-  for (int i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
-    if (tasks[i].next == &tasks[0]) {
-      t = &tasks[i + 1];
-      l = &tasks[i];
-      break;
-    }
-  }
+  Task *n = currentTask->next;
+  currentTask->next = t;
+  t->next = n;
 
-  createTask(t, main, tasks[0].regs.eflags, (uint32_t *)tasks[0].regs.cr3);
-
-  l->next = t;
-  t->next = &tasks[0];
-  t->name = name;
-  t->remainingSleep = 0;
+  t->setName(name);
 }
 
 void exitTask() {
-  killTask(runningTask);
+  killTask(currentTask);
   yield();
-}
-
-Task *findTaskByName(char *name) {
-  for (int i = 0; i < sizeof(tasks) / sizeof(Task); i++) {
-    Task *t = &tasks[i];
-
-    if (strcmp(name, t->name) == 0) {
-      return t;
-    }
-  }
-
-  return NULL;
 }

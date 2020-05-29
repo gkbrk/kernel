@@ -64,6 +64,7 @@ void serial_printf(const char *s, ...) {
   va_end(ap);
 }
 
-driverDefinition SERIAL_DRIVER = {.name = "Serial Port",
-                                  .isAvailable = driver_true,
-                                  .initialize = serial_init};
+static bool dt() { return true; }
+
+driverDefinition SERIAL_DRIVER = {
+    .name = "Serial Port", .isAvailable = dt, .initialize = serial_init};
