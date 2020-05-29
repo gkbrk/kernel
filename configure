@@ -1,0 +1,79 @@
+#!/bin/sh
+
+# C rules
+ORIG=${CFLAGS}
+CFLAGS="-std=gnu99 -ffreestanding"
+CFLAGS="${CFLAGS} -Os -flto"
+CFLAGS="${CFLAGS} -Wall -Wextra -pedantic"
+CFLAGS="${CFLAGS} ${ORIG}"
+
+# CPP
+ORIG=${CXXFLAGS}
+CXXFLAGS="-Os -flto -DDEBUG"
+CXXFLAGS="${CXXFLAGS} -Wall -Wextra"
+CXXFLAGS="${CXXFLAGS} -fno-exceptions -fno-rtti -ffreestanding"
+CXXFLAGS="${CXXFLAGS} ${ORIG}"
+
+cat <<EOF
+
+rule cc
+  command = i686-elf-gcc ${CFLAGS} -I. -c \$in -o \$out
+
+rule cxx
+  command = i686-elf-c++ ${CXXFLAGS} -I. -c \$in -o \$out
+
+rule nasm
+  command = nasm -felf32 \$in -o \$out
+
+rule gas
+  command = as --32 -c \$in -o \$out
+
+rule link
+  command = i686-elf-gcc -T linker.ld -flto -nostdlib $
+            -fno-stack-protector -Os -o \$out \$in -lgcc
+
+rule tar
+  command = tar cvf \$out \$in
+
+EOF
+
+objfiles=""
+
+for file in $(find . -type f -iname '*.c')
+do
+    objname=${file%.c}.o
+    echo "build ${objname}: cc ${file}"
+    objfiles="${objfiles} ${objname}"
+done
+
+for file in $(find . -type f -iname '*.cpp')
+do
+    objname=${file%.cpp}.o
+    echo "build ${objname}: cxx ${file}"
+    objfiles="${objfiles} ${objname}"
+done
+
+for file in $(find . -type f -iname '*.asm')
+do
+    objname=${file%.asm}.o
+    echo "build ${objname}: nasm ${file}"
+    objfiles="${objfiles} ${objname}"
+done
+
+for file in $(find . -type f -iname '*.s')
+do
+    objname=${file%.s}.o
+    echo "build ${objname}: gas ${file}"
+    objfiles="${objfiles} ${objname}"
+done
+
+printf "build tar-drive.tar: tar"
+for file in $(find tar-drive/ -type f)
+do
+    printf " %s" "${file}"
+done
+echo
+
+echo "build leonardo.bin: link ${objfiles}"
+
+echo "default leonardo.bin"

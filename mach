@@ -1,0 +1,57 @@
+#!/bin/sh
+
+build () {
+    ./configure > build.ninja
+    ninja
+}
+
+clean () {
+    ./configure > build.ninja
+    ninja -t clean
+}
+
+format () {
+    clang-format -i $(find . -type f -name '*.c')
+    clang-format -i $(find . -type f -name '*.cpp')
+    clang-format -i $(find . -type f -name '*.h')
+}
+
+run () {
+    ./mach
+    ninja tar-drive.tar
+
+    qemu-system-x86_64 \
+        -serial mon:stdio \
+        -kernel leonardo.bin \
+        -hda tar-drive.tar \
+        -d guest_errors \
+        -soundhw pcspk \
+        -vga std \
+        -d cpu_reset \
+        -m 1024
+}
+
+reload () {
+    find . -type f -name '*.c' \
+         -or -name '*.cpp' \
+         -or -name '*.h' > QtCreator.files
+}
+
+iso () {
+    mkdir -p build/iso/boot/grub
+    cp leonardo.bin build/iso/boot/leonardo.bin
+    echo "menuentry \"leonardo\" { multiboot /boot/leonardo.bin }" > build/iso/boot/grub/grub.cfg
+    grub-mkrescue -o build/iso/leonardo.iso build/iso
+}
+
+action=$*
+if [ -z "${action}" ]
+then
+  action="build"
+fi
+
+
+for command in ${action}
+do
+    "${command}"
+done
