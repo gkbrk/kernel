@@ -24,7 +24,9 @@ static void time_task() {
   size_t oldLen = 0;
 
   while (true) {
-    String t = cmos_formatted_string();
+    auto cmos = CMOS::inst();
+    cmos->updateTime();
+    String t = cmos->formattedString();
     size_t len = t.length();
 
     size_t old_color = TextVGA::s_color;

@@ -5,8 +5,11 @@
 #include "../libk/string.h"
 #include "../scheduler.h"
 #include "cmos.h"
-#include "driver.h"
 #include "io.h"
+
+namespace Kernel::Drivers {
+
+static const size_t CURRENT_YEAR = 2020;
 
 static unsigned char cmos_second;
 static unsigned char cmos_minute;
@@ -14,6 +17,7 @@ static unsigned char cmos_hour;
 static unsigned char cmos_day;
 static unsigned char cmos_month;
 static unsigned int cmos_year;
+static int century_register = 0x00;
 
 static unsigned char get_RTC_register(int reg) {
   outb(0x70, reg);
@@ -26,16 +30,27 @@ static inline uint64_t rdtsc() {
   return ret;
 }
 
-int century_register = 0x00;
-
 enum { cmos_address = 0x70, cmos_data = 0x71 };
 
-int get_update_in_progress_flag() {
+static int get_update_in_progress_flag() {
   outb(cmos_address, 0x0A);
   return (inb(cmos_data) & 0x80);
 }
 
-void cmos_update_time() {
+static CMOS s_inst;
+
+CMOS::CMOS() {}
+
+CMOS *CMOS::inst() { return &s_inst; }
+
+bool CMOS::isAvailable() { return true; }
+
+bool CMOS::initialize() {
+  updateTime();
+  return true;
+}
+
+void CMOS::updateTime() {
   unsigned char century;
   unsigned char last_second;
   unsigned char last_minute;
@@ -122,8 +137,7 @@ void cmos_update_time() {
   }
 }
 
-String cmos_formatted_string() {
-  cmos_update_time(); // Update time
+String CMOS::formattedString() const {
   StringBuilder b;
   b.append((size_t)cmos_hour);
   b.append(":");
@@ -133,17 +147,4 @@ String cmos_formatted_string() {
   return b.to_string();
 }
 
-extern "C" char *cmos_formatted_time() {
-  String t = cmos_formatted_string();
-  return strdup(t.c_str());
-}
-
-static bool cmos_init() {
-  cmos_update_time();
-  return true;
-}
-
-static bool dt() { return true; }
-
-driverDefinition CMOS_DRIVER = {
-    .name = "CMOS Chip", .isAvailable = dt, .initialize = cmos_init};
+} // namespace Kernel::Drivers

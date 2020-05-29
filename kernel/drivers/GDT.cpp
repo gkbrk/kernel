@@ -37,7 +37,7 @@ static void encodeGdtEntry(uint8_t *target, size_t base, size_t limit,
   target[5] = type;
 }
 
-GDT s_inst;
+static GDT s_inst;
 static uint8_t gdt_table[24];
 
 GDT::GDT() {}

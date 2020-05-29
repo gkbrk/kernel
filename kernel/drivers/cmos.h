@@ -1,23 +1,26 @@
 #pragma once
 
-#include "driver.h"
-
-#define CURRENT_YEAR 2020
-
-#ifdef __cplusplus
-
 #include "../libk/String.h"
+#include "../libk/TypeName.h"
 
-String cmos_formatted_string();
+namespace Kernel::Drivers {
 
-extern "C" {
-#endif
+class CMOS {
+public:
+  CMOS();
+  static CMOS *inst();
 
-void cmos_update_time();
-char *cmos_formatted_time();
+  bool isAvailable();
+  bool initialize();
 
-#ifdef __cplusplus
+  void updateTime();
+  String formattedString() const;
+};
+
+} // namespace Kernel::Drivers
+
+namespace Libk {
+
+GEN_TYPENAME(Kernel::Drivers::CMOS);
+
 }
-#endif
-
-extern driverDefinition CMOS_DRIVER;

@@ -3,7 +3,7 @@
 #ifdef __cplusplus
 
 #include "../libk/Option.h"
-#include "cppdriver.h"
+#include "driver.h"
 #include <stdint.h>
 
 class KeyboardDriver : public Driver {
