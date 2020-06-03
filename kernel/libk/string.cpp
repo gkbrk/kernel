@@ -66,7 +66,7 @@ char *strdup(const char *str) {
   char *copy;
 
   siz = strlen(str) + 1;
-  if ((copy = kmalloc(siz)) == NULL)
+  if ((copy = (char*)kmalloc(siz)) == NULL)
     return (NULL);
   (void)memcpy(copy, str, siz);
   return (copy);
@@ -86,7 +86,7 @@ void *memset(void *bufptr, int value, size_t size) {
   return bufptr;
 }
 
-void *memcpy(void *restrict dstptr, const void *restrict srcptr, size_t size) {
+void *memcpy(void *dstptr, const void *srcptr, size_t size) {
   unsigned char *dst = (unsigned char *)dstptr;
   const unsigned char *src = (const unsigned char *)srcptr;
   for (size_t i = 0; i < size; i++) {

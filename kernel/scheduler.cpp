@@ -5,7 +5,6 @@
 #include "libk/String.h"
 #include "libk/alloc.h"
 #include "libk/debug.h"
-#include "libk/log.h"
 #include "libk/string.h"
 #include "libk/vector.h"
 
@@ -93,9 +92,7 @@ void killTask(Task *t) {
 }
 
 void spawnTask(void (*main)(), const char *name) {
-  klog("Spawning new task");
-  klog(name);
-
+  dbg() << "Spawning new task: " << name;
   Task *t = new Task(main, currentTask->regs.eflags, currentTask->regs.cr3);
 
   Task *n = currentTask->next;

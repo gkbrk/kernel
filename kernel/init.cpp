@@ -5,7 +5,6 @@
 #include "drivers/terminal.h"
 #include "libk/alloc.h"
 #include "libk/debug.h"
-#include "libk/log.h"
 #include "scheduler.h"
 #include <stdint.h>
 
@@ -42,15 +41,15 @@ extern "C" void init(multiboot_info_t *mb, unsigned int magic) {
   kmalloc_init();
 
   initTasking();
-  klog("Starting scheduler/tasking");
-  klog("Kernel memory allocator initialized");
+  dbg() << "Started scheduler/tasking";
+  dbg() << "Kernel memory allocator initialized";
   Kernel::Drivers::VGATerminal::clear();
 
-  klog("Loading drivers...");
+  dbg() << "Loading drivers...";
   Kernel::Drivers::loadDrivers();
-  klog("Drivers loaded");
+  dbg() << "Drivers loaded";
 
-  klog("Loading IDT, here we go");
+  dbg() << "Loading IDT, here we go";
   idt_init();
 
   dbg() << "Start ctors at " << &start_ctors;

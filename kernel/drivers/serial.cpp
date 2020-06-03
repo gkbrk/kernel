@@ -1,7 +1,6 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-#include "../libk/log.h"
 #include "../libk/printf.h"
 #include "../libk/spinlock.h"
 #include "../scheduler.h"

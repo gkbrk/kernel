@@ -23,14 +23,14 @@ static const size_t numBlocks = 8192;
 uint8_t *alloc_begin;
 uint8_t *alloc_end;
 
-extern "C" void *kmalloc_forever(size_t size) {
+void *kmalloc_forever(size_t size) {
   void *ptr = alloc_begin;
   alloc_begin += size;
   ASSERT(alloc_begin < alloc_end);
   return ptr;
 }
 
-extern "C" void kmalloc_init() {
+void kmalloc_init() {
   allocTable = static_cast<AllocTableItem *>(
       kmalloc_forever(numBlocks * sizeof(AllocTableItem)));
 
@@ -54,7 +54,7 @@ size_t getMemUsage() {
   return used;
 }
 
-extern "C" void *kmalloc(size_t size) {
+void *kmalloc(size_t size) {
   if (size == 0)
     return NULL;
   lock.lock();
@@ -79,7 +79,7 @@ template <typename T> static constexpr T min(T v1, T v2) {
   }
 }
 
-extern "C" void *kmrealloc(void *ptr, size_t size) {
+void *kmrealloc(void *ptr, size_t size) {
   if (ptr == NULL)
     return kmalloc(size);
 
@@ -115,7 +115,7 @@ extern "C" void *kmrealloc(void *ptr, size_t size) {
   return NULL;
 }
 
-extern "C" void kmfree(void *ptr) {
+void kmfree(void *ptr) {
   if (ptr == NULL)
     return;
   lock.lock();

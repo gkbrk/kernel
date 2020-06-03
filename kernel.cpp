@@ -14,7 +14,6 @@
 #include "kernel/libk/String.h"
 #include "kernel/libk/alloc.h"
 #include "kernel/libk/debug.h"
-#include "kernel/libk/log.h"
 #include "kernel/scheduler.h"
 #include "kernel/shell.h"
 
@@ -61,7 +60,7 @@ extern "C" void kernel_main() {
   spawnTask(
       []() {
         dbg() << "Enter kernel main";
-        klog("Booting kernel");
+        dbg() << "Booting kernel";
         Kernel::Drivers::VGATerminal::write("Booting kernel...\n");
 
         spawnTask(time_task, "time-display");
