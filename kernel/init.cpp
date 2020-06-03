@@ -18,8 +18,7 @@ extern "C" uint8_t __KERNEL_END;
 extern "C" void kernel_main();
 
 extern "C" void init(multiboot_info_t *mb, unsigned int magic) {
-  // TODO: Verify magic number
-  (void)magic;
+  ASSERT(magic == 0x2BADB002);
   uint64_t maxMem = 0;
 
   multiboot_memory_map_t *memmap = (multiboot_memory_map_t *)mb->mmap_addr;
