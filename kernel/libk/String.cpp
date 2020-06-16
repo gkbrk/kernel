@@ -2,9 +2,7 @@
 #include "../drivers/terminal.h"
 #include "Pair.h"
 #include "StringBuilder.h"
-#include "alloc.h"
 #include "assert.h"
-#include "debug.h"
 
 template <typename T> constexpr static void swap(T &a, T &b) {
   T tmp = a;
@@ -13,18 +11,18 @@ template <typename T> constexpr static void swap(T &a, T &b) {
 }
 
 String::String(const char *str, size_t size) {
-  m_value = static_cast<char *>(kmalloc(size + 1));
+  m_value = new char[size + 1];
   ASSERT(m_value != NULL);
   memcpy(m_value, str, size);
   m_value[size] = 0;
   m_size = size;
 }
 
-String::~String() { kmfree(m_value); }
+String::~String() { delete m_value; }
 
 String::String(const String &other) {
   m_size = other.m_size;
-  m_value = static_cast<char *>(kmalloc(m_size + 1));
+  m_value = new char[m_size + 1];
   ASSERT(m_value != NULL);
   memcpy(m_value, other.m_value, m_size);
   m_value[m_size] = 0;
