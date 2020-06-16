@@ -16,56 +16,77 @@ CXXFLAGS="${CXXFLAGS} ${ORIG}"
 
 cat <<EOF
 
+# Kernel Ninja build script
+# Generated on $(date)
+
+cflags = ${CFLAGS}
+cxxflags = ${CXXFLAGS}
+root = build
+
 rule cc
-  command = i686-elf-gcc ${CFLAGS} -I. -c \$in -o \$out
+  command = i686-elf-gcc \$cflags -I. -c \$in -o \$out
 
 rule cxx
-  command = i686-elf-c++ ${CXXFLAGS} -I. -c \$in -o \$out
+  command = i686-elf-c++ \$cxxflags -I. -c \$in -o \$out
+  description = Building C++ file \$in
 
 rule nasm
   command = nasm -felf32 \$in -o \$out
+  description = Assembling \$in with NASM
 
 rule gas
   command = as --32 -c \$in -o \$out
+  description = Assembling \$in with gas
 
 rule link
-  command = i686-elf-gcc -T linker.ld -Os -flto -s -nostdlib -fno-stack-protector -Os -o \$out \$in -lgcc
+  description = Linking \$out
+  command = i686-elf-c++ -T linker.ld -Os -flto -s -nostdlib $
+            -fno-stack-protector -Os -o \$out \$in -lgcc
 
 rule tar
   command = tar cvf \$out \$in
 
 EOF
 
+build () {
+    printf "build %s: %s %s\n\n" "${1}" "${2}" "${3}"
+}
+
 objfiles=""
 
+printf "# C files\n\n"
 for file in $(find . -type f -iname '*.c')
 do
     objname=${file%.c}.o
-    echo "build ${objname}: cc ${file}"
+    build "${objname}" cc "${file}"
     objfiles="${objfiles} ${objname}"
 done
 
+printf "# C++ files\n\n"
 for file in $(find . -type f -iname '*.cpp')
 do
     objname=${file%.cpp}.o
-    echo "build ${objname}: cxx ${file}"
+    build "${objname}" cxx "${file}"
     objfiles="${objfiles} ${objname}"
 done
 
+printf "# NASM files\n\n"
 for file in $(find . -type f -iname '*.asm')
 do
     objname=${file%.asm}.o
-    echo "build ${objname}: nasm ${file}"
+    build "${objname}" nasm "${file}"
     objfiles="${objfiles} ${objname}"
 done
 
+printf "# GAS files\n\n"
 for file in $(find . -type f -iname '*.s')
 do
     objname=${file%.s}.o
-    echo "build ${objname}: gas ${file}"
+    build "${objname}" gas "${file}"
     objfiles="${objfiles} ${objname}"
 done
 
+printf "# tar drive\n\n"
 printf "build tar-drive.tar: tar"
 for file in $(find tar-drive/ -type f)
 do
@@ -73,6 +94,6 @@ do
 done
 echo
 
-echo "build leonardo.bin: link ${objfiles}"
+build leonardo.bin link "${objfiles}"
 
 echo "default leonardo.bin"
