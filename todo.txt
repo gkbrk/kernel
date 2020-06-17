@@ -3,13 +3,14 @@
 - Key buffer instead of polling
 
 [File system]
-- Mount filesystem classes to mountpoints
+- VFS prototype
 - TarFS file write support
-- File attribute type for the listFiles method
 - Stream file contents instead of reading it all into a buffer
 
 [Graphics]
 - Double buffering
+- Simple drawing API
+- Bitmap font rendering
 
 [Drivers]
 - Mouse driver
@@ -23,6 +24,7 @@
 - Realloc support for Vectors
 
 [Scheduler]
+- Priority levels
 - Push current task to end of Vector on yield
 
 [Interrupts]
@@ -30,4 +32,5 @@
 - Notify keyboard driver on IRQ
 
 [Process runtime]
+- Reintroduce message passing
 - Simple bytecode interpreter
