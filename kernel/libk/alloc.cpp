@@ -20,6 +20,7 @@ static AllocTableItem *allocTable;
 
 static const size_t numBlocks = 8192;
 
+uint8_t *alloc_start;
 uint8_t *alloc_begin;
 uint8_t *alloc_end;
 

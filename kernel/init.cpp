@@ -37,6 +37,8 @@ extern "C" void init(multiboot_info_t *mb, unsigned int magic) {
     alloc_begin = &__KERNEL_END;
   }
 
+  alloc_start = alloc_begin;
+
   kmalloc_init();
 
   initTasking();

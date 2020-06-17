@@ -51,7 +51,9 @@ static void time_task() {
 void memory_stats() {
   while (true) {
     size_t bytes = getMemUsage();
-    dbg() << "Current memory usage is " << bytes << " bytes";
+    dbg() << "Current memory usage is " << bytes / 1000 << " KB";
+    dbg() << "Physical memory usage: "
+          << (size_t)(alloc_begin - alloc_start) / 1000 << "KB";
     sleep(5);
   }
 }

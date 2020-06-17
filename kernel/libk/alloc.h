@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+extern uint8_t *alloc_start;
 extern uint8_t *alloc_begin;
 extern uint8_t *alloc_end;
 
