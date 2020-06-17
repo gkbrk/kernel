@@ -36,6 +36,8 @@ void serial_lock() { lock.lock(); }
 
 void serial_unlock() { lock.unlock(); }
 
+void serial_force_unlock() { lock.force_unlock(); }
+
 static bool serial_received() { return inb(COM1 + 5) & 1; }
 
 char serial_read() {

@@ -18,6 +18,8 @@ public:
     m_locked = false;
   }
 
+  void force_unlock() { m_locked = false; }
+
 private:
   volatile bool m_locked;
 };
