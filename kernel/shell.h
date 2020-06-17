@@ -74,12 +74,17 @@ void shell_pkill(char *) {
  killTask(t);*/
 }
 
-void shell_ls(char *) {
-  auto files = Filesystem::TarFS::inst()->listFiles();
+void shell_ls(char *arg) {
+  FS::FS *fs = FS::TarFS::inst();
 
-  files.forEach([](auto file) {
-    file->print();
-    Drivers::VGATerminal::write("\n");
+  fs->readDir(String(arg), [](FS::DirEntry dir) {
+    StringBuilder b;
+    b.append(dir.path);
+    b.append(" [");
+    b.append(dir.size);
+    b.append("]\n");
+    String s = b.to_string();
+    Drivers::VGATerminal::write(s.c_str());
   });
 }
 
@@ -123,7 +128,7 @@ void shell_vga(char *) {
 }
 
 void shell_playMelody(char *file) {
-  auto contents = Filesystem::TarFS::inst()->readFile(file);
+  auto contents = FS::TarFS::inst()->readFile(file);
 
   for (size_t i = 0; i < contents.length(); i++) {
     Drivers::PCSpeaker::playFreq(contents[i]);
@@ -134,13 +139,13 @@ void shell_playMelody(char *file) {
 }
 
 void shell_cat(char *file) {
-  auto contents = Filesystem::TarFS::inst()->readFile(file);
+  auto contents = FS::TarFS::inst()->readFile(file);
 
   contents.print();
 }
 
 void shell_read(char *path) {
-  auto contents = Filesystem::TarFS::inst()->readFile(path);
+  auto contents = FS::TarFS::inst()->readFile(path);
 
   size_t i = 0;
   while (true) {

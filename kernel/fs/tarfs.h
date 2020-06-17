@@ -2,10 +2,11 @@
 
 #include "../libk/String.h"
 #include "../libk/vector.h"
+#include "FS.h"
 
-namespace Kernel::Filesystem {
+namespace Kernel::FS {
 
-class TarFS {
+class TarFS : public FS {
 public:
   static TarFS *inst() {
     if (s_inst == nullptr) {
@@ -14,12 +15,15 @@ public:
     return s_inst;
   }
 
-  Vector<String> listFiles() const;
   String readFile(const char *name) const;
+
+  // FS API
+  bool open(String, String) override;
+  bool readDir(String path, void (*function)(DirEntry)) override;
 
 private:
   TarFS() {}
   static TarFS *s_inst;
 };
 
-} // namespace Kernel::Filesystem
+} // namespace Kernel::FS
