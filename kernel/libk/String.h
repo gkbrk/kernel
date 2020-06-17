@@ -6,19 +6,22 @@
 
 class String {
 public:
-  String() {}
+  String() : m_size(0), m_value(nullptr) {}
+  explicit String(const char *str) : String(str, strlen(str)) {}
   explicit String(const char *str, size_t size);
   ~String();
 
   String(const String &);
   String &operator=(String);
 
-  char *c_str();
+  char *c_str() const;
   void print() const;
 
   size_t length() const { return m_size; }
 
   char get(size_t index) const;
+
+  bool starts_with(const String &) const;
 
   char operator[](size_t index) const { return get(index); }
 

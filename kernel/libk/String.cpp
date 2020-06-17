@@ -34,11 +34,23 @@ String &String::operator=(String other) {
   return *this;
 }
 
-char *String::c_str() { return m_value; }
+char *String::c_str() const { return m_value; }
 
 char String::get(size_t index) const {
   ASSERT(index < m_size);
   return m_value[index];
+}
+
+bool String::starts_with(const String &other) const {
+  if (length() < other.length())
+    return false;
+
+  for (size_t i = 0; i < other.length(); i++) {
+    if (m_value[i] != other.m_value[i])
+      return false;
+  }
+
+  return true;
 }
 
 Pair<String, String> String::split_at(char sep) {
