@@ -12,7 +12,7 @@ StringBuilder::StringBuilder() {
 StringBuilder::~StringBuilder() { kmfree(m_buffer); }
 
 void StringBuilder::append(char c) {
-  m_buffer = static_cast<char *>(kmrealloc(m_buffer, m_size + 1));
+  m_buffer = (char *)kmrealloc(m_buffer, m_size + 1);
   ASSERT(m_buffer != NULL);
   m_buffer[m_size] = c;
   m_size++;

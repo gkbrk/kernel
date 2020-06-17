@@ -4,7 +4,7 @@
 
 class DebugPrinter {
 public:
-  DebugPrinter(const char *);
+  DebugPrinter(const String);
   ~DebugPrinter();
   void write(char c) const;
 };
@@ -17,4 +17,4 @@ const DebugPrinter &operator<<(const DebugPrinter &, int);
 const DebugPrinter &operator<<(const DebugPrinter &, void *);
 
 const DebugPrinter dbg();
-const DebugPrinter dbg(const char *);
+const DebugPrinter dbg(const String);

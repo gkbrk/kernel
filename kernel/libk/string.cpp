@@ -66,7 +66,7 @@ char *strdup(const char *str) {
   char *copy;
 
   siz = strlen(str) + 1;
-  if ((copy = (char*)kmalloc(siz)) == NULL)
+  if ((copy = (char *)kmalloc(siz)) == NULL)
     return (NULL);
   (void)memcpy(copy, str, siz);
   return (copy);

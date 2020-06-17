@@ -123,7 +123,7 @@ void shell_vga(char *) {
     boxX %= 800;
     boxY %= 600;
 
-    dbg("game") << "X: " << boxX << " Y: " << boxY;
+    dbg(String("game")) << "X: " << boxX << " Y: " << boxY;
   }
 }
 
