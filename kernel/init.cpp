@@ -65,6 +65,7 @@ extern "C" void init(multiboot_info_t *mb, unsigned int magic) {
   kernel_main();
 
   while (1) {
+    // Save power if there is nothing else to do
     hlt();
     yield();
   }

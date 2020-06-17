@@ -20,6 +20,8 @@ public:
   Task *next;
   Registers regs;
 
+  uint8_t *m_stack;
+
 private:
   double m_remaining_sleep;
   String *m_name;

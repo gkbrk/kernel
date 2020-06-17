@@ -1,6 +1,7 @@
 #include <stdbool.h>
 
 #include "Task.h"
+#include "scheduler.h"
 
 #include "libk/String.h"
 #include "libk/alloc.h"
@@ -20,7 +21,8 @@ Task::Task(void (*main)(), uint32_t flags, uint32_t pagedir) {
   regs.eflags = flags;
   regs.eip = (uint32_t)main;
   regs.cr3 = (uint32_t)pagedir;
-  regs.esp = (uint32_t)kmalloc_forever(4096);
+  m_stack = new uint8_t[4096];
+  regs.esp = (uint32_t)m_stack;
 }
 
 String *Task::name() const { return m_name; }
@@ -88,6 +90,7 @@ void killTask(Task *t) {
     p = p->next;
 
   p->next = t->next;
+  delete t->m_stack;
   delete t;
 }
 
@@ -103,6 +106,10 @@ void spawnTask(void (*main)(), const char *name) {
 }
 
 void exitTask() {
+  Task *n = currentTask->next;
   killTask(currentTask);
-  yield();
+  currentTask = n;
+
+  Registers r;
+  switchTask(&r, &currentTask->regs);
 }
