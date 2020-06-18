@@ -238,9 +238,17 @@ String shell_read_line() {
 }
 
 void shell() {
+#ifdef GITCOMMIT
+  kprintf("Git commit: %s\n", GITCOMMIT);
+#endif
+
+#ifdef BUILDDATE
+  kprintf("Build date: %s\n", BUILDDATE);
+#endif
+
   kprintf("\n"
           "##########################\n"
-          "# Welcome to LeonardoOS! #\n"
+          "# Welcome to the kernel! #\n"
           "##########################\n"
           "\n"
           "In order to read the quickstart guide, type `read help.txt`.\n");

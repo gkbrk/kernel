@@ -28,7 +28,7 @@ run () {
         -soundhw pcspk \
         -vga std \
         -d cpu_reset \
-        -m 1024
+        -m 64
 }
 
 reload () {

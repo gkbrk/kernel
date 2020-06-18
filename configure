@@ -21,13 +21,14 @@ cat <<EOF
 
 cflags = ${CFLAGS}
 cxxflags = ${CXXFLAGS}
+buildinfo = -DGITCOMMIT="\"$(git rev-parse HEAD)\"" -DBUILDDATE="\"$(date)\""
 root = build
 
 rule cc
   command = i686-elf-gcc \$cflags -I. -c \$in -o \$out
 
 rule cxx
-  command = i686-elf-c++ \$cxxflags -I. -c \$in -o \$out
+  command = i686-elf-c++ \$cxxflags \$buildinfo -I. -c \$in -o \$out
   description = Building C++ file \$in
 
 rule nasm
