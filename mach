@@ -31,10 +31,15 @@ run () {
         -m 64
 }
 
-reload () {
-    find . -type f -name '*.c' \
-         -or -name '*.cpp' \
-         -or -name '*.h' > QtCreator.files
+runcurses () {
+    ./mach
+    ninja tar-drive.tar
+
+    qemu-system-x86_64 \
+        -curses \
+        -kernel leonardo.bin \
+        -hda tar-drive.tar \
+        -m 64
 }
 
 iso () {
