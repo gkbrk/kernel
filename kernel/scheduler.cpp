@@ -94,17 +94,6 @@ void killTask(Task *t) {
   delete t;
 }
 
-void spawnTask(void (*main)(), const char *name) {
-  dbg() << "Spawning new task: " << name;
-  Task *t = new Task(main, currentTask->regs.eflags, currentTask->regs.cr3);
-
-  Task *n = currentTask->next;
-  currentTask->next = t;
-  t->next = n;
-
-  t->setName(name);
-}
-
 void exitTask() {
   Task *n = currentTask->next;
   killTask(currentTask);
