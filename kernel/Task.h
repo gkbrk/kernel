@@ -17,6 +17,20 @@ public:
   void setRemainingSleep(double amount);
   double remainingSleep() const;
 
+  template <typename T>
+  void PushToStack(T val) {
+      memcpy((void*)regs.esp, &val, sizeof(T));
+      regs.esp -= sizeof(T);
+  }
+
+  template <typename T>
+  T PopFromStack() {
+      T val;
+      regs.esp += sizeof(T);
+      memcpy(&val, (void*)regs.esp, sizeof(T));
+      return val;
+  }
+
   Task *next;
   Registers regs;
 

@@ -12,6 +12,7 @@ ORIG=${CXXFLAGS}
 CXXFLAGS="-Os -flto -DDEBUG"
 CXXFLAGS="${CXXFLAGS} -Wall -Wextra"
 CXXFLAGS="${CXXFLAGS} -fno-exceptions -fno-rtti -ffreestanding"
+CXXFLAGS="${CXXFLAGS} -std=c++17"
 CXXFLAGS="${CXXFLAGS} ${ORIG}"
 
 cat <<EOF
