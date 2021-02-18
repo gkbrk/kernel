@@ -11,7 +11,8 @@ clean () {
 }
 
 format () {
-    clang-format -i $(find . -type f -name '*.c')
+    # TODO: Check if any files exist before attempting to format them.
+    #clang-format -i $(find . -type f -name '*.c')
     clang-format -i $(find . -type f -name '*.cpp')
     clang-format -i $(find . -type f -name '*.h')
 }
