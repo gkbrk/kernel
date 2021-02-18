@@ -128,14 +128,21 @@ void shell_vga(char *) {
 }
 
 void shell_playMelody(char *file) {
-  auto contents = FS::TarFS::inst()->readFile(file);
+  spawnTask(
+      []() {
+        auto file = currentTask->PopFromStack<const char *>();
+        auto contents = FS::TarFS::inst()->readFile(file);
 
-  for (size_t i = 0; i < contents.length(); i++) {
-    Drivers::PCSpeaker::playFreq(contents[i]);
-    sleep(0.2);
-  }
+        for (size_t i = 0; i < contents.length(); i++) {
+          Drivers::PCSpeaker::playFreq(contents[i]);
+          sleep(0.2);
+        }
 
-  Drivers::PCSpeaker::noSound();
+        Drivers::PCSpeaker::noSound();
+        exitTask();
+      },
+      "music-player", file);
+  // TODO: strdup the file argument and free in the subprocess
 }
 
 void shell_cat(char *file) {
