@@ -17,18 +17,28 @@ public:
   void setRemainingSleep(double amount);
   double remainingSleep() const;
 
-  template <typename T>
-  void PushToStack(T val) {
-      memcpy((void*)regs.esp, &val, sizeof(T));
-      regs.esp -= sizeof(T);
+  template <typename T> void PushToStack(T val) {
+    // Turn the ESP register into a void pointer
+    auto esp = (void *)(size_t)regs.esp;
+
+    // Copy bytes from value to stack
+    memcpy(esp, &val, sizeof(T));
+
+    // Stack grows downwards
+    regs.esp -= sizeof(T);
   }
 
-  template <typename T>
-  T PopFromStack() {
-      T val;
-      regs.esp += sizeof(T);
-      memcpy(&val, (void*)regs.esp, sizeof(T));
-      return val;
+  template <typename T> T PopFromStack() {
+    T val;
+    // Reading a value, stack shrinks upwards
+    regs.esp += sizeof(T);
+
+    // Turn the ESP register into a void pointer
+    auto esp = (void *)(size_t)regs.esp;
+
+    // Copy bytes from stack to value
+    memcpy(&val, esp, sizeof(T));
+    return val;
   }
 
   Task *next;
