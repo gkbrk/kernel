@@ -1,13 +1,13 @@
 #!/bin/sh
 
 build () {
-    ./configure > build.ninja
-    ninja
+    ./configure > Makefile
+    make -j8
 }
 
 clean () {
-    ./configure > build.ninja
-    ninja -t clean
+    ./configure > Makefile
+    make clean
 }
 
 format () {
@@ -19,7 +19,7 @@ format () {
 
 run () {
     ./mach
-    ninja tar-drive.tar
+    make tar-drive.tar
 
     qemu-system-x86_64 \
         -serial mon:stdio \
@@ -34,10 +34,11 @@ run () {
 
 runcurses () {
     ./mach
-    ninja tar-drive.tar
+    make tar-drive.tar
 
     qemu-system-x86_64 \
         -curses \
+        -serial file:serial.log \
         -kernel leonardo.bin \
         -hda tar-drive.tar \
         -m 64

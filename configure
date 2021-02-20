@@ -13,89 +13,115 @@ CXXFLAGS="-Os -flto -DDEBUG"
 CXXFLAGS="${CXXFLAGS} -Wall -Wextra"
 CXXFLAGS="${CXXFLAGS} -fno-exceptions -fno-rtti -ffreestanding"
 CXXFLAGS="${CXXFLAGS} -std=c++17"
+CXXFLAGS="${CXXFLAGS} -I."
 CXXFLAGS="${CXXFLAGS} ${ORIG}"
+
+build_cc_makefile () {
+    objname="${1}";shift
+    file="${1}";shift
+    printf "%s: %s\n" "${objname}" "${file}"
+    printf "	%s\n\n" "i686-elf-gcc ${CFLAGS} -c ${file} -o ${objname}"
+}
+
+build_cpp_makefile () {
+    objname="${1}";shift
+    file="${1}";shift
+    printf "%s: %s\n" "${objname}" "${file}"
+    printf "	%s\n\n" "i686-elf-c++ -o ${objname} -I. -c ${file} ${CXXFLAGS}"
+}
+
+build_nasm_makefile () {
+    objname="${1}";shift
+    file="${1}";shift
+    printf "%s: %s\n" "${objname}" "${file}"
+    printf "	%s\n\n" "nasm -felf32 ${file} -o ${objname}"
+}
+
+build_gas_makefile () {
+    objname="${1}";shift
+    file="${1}";shift
+    printf "%s: %s\n" "${objname}" "${file}"
+    printf "	%s\n\n" "as --32 -c ${file} -o ${objname}"
+}
+
+build_tar_makefile () {
+    objname="${1}";shift
+    file="${1}";shift
+    printf "%s: %s\n" "${objname}" "${file}"
+    printf "	%s\n\n" "tar cvf ${objname} ${file}"
+}
+
+build_link_makefile () {
+    objname="${1}";shift
+    file="${1}";shift
+    printf "%s: %s\n" "${objname}" "${file}"
+    printf "	%s\n\n" "i686-elf-c++ -T linker.ld -Os -flto -s -nostdlib -fno-stack-protector -Os -o ${objname} ${file} -lgcc"
+}
 
 cat <<EOF
 
-# Kernel Ninja build script
+# Kernel build script
 # Generated on $(date)
 
-cflags = ${CFLAGS}
-cxxflags = ${CXXFLAGS}
-buildinfo = -DGITCOMMIT="\"$(git rev-parse HEAD)\"" -DBUILDDATE="\"$(date)\""
-root = build
-
-rule cc
-  command = i686-elf-gcc \$cflags -I. -c \$in -o \$out
-
-rule cxx
-  command = i686-elf-c++ \$cxxflags \$buildinfo -I. -c \$in -o \$out
-  description = Building C++ file \$in
-
-rule nasm
-  command = nasm -felf32 \$in -o \$out
-  description = Assembling \$in with NASM
-
-rule gas
-  command = as --32 -c \$in -o \$out
-  description = Assembling \$in with gas
-
-rule link
-  description = Linking \$out
-  command = i686-elf-c++ -T linker.ld -Os -flto -s -nostdlib $
-            -fno-stack-protector -Os -o \$out \$in -lgcc
-
-rule tar
-  command = tar cvf \$out \$in
+all: leonardo.bin
+.PHONY: all
 
 EOF
 
-build () {
-    printf "build %s: %s %s\n\n" "${1}" "${2}" "${3}"
-}
-
 objfiles=""
+toClean=""
 
 printf "# C files\n\n"
 for file in $(find . -type f -iname '*.c')
 do
     objname=${file%.c}.o
-    build "${objname}" cc "${file}"
+    build_cc_makefile "${objname}" "${file}"
     objfiles="${objfiles} ${objname}"
+    toClean="${toClean} ${objname}"
 done
 
 printf "# C++ files\n\n"
 for file in $(find . -type f -iname '*.cpp')
 do
     objname=${file%.cpp}.o
-    build "${objname}" cxx "${file}"
+    build_cpp_makefile "${objname}" "${file}"
     objfiles="${objfiles} ${objname}"
+    toClean="${toClean} ${objname}"
 done
 
 printf "# NASM files\n\n"
 for file in $(find . -type f -iname '*.asm')
 do
     objname=${file%.asm}.o
-    build "${objname}" nasm "${file}"
+    build_nasm_makefile "${objname}" "${file}"
     objfiles="${objfiles} ${objname}"
+    toClean="${toClean} ${objname}"
 done
 
 printf "# GAS files\n\n"
 for file in $(find . -type f -iname '*.s')
 do
     objname=${file%.s}.o
-    build "${objname}" gas "${file}"
+    build_gas_makefile "${objname}" "${file}"
     objfiles="${objfiles} ${objname}"
+    toClean="${toClean} ${objname}"
 done
 
 printf "# tar drive\n\n"
-printf "build tar-drive.tar: tar"
+tarfiles=""
 for file in $(find tar-drive/ -type f)
 do
-    printf " %s" "${file}"
+    tarfiles="${tarfiles} ${file}"
 done
-echo
+build_tar_makefile "tar-drive.tar" "${tarfiles}"
+toClean="${toClean} tar-drive.tar"
 
-build leonardo.bin link "${objfiles}"
+build_link_makefile "leonardo.bin" "${objfiles}"
+toClean="${toClean} leonardo.bin"
 
-echo "default leonardo.bin"
+printf "clean:\n"
+for file in $toClean
+do
+    printf "	rm -f %s\n" "${file}"
+done
+printf ".PHONY: clean\n\n"
