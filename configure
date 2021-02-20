@@ -58,6 +58,11 @@ build_link_makefile () {
     printf "	%s\n\n" "i686-elf-c++ -T linker.ld -Os -flto -s -nostdlib -fno-stack-protector -Os -o ${objname} ${file} -lgcc"
 }
 
+getobjname () {
+    a=$(printf "%s" "${1}" | md5sum | cut -d' ' -f 1)
+    printf "build/%s" "${a}"
+}
+
 cat <<EOF
 
 # Kernel build script
@@ -83,7 +88,7 @@ done
 printf "# C++ files\n\n"
 for file in $(find . -type f -iname '*.cpp')
 do
-    objname=${file%.cpp}.o
+    objname=$(getobjname "${file%.cpp}.o")
     build_cpp_makefile "${objname}" "${file}"
     objfiles="${objfiles} ${objname}"
     toClean="${toClean} ${objname}"
@@ -92,7 +97,7 @@ done
 printf "# NASM files\n\n"
 for file in $(find . -type f -iname '*.asm')
 do
-    objname=${file%.asm}.o
+    objname=$(getobjname "${file%.asm}.o")
     build_nasm_makefile "${objname}" "${file}"
     objfiles="${objfiles} ${objname}"
     toClean="${toClean} ${objname}"
@@ -101,7 +106,7 @@ done
 printf "# GAS files\n\n"
 for file in $(find . -type f -iname '*.s')
 do
-    objname=${file%.s}.o
+    objname=$(getobjname "${file%.s}.o")
     build_gas_makefile "${objname}" "${file}"
     objfiles="${objfiles} ${objname}"
     toClean="${toClean} ${objname}"
@@ -120,7 +125,7 @@ build_link_makefile "leonardo.bin" "${objfiles}"
 toClean="${toClean} leonardo.bin"
 
 printf "clean:\n"
-for file in $toClean
+for file in ${toClean}
 do
     printf "	rm -f %s\n" "${file}"
 done
