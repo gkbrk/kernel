@@ -1,4 +1,3 @@
-#include <libk/debug.h>
 #include <kernel/drivers/serial.h>
 #include <kernel/scheduler.h>
 #include <libk/assert.h>

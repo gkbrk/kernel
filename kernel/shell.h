@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Random.h"
 #include "drivers/BGA.h"
 #include "drivers/keyboard.h"
 #include "drivers/machine.h"
@@ -14,6 +13,7 @@
 #include "libk/string.h"
 #include "libk/vector.h"
 #include "scheduler.h"
+#include <kernel/Random.h>
 #include <stddef.h>
 
 using namespace Kernel;
@@ -32,41 +32,12 @@ void shell_echo(char *arg) {
   }
 }
 
-void shell_clear(char *) { Drivers::VGATerminal::clear(); }
-
-void shell_mem(char *) {
-  dbg() << "Memory usage: " << getMemUsage() << " bytes";
-  Drivers::VGATerminal::lock();
-  kprintf("Memory usage: %d bytes\n", getMemUsage());
-  Drivers::VGATerminal::unlock();
-}
-
-void shell_rand(char *) {
-  auto num = Kernel::random_prng<int16_t>();
-
-  Drivers::VGATerminal::lock();
-  kprintf("Your random number is %d\n", num);
-  Drivers::VGATerminal::unlock();
-}
+void shell_clear(char *);
+void shell_mem(char *);
+void shell_ps(char *);
+void shell_rand(char *);
 
 void shell_help(char *args);
-
-void shell_ps(char *) {
-  Task *t = currentTask;
-
-  while (true) {
-    if (t->name() != nullptr) {
-      const char *c = "";
-      if (currentTask == t) {
-        c = "[current task]";
-      }
-      kprintf("%s %s -> %s\n", t->name()->c_str(), c, t->next->name()->c_str());
-    }
-    t = t->next;
-    if (t == currentTask)
-      break;
-  }
-}
 
 void shell_pkill(char *) {
   // Task *t = findTaskByName(args);
@@ -291,7 +262,6 @@ void shell() {
       b.append(cmd);
       b.append(". Try typing \"help\".\n");
       b.to_string().print();
-      // kprintf("%s", s.c_str());
     }
   }
 }
