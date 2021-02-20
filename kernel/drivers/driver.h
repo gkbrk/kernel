@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../libk/TypeName.h"
-#include "../libk/debug.h"
+#include <libk/TypeName.h>
+#include <libk/debug.h>
 
 class Driver {
 public:

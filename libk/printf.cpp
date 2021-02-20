@@ -1,5 +1,5 @@
-#include "printf.h"
-#include "../drivers/terminal.h"
+#include <libk/printf.h>
+#include <kernel/drivers/terminal.h>
 
 static void vsprintf_helper(char *str, void (*putchar)(char),
                             const char *format, uint32_t *pos, va_list arg) {

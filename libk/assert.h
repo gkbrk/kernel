@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../drivers/serial.h"
+#include <kernel/drivers/serial.h>
 
 #define ASSERT(x)                                                              \
   do {                                                                         \

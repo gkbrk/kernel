@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../libk/TypeName.h"
+#include <libk/TypeName.h>
 
 namespace Kernel::Drivers {
 

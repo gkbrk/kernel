@@ -1,8 +1,7 @@
 #include <stdint.h>
 
-#include "../libk/StringBuilder.h"
-#include "../libk/alloc.h"
-#include "../libk/string.h"
+#include <libk/StringBuilder.h>
+#include <libk/alloc.h>
 #include "../scheduler.h"
 #include "cmos.h"
 #include "io.h"

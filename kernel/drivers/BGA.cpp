@@ -1,5 +1,5 @@
 #include "BGA.h"
-#include "../libk/debug.h"
+#include <libk/debug.h>
 #include "io.h"
 
 namespace Kernel::Drivers {

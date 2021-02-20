@@ -1,9 +1,8 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-#include "../libk/printf.h"
-#include "../libk/spinlock.h"
-#include "../scheduler.h"
+#include <libk/printf.h>
+#include <libk/spinlock.h>
 #include "io.h"
 #include "serial.h"
 

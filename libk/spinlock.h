@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../scheduler.h"
-#include "assert.h"
+#include <kernel/scheduler.h>
+#include <libk/assert.h>
 
 class Spinlock {
 public:

@@ -1,8 +1,8 @@
-#include "String.h"
-#include "../drivers/terminal.h"
-#include "Pair.h"
-#include "StringBuilder.h"
-#include "assert.h"
+#include <libk/String.h>
+#include <kernel/drivers/terminal.h>
+#include <libk/Pair.h>
+#include <libk/StringBuilder.h>
+#include <libk/assert.h>
 
 template <typename T> constexpr static void swap(T &a, T &b) {
   T tmp = a;

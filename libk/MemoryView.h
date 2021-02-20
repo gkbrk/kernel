@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../drivers/serial.h"
-#include "string.h"
+#include <kernel/drivers/serial.h>
+#include <libk/string.h>
 #include <stddef.h>
 
 class MemoryView {

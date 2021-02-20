@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../libk/TypeName.h"
+#include <libk/TypeName.h>
 #include <stddef.h>
 
 #define COM1 0x3f8

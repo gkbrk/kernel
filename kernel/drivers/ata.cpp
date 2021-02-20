@@ -1,5 +1,5 @@
 #include "ata.h"
-#include "../libk/debug.h"
+#include <libk/debug.h>
 #include "../scheduler.h"
 #include "io.h"
 

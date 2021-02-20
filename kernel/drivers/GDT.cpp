@@ -1,5 +1,5 @@
 #include "GDT.h"
-#include "../libk/assert.h"
+#include <libk/assert.h>
 #include <stddef.h>
 #include <stdint.h>
 

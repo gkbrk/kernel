@@ -1,4 +1,4 @@
-#include "../libk/debug.h"
+#include <libk/debug.h>
 #include "BGA.h"
 #include "GDT.h"
 #include "cmos.h"

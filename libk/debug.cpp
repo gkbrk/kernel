@@ -1,7 +1,7 @@
-#include "debug.h"
-#include "../drivers/serial.h"
-#include "../scheduler.h"
-#include "assert.h"
+#include <libk/debug.h>
+#include <kernel/drivers/serial.h>
+#include <kernel/scheduler.h>
+#include <libk/assert.h>
 
 const DebugPrinter dbg() { return dbg(*currentTask->name()); }
 const DebugPrinter dbg(String name) { return DebugPrinter(name); }

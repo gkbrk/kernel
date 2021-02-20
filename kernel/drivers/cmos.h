@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../libk/String.h"
-#include "../libk/TypeName.h"
+#include <libk/String.h>
+#include <libk/TypeName.h>
 
 namespace Kernel::Drivers {
 

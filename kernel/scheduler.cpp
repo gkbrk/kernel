@@ -1,13 +1,9 @@
-#include <stdbool.h>
-
 #include "Task.h"
 #include "scheduler.h"
 
-#include "libk/String.h"
+#include <libk/String.h>
 #include "libk/alloc.h"
-#include "libk/debug.h"
 #include "libk/string.h"
-#include "libk/vector.h"
 
 #include "../arch/x86/idt.h"
 
@@ -59,7 +55,7 @@ void schedulerTimerTick(size_t freq) {
 
 void initTasking() {
   Task *t = new Task(nullptr, 0, 0);
-  t->setName("kmain");
+  t->setName("kmain_idle");
   t->next = t;
   currentTask = t;
 }

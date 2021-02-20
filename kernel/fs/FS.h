@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../libk/String.h"
+#include <libk/String.h>
 
 namespace Kernel::FS {
 

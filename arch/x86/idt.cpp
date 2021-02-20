@@ -1,6 +1,6 @@
 #include "idt.h"
-#include "../../kernel/drivers/io.h"
-#include "../../kernel/libk/debug.h"
+#include <kernel/drivers/io.h>
+#include <libk/debug.h>
 
 struct IDT_entry IDT[256];
 

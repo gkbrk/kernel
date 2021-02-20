@@ -2,9 +2,8 @@
 #include <stddef.h>
 
 #include "../drivers/ata.h"
-#include "../libk/StringBuilder.h"
-#include "../libk/alloc.h"
-#include "../libk/debug.h"
+#include <libk/StringBuilder.h>
+#include <libk/alloc.h>
 #include "tarfs.h"
 
 static size_t octaltoint(const uint8_t *c) {

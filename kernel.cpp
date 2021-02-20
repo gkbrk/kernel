@@ -1,23 +1,15 @@
-#include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 
-#include "arch/multiboot.h"
-#include "arch/x86/idt.h"
-#include "kernel/drivers/cmos.h"
-#include "kernel/drivers/loader.h"
-#include "kernel/drivers/pcspeaker.h"
-#include "kernel/drivers/serial.h"
-#include "kernel/drivers/terminal.h"
-#include "kernel/drivers/vga.h"
-#include "kernel/fs/tarfs.h"
-#include "kernel/libk/String.h"
-#include "kernel/libk/alloc.h"
-#include "kernel/libk/debug.h"
-#include "kernel/scheduler.h"
-#include "kernel/shell.h"
+#include <kernel/drivers/cmos.h>
+#include <kernel/drivers/terminal.h>
+#include <kernel/drivers/vga.h>
+#include <libk/String.h>
+#include <libk/alloc.h>
+#include <libk/debug.h>
+#include <kernel/scheduler.h>
+#include <kernel/shell.h>
 
-static void time_task() {
+[[noreturn]] static void time_task() {
   using namespace Kernel::Drivers;
 
   size_t oldLen = 0;
@@ -48,13 +40,13 @@ static void time_task() {
   }
 }
 
-void memory_stats() {
+[[noreturn]] static void memory_stats() {
   while (true) {
     size_t bytes = getMemUsage();
     dbg() << "Current memory usage is " << bytes / 1000 << " KB";
     dbg() << "Physical memory usage: "
           << (size_t)(alloc_begin - alloc_start) / 1000 << "KB";
-    sleep(5);
+    sleep(5.0f);
   }
 }
 

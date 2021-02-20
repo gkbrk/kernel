@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../libk/String.h"
-#include "../libk/vector.h"
+#include <libk/String.h>
+#include <libk/vector.h>
 #include "FS.h"
 
 namespace Kernel::FS {

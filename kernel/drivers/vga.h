@@ -1,5 +1,5 @@
 #pragma once
-#include "../libk/assert.h"
+#include <libk/assert.h>
 #include "io.h"
 #include <stddef.h>
 #include <stdint.h>

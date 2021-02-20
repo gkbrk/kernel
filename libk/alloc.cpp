@@ -1,10 +1,10 @@
 #include <stddef.h>
 
-#include "../drivers/serial.h"
-#include "alloc.h"
-#include "assert.h"
-#include "spinlock.h"
-#include "string.h"
+#include <kernel/drivers/serial.h>
+#include <libk/alloc.h>
+#include <libk/assert.h>
+#include <libk/spinlock.h>
+#include <libk/string.h>
 
 #include "debug.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../libk/spinlock.h"
-#include "../libk/string.h"
+#include <libk/spinlock.h>
+#include <libk/string.h>
 #include "vga.h"
 
 namespace Kernel::Drivers::VGATerminal {
