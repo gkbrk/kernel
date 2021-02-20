@@ -1,8 +1,7 @@
-#include <libk/debug.h>
-#include "BGA.h"
-#include "GDT.h"
-#include "cmos.h"
-#include "driver.h"
+#include <kernel/drivers/BGA.h>
+#include <kernel/drivers/GDT.h>
+#include <kernel/drivers/cmos.h>
+#include <kernel/drivers/driver.h>
 
 namespace Kernel::Drivers {
 void loadDrivers() {

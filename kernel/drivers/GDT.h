@@ -9,8 +9,8 @@ public:
   GDT();
   static GDT *inst();
 
-  bool isAvailable();
-  bool initialize();
+  static bool isAvailable();
+  static bool initialize();
 };
 
 } // namespace Kernel::Drivers

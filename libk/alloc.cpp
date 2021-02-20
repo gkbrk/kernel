@@ -56,7 +56,7 @@ size_t getMemUsage() {
 
 void *kmalloc(size_t size) {
   if (size == 0)
-    return NULL;
+    return nullptr;
 
   lock.lock();
 
@@ -105,7 +105,7 @@ static AllocTableItem *findByPtr(void *ptr) {
 }
 
 void *kmrealloc(void *ptr, size_t size) {
-  if (ptr == NULL)
+  if (ptr == nullptr)
     return kmalloc(size);
 
   ASSERT(size > 0);
@@ -122,7 +122,7 @@ void *kmrealloc(void *ptr, size_t size) {
 }
 
 void kmfree(void *ptr) {
-  if (ptr == NULL)
+  if (ptr == nullptr)
     return;
 
   lock.lock();
@@ -132,8 +132,6 @@ void kmfree(void *ptr) {
   item->free = true;
   lock.unlock();
 }
-
-void kfree(void *ptr) { kmfree(ptr); }
 
 void *operator new(size_t size) { return kmalloc(size); }
 void operator delete(void *ptr) { return kmfree(ptr); }

@@ -1,5 +1,5 @@
-#include "string.h"
-#include "printf.h"
+#include <libk/printf.h>
+#include <libk/string.h>
 
 size_t strlen(const char *str) {
   size_t len = 0;
@@ -11,8 +11,8 @@ size_t strlen(const char *str) {
 
 int strcmp(const char *a, const char *b) {
   for (size_t i = 0; true; i++) {
-    unsigned char ac = (unsigned char)a[i];
-    unsigned char bc = (unsigned char)b[i];
+    auto ac = (unsigned const char)a[i];
+    auto bc = (unsigned const char)b[i];
     if (ac == '\0' && bc == '\0')
       return 0;
     if (ac < bc)
@@ -43,15 +43,15 @@ char *strsep(char **stringp, const char *delim) {
   const char *spanp;
   int c, sc;
   char *tok;
-  if ((s = *stringp) == NULL)
-    return (NULL);
+  if ((s = *stringp) == nullptr)
+    return (nullptr);
   for (tok = s;;) {
     c = *s++;
     spanp = delim;
     do {
       if ((sc = *spanp++) == c) {
         if (c == 0)
-          s = NULL;
+          s = nullptr;
         else
           s[-1] = 0;
         *stringp = s;
@@ -66,8 +66,8 @@ char *strdup(const char *str) {
   char *copy;
 
   siz = strlen(str) + 1;
-  if ((copy = (char *)kmalloc(siz)) == NULL)
-    return (NULL);
+  if ((copy = (char *)kmalloc(siz)) == nullptr)
+    return (nullptr);
   (void)memcpy(copy, str, siz);
   return (copy);
 }
@@ -75,7 +75,7 @@ char *strdup(const char *str) {
 void sprintf(char *buf, const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  vsprintf(buf, NULL, fmt, ap);
+  vsprintf(buf, nullptr, fmt, ap);
   va_end(ap);
 }
 

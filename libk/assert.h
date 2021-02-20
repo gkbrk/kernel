@@ -1,5 +1,6 @@
 #pragma once
 
+#include <arch/x86/idt.h>
 #include <kernel/drivers/serial.h>
 
 #define ASSERT(x)                                                              \
@@ -9,8 +10,8 @@
       serial_lock();                                                           \
       serial_writestring("ASSERTION FAILED\n");                                \
       serial_printf("%s:%s:%d\n", __func__, __FILE__, __LINE__);               \
-      asm("cli");                                                              \
-      asm("hlt");                                                              \
+      interrupt_disable();                                                     \
+      hlt();                                                                   \
     }                                                                          \
   } while (0)
 

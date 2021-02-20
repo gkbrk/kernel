@@ -1,10 +1,9 @@
-#include <stdbool.h>
 #include <stddef.h>
 
-#include "../drivers/ata.h"
+#include <kernel/drivers/ata.h>
+#include <kernel/fs/tarfs.h>
 #include <libk/StringBuilder.h>
 #include <libk/alloc.h>
-#include "tarfs.h"
 
 static size_t octaltoint(const uint8_t *c) {
   size_t value = 0;
@@ -17,7 +16,7 @@ static size_t octaltoint(const uint8_t *c) {
   return value;
 }
 
-static size_t sum(uint8_t *buf) {
+static size_t sum(const uint8_t *buf) {
   size_t total = 0;
   for (size_t i = 0; i < 512; i++) {
     total += buf[i];
@@ -27,8 +26,8 @@ static size_t sum(uint8_t *buf) {
 
 namespace Kernel::FS {
 
-String TarFS::readFile(const char *name) const {
-  uint8_t *buf = static_cast<uint8_t *>(kmalloc(512));
+String TarFS::readFile(const char *name) {
+  auto *buf = static_cast<uint8_t *>(kmalloc(512));
 
   uint8_t sec = 1;
   size_t prev_sum = 1;
@@ -46,7 +45,6 @@ String TarFS::readFile(const char *name) const {
         String s((char *)buf, filesize);
         kmfree(buf);
         return s;
-        break;
       }
 
       sec += filesize / 512;
@@ -58,7 +56,7 @@ String TarFS::readFile(const char *name) const {
     sec++;
   }
 
-  return String(NULL, 0);
+  return String(nullptr, 0);
 }
 
 // FS API

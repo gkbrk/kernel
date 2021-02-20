@@ -1,4 +1,4 @@
-#include "GDT.h"
+#include <kernel/drivers/GDT.h>
 #include <libk/assert.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -40,7 +40,7 @@ static void encodeGdtEntry(uint8_t *target, size_t base, size_t limit,
 static GDT s_inst;
 static uint8_t gdt_table[24];
 
-GDT::GDT() {}
+GDT::GDT() = default;
 
 GDT *GDT::inst() { return &s_inst; }
 

@@ -2,6 +2,7 @@
 #include <kernel/drivers/serial.h>
 #include <kernel/scheduler.h>
 #include <libk/assert.h>
+#include <libk/debug.h>
 
 const DebugPrinter dbg() { return dbg(*currentTask->name()); }
 const DebugPrinter dbg(String name) { return DebugPrinter(name); }
@@ -26,7 +27,7 @@ const DebugPrinter &operator<<(const DebugPrinter &printer, char c) {
 }
 
 const DebugPrinter &operator<<(const DebugPrinter &printer, const char *str) {
-  ASSERT(str != NULL);
+  ASSERT(str != nullptr);
   for (size_t i = 0; i < strlen(str); i++)
     printer.write(str[i]);
   return printer;
@@ -55,7 +56,7 @@ const DebugPrinter &operator<<(const DebugPrinter &printer, int num) {
 const DebugPrinter &operator<<(const DebugPrinter &printer, void *ptr) {
   char buf[32];
   int i = 30;
-  for (size_t val = (size_t)ptr; val && i; --i, val /= 16)
+  for (auto val = (size_t)ptr; val && i; --i, val /= 16)
     buf[i] = "0123456789abcdef"[val % 16];
   printer << "0x";
   printer << &buf[i + 1];

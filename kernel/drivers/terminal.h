@@ -1,8 +1,8 @@
 #pragma once
 
+#include <kernel/drivers/vga.h>
 #include <libk/spinlock.h>
 #include <libk/string.h>
-#include "vga.h"
 
 namespace Kernel::Drivers::VGATerminal {
 

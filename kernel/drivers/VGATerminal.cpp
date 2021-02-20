@@ -1,5 +1,5 @@
+#include <kernel/drivers/terminal.h>
 #include <libk/spinlock.h>
-#include "terminal.h"
 
 namespace Kernel::Drivers::VGATerminal {
 

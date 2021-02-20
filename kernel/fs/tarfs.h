@@ -1,8 +1,8 @@
 #pragma once
 
+#include "FS.h"
 #include <libk/String.h>
 #include <libk/vector.h>
-#include "FS.h"
 
 namespace Kernel::FS {
 
@@ -15,14 +15,14 @@ public:
     return s_inst;
   }
 
-  String readFile(const char *name) const;
+  static String readFile(const char *name);
 
   // FS API
   bool open(String, String) override;
   bool readDir(String path, void (*function)(DirEntry)) override;
 
 private:
-  TarFS() {}
+  TarFS() = default;
   static TarFS *s_inst;
 };
 

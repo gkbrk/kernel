@@ -10,7 +10,8 @@ public:
   ATADrive(uint16_t io_port, bool available, bool slave)
       : m_io_port{io_port}, m_available{available}, m_slave{slave} {}
 
-  size_t read_sectors(uint32_t sector, uint8_t sectorCount, uint8_t *dest);
+  size_t read_sectors(uint32_t sector, uint8_t sectorCount,
+                      uint8_t *dest) const;
   bool is_ready() const;
   void wait_ready() const;
 

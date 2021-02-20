@@ -1,5 +1,4 @@
 #include "Random.h"
-#include "libk/string.h"
 #include <stddef.h>
 
 namespace Kernel {

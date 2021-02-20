@@ -34,7 +34,7 @@ static char scanCodes[128] = {
                                                                     undefined*/
 };
 
-extern "C" char keyboardSpinLoop() {
+char keyboardSpinLoop() {
   while (true) {
     uint8_t scancode = KeyboardDriver::spinRawKeycode();
     if ((scancode & 128) == 128)

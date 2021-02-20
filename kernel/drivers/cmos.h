@@ -10,11 +10,11 @@ public:
   CMOS();
   static CMOS *inst();
 
-  bool isAvailable();
-  bool initialize();
+  static bool isAvailable();
+  static bool initialize();
 
-  void updateTime();
-  String formattedString() const;
+  static void updateTime();
+  [[nodiscard]] static String formattedString();
 };
 
 } // namespace Kernel::Drivers

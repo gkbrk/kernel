@@ -1,9 +1,7 @@
 #pragma once
 
-#ifdef __cplusplus
-
-#include <libk/Option.h>
 #include "driver.h"
+#include <libk/Option.h>
 #include <stdint.h>
 
 class KeyboardDriver : public Driver {
@@ -12,9 +10,4 @@ public:
   static uint8_t spinRawKeycode();
 };
 
-extern "C"
-
-#endif
-
-    char
-    keyboardSpinLoop();
+char keyboardSpinLoop();

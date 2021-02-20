@@ -1,5 +1,5 @@
-#include <libk/printf.h>
 #include <kernel/drivers/terminal.h>
+#include <libk/printf.h>
 
 static void vsprintf_helper(char *str, void (*putchar)(char),
                             const char *format, uint32_t *pos, va_list arg) {
@@ -8,9 +8,7 @@ static void vsprintf_helper(char *str, void (*putchar)(char),
   char buf[512];
   uint32_t uval;
   uint32_t size = 8;
-  uint32_t i;
   uint32_t len;
-  int size_override = 0;
   memset(buf, 0, 512);
 
   while ((c = *format++) != 0) {
@@ -36,13 +34,12 @@ static void vsprintf_helper(char *str, void (*putchar)(char),
         }
         len = strlen(buf);
         // If use did not specify width, then just use len = width
-        if (!size_override)
-          size = len;
+        size = len;
         if ((c == 'x' || c == 'p' || c == 'd') && len < size) {
-          for (i = 0; i < len; i++) {
+          for (auto i = 0; i < len; i++) {
             buf[size - 1 - i] = buf[len - 1 - i];
           }
-          for (i = 0; i < size - len; i++) {
+          for (auto i = 0; i < size - len; i++) {
             buf[i] = '0';
           }
         }
@@ -115,14 +112,14 @@ void vsprintf(char *str, void (*putchar)(char), const char *format,
 void kprintf(const char *s, ...) {
   va_list ap;
   va_start(ap, s);
-  vsprintf(NULL, Kernel::Drivers::VGATerminal::write, s, ap);
+  vsprintf(nullptr, Kernel::Drivers::VGATerminal::write, s, ap);
   va_end(ap);
 }
 
 size_t snprintf(char *s, size_t, const char *format, ...) {
   va_list ap;
   va_start(ap, format);
-  vsprintf(s, NULL, format, ap);
+  vsprintf(s, nullptr, format, ap);
   va_end(ap);
 
   return strlen(s);

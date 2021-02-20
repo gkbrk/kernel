@@ -1,6 +1,6 @@
-#include "BGA.h"
+#include <kernel/drivers/BGA.h>
+#include <kernel/drivers/io.h>
 #include <libk/debug.h>
-#include "io.h"
 
 namespace Kernel::Drivers {
 
@@ -35,7 +35,6 @@ static void writeRegister(uint16_t index, uint16_t value) {
 
 static BGA *s_inst;
 static volatile uint8_t *bankBuffer = (uint8_t *)VBE_DISPI_BANK_ADDRESS;
-static uint16_t currentBank;
 
 BGA::BGA() { m_fb = nullptr; }
 
@@ -62,7 +61,6 @@ static void setRes(size_t width, size_t height) {
   writeRegister(VBE_DISPI_INDEX_BPP, 24);
   writeRegister(VBE_DISPI_INDEX_ENABLE, VBE_DISPI_ENABLED);
   writeRegister(VBE_DISPI_INDEX_BANK, 0);
-  currentBank = 0;
 }
 
 bool BGA::setResolution(size_t width, size_t height) {

@@ -1,10 +1,10 @@
 #include <stdint.h>
 
+#include <kernel/drivers/cmos.h>
+#include <kernel/drivers/io.h>
+#include <kernel/scheduler.h>
 #include <libk/StringBuilder.h>
 #include <libk/alloc.h>
-#include "../scheduler.h"
-#include "cmos.h"
-#include "io.h"
 
 namespace Kernel::Drivers {
 
@@ -38,7 +38,7 @@ static int get_update_in_progress_flag() {
 
 static CMOS s_inst;
 
-CMOS::CMOS() {}
+CMOS::CMOS() = default;
 
 CMOS *CMOS::inst() { return &s_inst; }
 
@@ -136,7 +136,7 @@ void CMOS::updateTime() {
   }
 }
 
-String CMOS::formattedString() const {
+String CMOS::formattedString() {
   StringBuilder b;
   b.append((size_t)cmos_hour);
   b.append(":");

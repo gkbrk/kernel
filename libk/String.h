@@ -14,19 +14,19 @@ public:
   String(const String &);
   String &operator=(String);
 
-  char *c_str() const;
+  [[nodiscard]] char *c_str() const;
   void print() const;
 
-  size_t length() const { return m_size; }
+  [[nodiscard]] size_t length() const { return m_size; }
 
-  char get(size_t index) const;
+  [[nodiscard]] char get(size_t index) const;
 
-  bool starts_with(const String &) const;
+  [[nodiscard]] bool starts_with(const String &) const;
 
   char operator[](size_t index) const { return get(index); }
 
   bool operator==(String &other) { return streq(m_value, other.c_str()); }
-  bool operator==(String other) { return streq(m_value, other.c_str()); }
+  bool operator==(const String &other) { return streq(m_value, other.c_str()); }
   bool operator==(const char *other) const { return streq(m_value, other); }
 
   MemoryView as_view() { return MemoryView(m_value, m_size); }

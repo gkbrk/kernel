@@ -1,7 +1,7 @@
-#include "ata.h"
+#include <kernel/drivers/ata.h>
+#include <kernel/drivers/io.h>
+#include <kernel/scheduler.h>
 #include <libk/debug.h>
-#include "../scheduler.h"
-#include "io.h"
 
 #define ATA_DATA 0
 #define ATA_ERROR 1
@@ -43,7 +43,7 @@ void ATADrive::wait_ready() const {
 }
 
 size_t ATADrive::read_sectors(uint32_t sector, uint8_t sectorCount,
-                              uint8_t *dest) {
+                              uint8_t *dest) const {
   dbg() << "Reading sectors with ATA";
 
   outb(m_io_port + ATA_DRV_HEAD, (m_slave << 4) | ((sector >> 24) & 0x0F));

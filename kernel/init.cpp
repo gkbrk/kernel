@@ -17,11 +17,11 @@ extern "C" uint8_t __KERNEL_END;
 
 extern "C" void kernel_main();
 
-extern "C" void init(multiboot_info_t *mb, unsigned int magic) {
+extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
   ASSERT(magic == 0x2BADB002);
   uint64_t maxMem = 0;
 
-  multiboot_memory_map_t *memmap = (multiboot_memory_map_t *)mb->mmap_addr;
+  auto *memmap = (multiboot_memory_map_t *)mb->mmap_addr;
   while ((long unsigned int)memmap <
          (long unsigned int)mb->mmap_addr + mb->mmap_length) {
     if (memmap->type == 1 && memmap->len >= maxMem) {
@@ -64,7 +64,7 @@ extern "C" void init(multiboot_info_t *mb, unsigned int magic) {
 
   kernel_main();
 
-  while (1) {
+  while (true) {
     // Save power if there is nothing else to do
     hlt();
     yield();

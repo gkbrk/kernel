@@ -1,24 +1,19 @@
-#include "Task.h"
 #include "scheduler.h"
+#include "Task.h"
 
 #include <libk/String.h>
-#include "libk/alloc.h"
-#include "libk/string.h"
+#include <libk/alloc.h>
+#include <libk/string.h>
 
 #include "../arch/x86/idt.h"
 
 Task::Task(void (*main)(), uint32_t flags, uint32_t pagedir) {
-  regs.eax = 0;
-  regs.ebx = 0;
-  regs.ecx = 0;
-  regs.edx = 0;
-  regs.esi = 0;
-  regs.edi = 0;
   regs.eflags = flags;
   regs.eip = (uint32_t)main;
   regs.cr3 = (uint32_t)pagedir;
   m_stack = new uint8_t[4096];
   regs.esp = (uint32_t)m_stack;
+  next = nullptr;
 }
 
 String *Task::name() const { return m_name; }
@@ -36,15 +31,15 @@ double Task::remainingSleep() const { return m_remaining_sleep; }
 Task *currentTask;
 
 void schedulerTimerTick(size_t freq) {
-  double amount = 1.0 / freq;
+  double amount = 1.0 / (double)freq;
 
   Task *t = currentTask;
 
-  while (1) {
+  while (true) {
     if (t->remainingSleep() >= amount) {
       t->addRemainingSleep(-amount);
     } else {
-      t->setRemainingSleep(0);
+      t->setRemainingSleep(0.0);
     }
     t = t->next;
 
@@ -67,7 +62,7 @@ void yield() {
 
   while (true) {
     currentTask = currentTask->next;
-    if (currentTask->remainingSleep() == 0) {
+    if (currentTask->remainingSleep() == 0.0) {
       break;
     }
   }

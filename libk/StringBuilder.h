@@ -12,11 +12,11 @@ public:
 
   void append(char);
   void append(const char *);
-  void append(String);
+  void append(const String &);
   void append(size_t);
 
-  String to_string() const;
-  size_t length() const;
+  [[nodiscard]] String to_string() const;
+  [[nodiscard]] size_t length() const;
 
   void unsafe_set_length(size_t);
 

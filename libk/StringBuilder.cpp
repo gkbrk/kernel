@@ -1,19 +1,19 @@
-#include <libk/StringBuilder.h>
 #include <kernel/drivers/serial.h>
 #include <libk/String.h>
+#include <libk/StringBuilder.h>
 #include <libk/alloc.h>
 #include <libk/assert.h>
 
 StringBuilder::StringBuilder() {
   m_size = 0;
-  m_buffer = NULL;
+  m_buffer = nullptr;
 }
 
 StringBuilder::~StringBuilder() { kmfree(m_buffer); }
 
 void StringBuilder::append(char c) {
   m_buffer = (char *)kmrealloc(m_buffer, m_size + 1);
-  ASSERT(m_buffer != NULL);
+  ASSERT(m_buffer != nullptr);
   m_buffer[m_size] = c;
   m_size++;
 }
@@ -24,7 +24,7 @@ void StringBuilder::append(const char *str) {
   }
 }
 
-void StringBuilder::append(String str) {
+void StringBuilder::append(const String &str) {
   for (size_t i = 0; i < str.length(); i++) {
     append(str[i]);
   }

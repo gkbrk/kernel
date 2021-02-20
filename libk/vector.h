@@ -1,7 +1,7 @@
 #pragma once
 
-#include "alloc.h"
-#include "assert.h"
+#include <libk/alloc.h>
+#include <libk/assert.h>
 #include <stddef.h>
 
 template <typename T> constexpr static void swap(T &a, T &b) {
@@ -14,7 +14,7 @@ template <typename T> class Vector {
 public:
   Vector() : Vector(32) {}
 
-  Vector(size_t cap) {
+  explicit Vector(size_t cap) {
     m_size = 0;
     m_capacity = cap;
     m_values = (T **)kmalloc(cap * sizeof(T));
@@ -42,7 +42,7 @@ public:
     return *this;
   }
 
-  Vector &operator=(Vector &&other) {
+  Vector &operator=(Vector &&other) noexcept {
     swap(m_size, other->m_size);
     swap(m_capacity, other->m_capacity);
     swap(m_values, other->m_values);

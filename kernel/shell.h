@@ -25,7 +25,7 @@ typedef struct {
 } ShellCommand;
 
 void shell_echo(char *arg) {
-  if (arg != NULL) {
+  if (arg != nullptr) {
     kprintf("%s\n", arg);
   } else {
     kprintf("\n");
@@ -54,8 +54,8 @@ void shell_help(char *args);
 void shell_ps(char *) {
   Task *t = currentTask;
 
-  while (1) {
-    if (t->name() != NULL) {
+  while (true) {
+    if (t->name() != nullptr) {
       const char *c = "";
       if (currentTask == t) {
         c = "[current task]";
@@ -69,9 +69,8 @@ void shell_ps(char *) {
 }
 
 void shell_pkill(char *) {
-  return; /*
- Task *t = findTaskByName(args);
- killTask(t);*/
+  // Task *t = findTaskByName(args);
+  // killTask(t);
 }
 
 void shell_ls(char *arg) {
@@ -88,7 +87,7 @@ void shell_ls(char *arg) {
   });
 }
 
-void shell_vga(char *) {
+[[noreturn]] void shell_vga(char *) {
   dbg() << "Going to VGA-land";
   Drivers::BGA *bga = Drivers::BGA::inst();
   bga->setResolution(800, 600);
@@ -96,7 +95,7 @@ void shell_vga(char *) {
   int boxX = 0;
   int boxY = 0;
 
-  while (1) {
+  while (true) {
     for (size_t y = 0; y < 600; y++) {
       for (size_t x = 0; x < 800; x++) {
         bga->setPixel(x, y, x % 100, y % 100, y % 100);
@@ -194,8 +193,8 @@ ShellCommand commands[] = {
      [](char *) { kprintf("unnamed kernel compiled on %s\n", __DATE__); }}};
 
 void shell_help(char *) {
-  for (size_t i = 0; i < sizeof(commands) / sizeof(ShellCommand); i++) {
-    kprintf("%s - %s\n", commands[i].name, commands[i].desc);
+  for (auto &command : commands) {
+    kprintf("%s - %s\n", command.name, command.desc);
   }
 
   kprintf("To get more information, please run the command "
@@ -272,12 +271,15 @@ void shell() {
       continue;
     }
 
+    if (cmd == "exit")
+      return;
+
     dbg() << "Executing command " << cmd;
 
     bool executed = false;
-    for (size_t i = 0; i < sizeof(commands) / sizeof(ShellCommand); i++) {
-      if (cmd == commands[i].name) {
-        commands[i].function(parts.second().c_str());
+    for (auto &command : commands) {
+      if (cmd == command.name) {
+        command.function(parts.second().c_str());
         executed = true;
         break;
       }

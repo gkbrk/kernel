@@ -3,11 +3,11 @@
 #include <kernel/drivers/cmos.h>
 #include <kernel/drivers/terminal.h>
 #include <kernel/drivers/vga.h>
+#include <kernel/scheduler.h>
+#include <kernel/shell.h>
 #include <libk/String.h>
 #include <libk/alloc.h>
 #include <libk/debug.h>
-#include <kernel/scheduler.h>
-#include <kernel/shell.h>
 
 [[noreturn]] static void time_task() {
   using namespace Kernel::Drivers;

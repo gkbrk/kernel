@@ -11,16 +11,16 @@ public:
   BGA();
   static BGA *inst();
 
-  bool isAvailable();
-  bool initialize();
+  static bool isAvailable();
+  static bool initialize();
 
   bool setResolution(size_t width, size_t height);
   void setPixel(size_t x, size_t y, uint8_t r, uint8_t g, uint8_t b);
   void flip() const;
 
 private:
-  size_t m_width;
-  size_t m_height;
+  size_t m_width = 0;
+  size_t m_height = 0;
   uint8_t *m_fb;
 };
 

@@ -1,10 +1,10 @@
 #include <stdarg.h>
 #include <stddef.h>
 
+#include <kernel/drivers/io.h>
+#include <kernel/drivers/serial.h>
 #include <libk/printf.h>
 #include <libk/spinlock.h>
-#include "io.h"
-#include "serial.h"
 
 static Spinlock lock;
 
@@ -12,7 +12,7 @@ namespace Kernel::Drivers {
 
 static Serial s_inst;
 
-Serial::Serial() {}
+Serial::Serial() = default;
 
 Serial *Serial::inst() { return &s_inst; }
 
@@ -66,6 +66,6 @@ void serial_writestring(const char *data) { serial_write(data, strlen(data)); }
 void serial_printf(const char *s, ...) {
   va_list ap;
   va_start(ap, s);
-  vsprintf(NULL, serial_write_char, s, ap);
+  vsprintf(nullptr, serial_write_char, s, ap);
   va_end(ap);
 }

@@ -1,6 +1,6 @@
-#include "pcspeaker.h"
-#include "../scheduler.h"
-#include "io.h"
+#include <kernel/drivers/io.h>
+#include <kernel/drivers/pcspeaker.h>
+#include <kernel/scheduler.h>
 
 namespace Kernel::Drivers {
 

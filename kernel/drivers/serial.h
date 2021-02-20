@@ -12,8 +12,8 @@ public:
   Serial();
   static Serial *inst();
 
-  bool isAvailable();
-  bool initialize();
+  static bool isAvailable();
+  static bool initialize();
 
 private:
 };

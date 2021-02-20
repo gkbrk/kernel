@@ -1,4 +1,4 @@
-#include "vga.h"
+#include <kernel/drivers/vga.h>
 
 namespace Kernel::Drivers::TextVGA {
 

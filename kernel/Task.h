@@ -11,11 +11,11 @@ typedef struct {
 class Task {
 public:
   Task(void (*)(), uint32_t, uint32_t);
-  String *name() const;
+  [[nodiscard]] String *name() const;
   void setName(const char *);
   void addRemainingSleep(double amount);
   void setRemainingSleep(double amount);
-  double remainingSleep() const;
+  [[nodiscard]] double remainingSleep() const;
 
   template <typename T> void PushToStack(T val) {
     // Turn the ESP register into a void pointer
@@ -42,16 +42,14 @@ public:
   }
 
   Task *next;
-  Registers regs;
+  Registers regs{};
 
   uint8_t *m_stack;
 
 private:
-  double m_remaining_sleep;
-  String *m_name;
+  double m_remaining_sleep = 0.0;
+  String *m_name{};
 };
 
 extern Task *currentTask;
-
-void createTask(Task *task, void (*main)(), uint32_t flags, uint32_t *pagedir);
 void killTask(Task *t);

@@ -1,17 +1,17 @@
 #pragma once
 
-#include "assert.h"
+#include <libk/assert.h>
 
 template <typename T> class Option {
 public:
-  Option(T val) {
+  explicit Option(T val) {
     m_has_value = true;
     m_val = val;
   }
 
   Option() { m_has_value = false; }
 
-  T or_default(T val) {
+  T or_default(T val) const {
     if (m_has_value) {
       return m_val;
     } else {
@@ -19,12 +19,12 @@ public:
     }
   }
 
-  T value() {
+  T value() const {
     ASSERT(m_has_value);
     return m_val;
   }
 
-  bool is_some() { return m_has_value; }
+  bool is_some() const { return m_has_value; }
 
 private:
   bool m_has_value;

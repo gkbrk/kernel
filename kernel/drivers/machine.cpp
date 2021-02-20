@@ -1,5 +1,5 @@
-#include "machine.h"
-#include "io.h"
+#include <kernel/drivers/io.h>
+#include <kernel/drivers/machine.h>
 
 namespace Kernel::Drivers {
 
