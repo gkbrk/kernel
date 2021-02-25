@@ -1,5 +1,6 @@
 #include <stdint.h>
 
+#include <kernel/Random.h>
 #include <kernel/drivers/cmos.h>
 #include <kernel/drivers/io.h>
 #include <kernel/scheduler.h>
@@ -23,7 +24,7 @@ static unsigned char get_RTC_register(int reg) {
   return inb(0x71);
 }
 
-static inline uint64_t rdtsc() {
+uint64_t CMOS::rdtsc() {
   uint64_t ret;
   asm volatile("rdtsc" : "=A"(ret));
   return ret;
@@ -118,6 +119,9 @@ void CMOS::updateTime() {
       century = (century & 0x0F) + ((century / 16) * 10);
     }
   }
+
+  Kernel::Random::feed_data(rdtsc(), 0.05);
+  Kernel::Random::feed_data(cmos_second, 0.01);
 
   // Convert 12 hour clock to 24 hour clock if necessary
 

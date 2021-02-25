@@ -2,6 +2,7 @@
 
 #include <libk/String.h>
 #include <libk/TypeName.h>
+#include <stdint.h>
 
 namespace Kernel::Drivers {
 
@@ -12,6 +13,8 @@ public:
 
   static bool isAvailable();
   static bool initialize();
+
+  static uint64_t rdtsc();
 
   static void updateTime();
   [[nodiscard]] static String formattedString();
