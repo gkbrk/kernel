@@ -1,11 +1,11 @@
 #pragma once
 
 #include "drivers/BGA.h"
-#include "drivers/keyboard.h"
 #include "drivers/machine.h"
 #include "drivers/pcspeaker.h"
 #include "drivers/terminal.h"
 #include "fs/tarfs.h"
+#include "kernel/drivers/ps2/keyboard.h"
 #include "libk/String.h"
 #include "libk/StringBuilder.h"
 #include "libk/debug.h"
@@ -36,6 +36,7 @@ void shell_clear(char *);
 void shell_mem(char *);
 void shell_ps(char *);
 void shell_rand(char *);
+[[noreturn]] void shell_vgademo(char *);
 
 void shell_help(char *args);
 
@@ -159,7 +160,7 @@ ShellCommand commands[] = {
     {"cat", "Print the contents of a file", shell_cat},
     {"shutdown", "Shut down machine",
      [](char *) { Drivers::Machine::shutdown(); }},
-    {"vga", "VGA test", shell_vga},
+    {"vgademo", "VGA test", shell_vgademo},
     {"uname", "",
      [](char *) { kprintf("unnamed kernel compiled on %s\n", __DATE__); }}};
 
