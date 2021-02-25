@@ -14,6 +14,7 @@ const DebugPrinter &operator<<(const DebugPrinter &, const char *);
 const DebugPrinter &operator<<(const DebugPrinter &, String);
 const DebugPrinter &operator<<(const DebugPrinter &, size_t);
 const DebugPrinter &operator<<(const DebugPrinter &, int);
+const DebugPrinter &operator<<(const DebugPrinter &, int32_t);
 const DebugPrinter &operator<<(const DebugPrinter &, void *);
 
 const DebugPrinter dbg();

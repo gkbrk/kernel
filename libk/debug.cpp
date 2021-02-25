@@ -52,6 +52,13 @@ const DebugPrinter &operator<<(const DebugPrinter &printer, int num) {
   return printer;
 }
 
+const DebugPrinter &operator<<(const DebugPrinter &printer, int32_t num) {
+  char buf[64] = {0};
+  itoa(num, buf);
+  printer << buf;
+  return printer;
+}
+
 const DebugPrinter &operator<<(const DebugPrinter &printer, void *ptr) {
   char buf[32];
   int i = 30;
