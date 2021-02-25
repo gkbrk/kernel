@@ -1,13 +1,23 @@
-#include "keyboard.h"
-#include "../scheduler.h"
-#include "io.h"
+#include <kernel/drivers/io.h>
+#include <kernel/drivers/ps2/keyboard.h>
+#include <kernel/scheduler.h>
+
+namespace Kernel::Drivers {
+
+static volatile uint8_t newScancode = 0;
+static volatile bool newKey = 0;
+
+void KeyboardDriver::kernelKeypress(uint8_t sc) {
+  newScancode = sc;
+  newKey = true;
+}
 
 Option<uint8_t> KeyboardDriver::getRawKeycode() {
-  if (!(inb(0x64) & 1))
+  if (!newKey)
     return {};
 
-  uint8_t scancode = inb(0x60);
-  return Option<uint8_t>(scancode);
+  newKey = false;
+  return Option<uint8_t>(newScancode);
 }
 
 uint8_t KeyboardDriver::spinRawKeycode() {
@@ -20,6 +30,8 @@ uint8_t KeyboardDriver::spinRawKeycode() {
 
   return keyCode.value();
 }
+
+} // namespace Kernel::Drivers
 
 static char scanCodes[128] = {
     0,   27,   '1',  '2', '3',  '4', '5', '6', '7', '8', '9', '0', '-',
@@ -36,7 +48,7 @@ static char scanCodes[128] = {
 
 char keyboardSpinLoop() {
   while (true) {
-    uint8_t scancode = KeyboardDriver::spinRawKeycode();
+    uint8_t scancode = Kernel::Drivers::KeyboardDriver::spinRawKeycode();
     if ((scancode & 128) == 128)
       continue;
     char key = scanCodes[scancode];
