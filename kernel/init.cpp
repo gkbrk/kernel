@@ -6,6 +6,7 @@
 #include "libk/alloc.h"
 #include "libk/debug.h"
 #include "scheduler.h"
+#include <kernel/Random.h>
 #include <stdint.h>
 
 // Defined in the linker script
@@ -20,6 +21,8 @@ extern "C" void kernel_main();
 extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
   ASSERT(magic == 0x2BADB002);
   uint64_t maxMem = 0;
+
+  Kernel::Random::init();
 
   auto *memmap = (multiboot_memory_map_t *)mb->mmap_addr;
   while ((long unsigned int)memmap <

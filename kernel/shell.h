@@ -37,6 +37,7 @@ void shell_mem(char *);
 void shell_ps(char *);
 void shell_rand(char *);
 [[noreturn]] void shell_vgademo(char *);
+[[noreturn]] void shell_vgarand(char *);
 
 void shell_help(char *args);
 
@@ -48,54 +49,15 @@ void shell_pkill(char *) {
 void shell_ls(char *arg) {
   FS::FS *fs = FS::TarFS::inst();
 
-  fs->readDir(String(arg), [](FS::DirEntry dir) {
-    StringBuilder b;
+  StringBuilder b;
+  fs->readDir(String(arg), [&](FS::DirEntry &dir) {
     b.append(dir.path);
     b.append(" [");
     b.append(dir.size);
     b.append("]\n");
-    String s = b.to_string();
-    Drivers::VGATerminal::write(s.c_str());
   });
-}
-
-[[noreturn]] void shell_vga(char *) {
-  dbg() << "Going to VGA-land";
-  Drivers::BGA *bga = Drivers::BGA::inst();
-  bga->setResolution(800, 600);
-
-  int boxX = 0;
-  int boxY = 0;
-
-  while (true) {
-    for (size_t y = 0; y < 600; y++) {
-      for (size_t x = 0; x < 800; x++) {
-        bga->setPixel(x, y, x % 100, y % 100, y % 100);
-      }
-    }
-
-    for (int x = boxX - 10; x < boxX + 10; x++)
-      for (int y = boxY - 10; y < boxY + 10; y++)
-        if (x >= 0 && x <= 800 && y >= 0 && y <= 600)
-          bga->setPixel(x, y, 255, 50, 50);
-
-    bga->flip();
-    char key = keyboardSpinLoop();
-
-    if (key == 'w')
-      boxY -= 30;
-    if (key == 'a')
-      boxX -= 30;
-    if (key == 's')
-      boxY += 30;
-    if (key == 'd')
-      boxX += 30;
-
-    boxX %= 800;
-    boxY %= 600;
-
-    dbg(String("game")) << "X: " << boxX << " Y: " << boxY;
-  }
+  String s = b.to_string();
+  Drivers::VGATerminal::write(s.c_str());
 }
 
 void shell_playMelody(char *file) {
@@ -161,6 +123,7 @@ ShellCommand commands[] = {
     {"shutdown", "Shut down machine",
      [](char *) { Drivers::Machine::shutdown(); }},
     {"vgademo", "VGA test", shell_vgademo},
+    {"vgarand", "VGA test", shell_vgarand},
     {"uname", "",
      [](char *) { kprintf("unnamed kernel compiled on %s\n", __DATE__); }}};
 

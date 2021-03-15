@@ -3,7 +3,8 @@
 
 namespace Kernel::Random {
 
-void feed_data(uint8_t, float);
+void init();
+void feed_data(uint8_t);
 uint8_t get_byte();
 
 } // namespace Kernel::Random

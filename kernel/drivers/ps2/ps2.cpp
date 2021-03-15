@@ -14,15 +14,15 @@ static const uint16_t POLL_PORT = 0x64U;
 void PS2::ps2Tick(bool isMouse) {
   auto packet = IO::in8(0x60);
 
-  Kernel::Random::feed_data(CMOS::rdtsc() >> 56, 0.05);
-  Kernel::Random::feed_data(CMOS::rdtsc() >> 48, 0.1);
-  Kernel::Random::feed_data(CMOS::rdtsc() >> 40, 0.2);
-  Kernel::Random::feed_data(CMOS::rdtsc() >> 32, 0.3);
-  Kernel::Random::feed_data(CMOS::rdtsc() >> 24, 0.4);
-  Kernel::Random::feed_data(CMOS::rdtsc() >> 16, 0.5);
-  Kernel::Random::feed_data(CMOS::rdtsc() >> 8, 0.6);
-  Kernel::Random::feed_data(CMOS::rdtsc(), 0.7);
-  Kernel::Random::feed_data(packet, 0.5);
+  Kernel::Random::feed_data(CMOS::rdtsc() >> 56);
+  Kernel::Random::feed_data(CMOS::rdtsc() >> 48);
+  Kernel::Random::feed_data(CMOS::rdtsc() >> 40);
+  Kernel::Random::feed_data(CMOS::rdtsc() >> 32);
+  Kernel::Random::feed_data(CMOS::rdtsc() >> 24);
+  Kernel::Random::feed_data(CMOS::rdtsc() >> 16);
+  Kernel::Random::feed_data(CMOS::rdtsc() >> 8);
+  Kernel::Random::feed_data(CMOS::rdtsc());
+  Kernel::Random::feed_data(packet);
 
   if (isMouse) {
     Kernel::Drivers::Mouse::HandlePacket(packet);

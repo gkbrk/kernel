@@ -120,8 +120,8 @@ void CMOS::updateTime() {
     }
   }
 
-  Kernel::Random::feed_data(rdtsc(), 0.05);
-  Kernel::Random::feed_data(cmos_second, 0.01);
+  Kernel::Random::feed_data(rdtsc());
+  Kernel::Random::feed_data(cmos_second);
 
   // Convert 12 hour clock to 24 hour clock if necessary
 

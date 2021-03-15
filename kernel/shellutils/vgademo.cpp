@@ -1,5 +1,4 @@
 #include <kernel/drivers/BGA.h>
-#include <kernel/drivers/ps2/keyboard.h>
 #include <kernel/drivers/ps2/mouse.h>
 #include <kernel/scheduler.h>
 #include <libk/debug.h>
