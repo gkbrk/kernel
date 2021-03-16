@@ -1,5 +1,5 @@
-#include "scheduler.h"
-#include "Task.h"
+#include <kernel/Task.h>
+#include <kernel/scheduler.h>
 
 #include <libk/String.h>
 #include <libk/alloc.h>
@@ -11,8 +11,13 @@ Task::Task(void (*main)(), uint32_t flags, uint32_t pagedir) {
   regs.eflags = flags;
   regs.eip = (uint32_t)main;
   regs.cr3 = (uint32_t)pagedir;
+
+  // The default stack size is 4096 bytes.
+  // TODO: Expose method to check stack usage.
+  // TODO: Expose method to change stack size with realloc.
   m_stack = new uint8_t[4096];
   regs.esp = (uint32_t)m_stack;
+
   next = nullptr;
 }
 

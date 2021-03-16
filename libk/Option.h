@@ -24,7 +24,7 @@ public:
     return m_val;
   }
 
-  bool is_some() const { return m_has_value; }
+  [[nodiscard]] bool is_some() const { return m_has_value; }
 
 private:
   bool m_has_value;

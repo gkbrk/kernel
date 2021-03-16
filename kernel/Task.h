@@ -1,6 +1,6 @@
 #pragma once
 
-#include "libk/String.h"
+#include <libk/String.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -12,12 +12,20 @@ class Task {
 public:
   Task(void (*)(), uint32_t, uint32_t);
   [[nodiscard]] String *name() const;
-  void setName(const char *);
+
+  /// Set the human-readable name of the task.
+  ///
+  /// This name will be displayed in utilities like ps.
+  /// @param name Name of the task
+  void setName(const char *name);
+
   void addRemainingSleep(double amount);
   void setRemainingSleep(double amount);
   [[nodiscard]] double remainingSleep() const;
 
+  /// Push a value into the task stack.
   template <typename T> void PushToStack(T val) {
+    // TODO: Check stack size before doing this.
     // Turn the ESP register into a void pointer
     auto esp = (void *)(size_t)regs.esp;
 
@@ -28,7 +36,9 @@ public:
     regs.esp -= sizeof(T);
   }
 
+  /// Pop a value from the task stack.
   template <typename T> T PopFromStack() {
+    // TODO: Check stack size before doing this.
     T val;
     // Reading a value, stack shrinks upwards
     regs.esp += sizeof(T);

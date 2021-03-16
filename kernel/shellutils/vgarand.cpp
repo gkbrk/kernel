@@ -11,8 +11,8 @@ using namespace Kernel;
   while (true) {
     for (int y = 0; y < 250; y++)
       for (int x = 0; x < 250; x++) {
-          auto pix = Kernel::random_prng<uint8_t>();
-          bga->setPixel(x, y, pix, pix, pix);
+        auto pix = Kernel::random_prng<uint8_t>();
+        bga->setPixel(x, y, pix, pix, pix);
       }
 
     bga->flip();
