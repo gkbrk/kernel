@@ -3,8 +3,9 @@
 #include <libk/assert.h>
 #include <libk/debug.h>
 
-const DebugPrinter dbg() { return dbg(*currentTask->name()); }
-const DebugPrinter dbg(String name) { return DebugPrinter(name); }
+DebugPrinter dbg() { return dbg(*currentTask->name()); }
+DebugPrinter dbg(const String &name) { return DebugPrinter(name); }
+DebugPrinter dbg(const char *name) { return DebugPrinter(String(name)); }
 
 DebugPrinter::DebugPrinter(String name) {
   serial_lock();
@@ -18,7 +19,7 @@ DebugPrinter::~DebugPrinter() {
   serial_unlock();
 }
 
-void DebugPrinter::write(char c) const { serial_write_char(c); }
+void DebugPrinter::write(char c) { serial_write_char(c); }
 
 const DebugPrinter &operator<<(const DebugPrinter &printer, char c) {
   printer.write(c);
