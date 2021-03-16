@@ -19,9 +19,15 @@ extern "C" uint8_t __KERNEL_END;
 extern "C" void kernel_main();
 
 extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
+  // If we are getting booted by something that implements the multiboot spec,
+  // the magic number we are passed will be 0x2BADB002.
   ASSERT(magic == 0x2BADB002);
   uint64_t maxMem = 0;
 
+  // One of the first things we want to do is initialize the kernel entropy pool
+  // in order to collect as much entropy as we can during boot time. If we are
+  // going to be starved for entropy, the random things we collect during boot
+  // will be the only things we can get our hands on.
   Kernel::Random::init();
 
   auto *memmap = (multiboot_memory_map_t *)mb->mmap_addr;
@@ -32,6 +38,10 @@ extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
       alloc_end = alloc_begin + memmap->len;
       maxMem = memmap->len;
     }
+
+    // Feed the mmap structure to the entropy pool.
+    Kernel::Random::feed_data((uint8_t *)memmap, memmap->size);
+
     memmap = (multiboot_memory_map_t *)((long unsigned int)memmap +
                                         memmap->size + sizeof(memmap->size));
   }
