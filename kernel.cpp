@@ -43,6 +43,8 @@
 [[noreturn]] static void memory_stats() {
   while (true) {
     size_t bytes = getMemUsage();
+    Kernel::Random::feed_data((uint8_t *)&bytes, sizeof(bytes));
+
     dbg() << "Current memory usage is " << bytes / 1000 << " KB";
     dbg() << "Physical memory usage: "
           << (size_t)(alloc_begin - alloc_start) / 1000 << "KB";
@@ -60,8 +62,6 @@ extern "C" void kernel_main() {
         spawnTask(time_task, "time-display");
         spawnTask(memory_stats, "memory-stats");
         spawnTask(shell, "shell");
-
-        // Kernel::Drivers::PCSpeaker::playFreq(300, 0.1);
 
         exitTask();
       },
