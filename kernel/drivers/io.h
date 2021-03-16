@@ -11,6 +11,10 @@ void out8(uint16_t, uint8_t);
 // 16-bit IO
 uint16_t in16(uint16_t);
 void out16(uint16_t, uint16_t);
+
+// 32-bit IO
+uint32_t in32(uint16_t);
+void out32(uint16_t, uint32_t);
 } // namespace Kernel::Drivers::IO
 
 void outb(uint16_t port, uint8_t val);
