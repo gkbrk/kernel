@@ -1,12 +1,54 @@
 #include <stdarg.h>
 #include <stddef.h>
 
+#include <kernel/Minitask/TaskRunner.h>
 #include <kernel/drivers/io.h>
 #include <kernel/drivers/serial.h>
 #include <libk/printf.h>
 #include <libk/spinlock.h>
 
 static Spinlock lock;
+
+static int serial_sent() { return inb(COM1 + 5) & 0x20; }
+
+template <const size_t BUFSIZE>
+class SerialWriteTask : public Kernel::Multitasking::Minitask {
+public:
+  void Write(uint8_t byte) {
+    m_buf[m_head++] = byte;
+    m_count++;
+
+    if (m_head == BUFSIZE)
+      m_head = 0;
+
+    if (m_count > BUFSIZE)
+      m_count = BUFSIZE;
+  }
+
+private:
+  String name() const override { return String("serial-writer"); }
+
+  bool step() override {
+    if (m_count == 0)
+      return true;
+
+    while (m_count) {
+      while (serial_sent() == 0)
+        ;
+
+      auto byte = m_buf[(m_head - m_count) % BUFSIZE];
+      m_count--;
+      outb(COM1, byte);
+    }
+
+    return true;
+  }
+  uint8_t m_buf[BUFSIZE];
+  size_t m_head = 0;
+  size_t m_count = 0;
+};
+
+static SerialWriteTask<2048> *writeTask;
 
 namespace Kernel::Drivers {
 
@@ -26,6 +68,9 @@ bool Serial::initialize() {
   outb(COM1 + 3, 0x03); // 8 bits, no parity, one stop bit
   outb(COM1 + 2, 0xC7); // Enable FIFO, clear them, with 14-byte threshold
   outb(COM1 + 4, 0x0B); // IRQs enabled, RTS/DSR set
+
+  writeTask = new SerialWriteTask<2048>();
+  Kernel::Multitasking::TaskRunner::SpawnTask(writeTask);
   return true;
 }
 
@@ -46,14 +91,7 @@ char serial_read() {
   return inb(COM1);
 }
 
-static int serial_sent() { return inb(COM1 + 5) & 0x20; }
-
-void serial_write_char(char a) {
-  while (serial_sent() == 0)
-    ;
-
-  outb(COM1, a);
-}
+void serial_write_char(char a) { writeTask->Write(a); }
 
 void serial_write(const char *data, size_t size) {
   for (size_t i = 0; i < size; i++) {

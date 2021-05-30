@@ -31,19 +31,14 @@ void TaskRunner::SpawnTask(Minitask *mt) {
 }
 
 void TaskRunner::Step() {
-  Minitask *start = cTask;
   while (true) {
     cTask = cTask->next;
 
     if (cTask->remainingSleep() == 0.0) {
       break;
     }
-
-    if (cTask == start) {
-      cTask = idleTask;
-      break;
-    }
   }
+
   if (!TaskRunner::cTask->step())
     KillTask(TaskRunner::cTask);
 }
