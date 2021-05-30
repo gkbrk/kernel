@@ -49,6 +49,7 @@ void shell_pkill(char *) {
 void shell_ls(char *arg) {
   FS::FS *fs = FS::TarFS::inst();
 
+  /*
   StringBuilder b;
   fs->readDir(String(arg), [&](FS::DirEntry &dir) {
     b.append(dir.path);
@@ -58,6 +59,7 @@ void shell_ls(char *arg) {
   });
   String s = b.to_string();
   Drivers::VGATerminal::write(s.c_str());
+  */
 }
 
 void shell_playMelody(char *file) {

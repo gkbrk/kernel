@@ -1,5 +1,6 @@
 #include <stddef.h>
 
+#include <kernel/Minitask/TaskRunner.h>
 #include <kernel/drivers/cmos.h>
 #include <kernel/drivers/terminal.h>
 #include <kernel/drivers/vga.h>
@@ -9,12 +10,11 @@
 #include <libk/alloc.h>
 #include <libk/debug.h>
 
-[[noreturn]] static void time_task() {
-  using namespace Kernel::Drivers;
+class TimeDisplay : public Multitasking::Minitask {
+  [[nodiscard]] String name() const override { return String("time-display"); }
 
-  size_t oldLen = 0;
-
-  while (true) {
+  bool step() override {
+    using namespace Kernel::Drivers;
     auto cmos = CMOS::inst();
     cmos->updateTime();
     String t = cmos->formattedString();
@@ -36,34 +36,68 @@
 
     oldLen = len;
 
-    sleep(0.5);
+    addRemainingSleep(0.5);
+    return true;
   }
-}
 
-[[noreturn]] static void memory_stats() {
-  while (true) {
+  size_t oldLen = 0;
+};
+
+class LogSpammer : public Multitasking::Minitask {
+public:
+  LogSpammer(const char *k, size_t limit) {
+    logStr = k;
+    m_limit = limit;
+  }
+  String name() const override {
+    auto sb = new StringBuilder();
+    sb->append("log-spammer[");
+    sb->append(logStr);
+    sb->append("]");
+    return sb->to_string();
+  }
+
+  bool step() override {
+    dbg("log spammer") << logStr << " " << m_iter;
+    addRemainingSleep(1.0);
+    if (m_iter == m_limit)
+      return false;
+
+    m_iter++;
+    return true;
+  }
+
+private:
+  const char *logStr = nullptr;
+  size_t m_iter = 0;
+  size_t m_limit = 0;
+};
+
+class MemUsageLogger : public Multitasking::Minitask {
+  [[nodiscard]] String name() const override { return String("memory-usage"); }
+
+  bool step() override {
     size_t bytes = getMemUsage();
     Kernel::Random::feed_data((uint8_t *)&bytes, sizeof(bytes));
 
-    dbg() << "Current memory usage is " << bytes / 1000 << " KB";
-    dbg() << "Physical memory usage: "
-          << (size_t)(alloc_begin - alloc_start) / 1000 << "KB";
-    sleep(5.0f);
+    dbg("mem-usage") << "Current memory usage is " << bytes / 1000 << " KB";
+    dbg("mem-usage") << "Physical memory usage: "
+                     << (size_t)(alloc_begin - alloc_start) / 1000 << "KB";
+    addRemainingSleep(5.0f);
+    return true;
   }
-}
+};
 
 extern "C" void kernel_main() {
-  spawnTask(
-      []() {
-        dbg() << "Enter kernel main";
-        dbg() << "Booting kernel";
-        Kernel::Drivers::VGATerminal::write("Booting kernel...\n");
+  dbg() << "Enter kernel main";
+  dbg() << "Booting kernel";
+  Kernel::Drivers::VGATerminal::write("Booting kernel...\n");
 
-        spawnTask(time_task, "time-display");
-        spawnTask(memory_stats, "memory-stats");
-        spawnTask(shell, "shell");
+  spawnTask(shell, "shell");
 
-        exitTask();
-      },
-      "init");
+  Multitasking::TaskRunner::InitTasking();
+  Multitasking::TaskRunner::SpawnTask(new LogSpammer("Hello", 5));
+  Multitasking::TaskRunner::SpawnTask(new LogSpammer("World", 6));
+  Multitasking::TaskRunner::SpawnTask(new TimeDisplay());
+  Multitasking::TaskRunner::SpawnTask(new MemUsageLogger());
 }

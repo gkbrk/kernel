@@ -6,6 +6,7 @@
 #include "libk/alloc.h"
 #include "libk/debug.h"
 #include "scheduler.h"
+#include <kernel/Minitask/TaskRunner.h>
 #include <kernel/Random.h>
 #include <stdint.h>
 
@@ -78,7 +79,8 @@ extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
   kernel_main();
 
   while (true) {
-    // Save power if there is nothing else to do
+    for (size_t i = 0; i < 512; i++)
+      Kernel::Multitasking::TaskRunner::Step();
     hlt();
     yield();
   }
