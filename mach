@@ -17,6 +17,10 @@ format () {
     clang-format -i $(find . -type f -name '*.h')
 }
 
+lint () {
+    clang-tidy --checks='bugprone*,modernize*,cppcoreguidelines*' --use-color $(find . -type f -wholename '*.cpp') -- -I. | less -r
+}
+
 run () {
     ./mach
     make tar-drive.tar

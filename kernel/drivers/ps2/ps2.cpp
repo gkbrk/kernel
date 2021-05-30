@@ -31,7 +31,7 @@ void PS2::ps2Tick(bool isMouse) {
   }
 }
 
-PS2::PS2() {}
+PS2::PS2() = default;
 
 uint8_t PS2::pollPort() { return IO::in8(POLL_PORT); }
 

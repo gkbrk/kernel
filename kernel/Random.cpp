@@ -5,7 +5,8 @@
 
 namespace Kernel::Random {
 
-static uint32_t s_state[16];
+static constexpr size_t state_size = 16;
+static uint32_t s_state[state_size];
 
 void init() {
   const char *value = "expand 32-byte k"
@@ -16,7 +17,7 @@ void init() {
 }
 
 static void chacha_step() {
-  uint32_t state[16];
+  uint32_t state[state_size];
   memcpy(state, s_state, sizeof(s_state));
   chacha_block(s_state, state, 10);
 }

@@ -28,5 +28,5 @@ public:
 
 private:
   bool m_has_value;
-  T m_val;
+  T m_val = {0};
 };
