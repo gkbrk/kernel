@@ -55,7 +55,7 @@ void schedulerTimerTick(size_t freq) {
 
 void initTasking() {
   Task *t = new Task(nullptr, 0, 0);
-  t->setName("kmain_idle");
+  t->setName("kernel-init");
   t->next = t;
   currentTask = t;
 }

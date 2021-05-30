@@ -56,6 +56,7 @@ extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
   kmalloc_init();
 
   initTasking();
+  Kernel::Multitasking::TaskRunner::InitTasking();
   dbg() << "Started scheduler/tasking";
   dbg() << "Kernel memory allocator initialized";
   Kernel::Drivers::VGATerminal::clear();
@@ -79,9 +80,6 @@ extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
   kernel_main();
 
   while (true) {
-    for (size_t i = 0; i < 512; i++)
-      Kernel::Multitasking::TaskRunner::Step();
-    hlt();
-    yield();
+    Kernel::Multitasking::TaskRunner::Step();
   }
 }

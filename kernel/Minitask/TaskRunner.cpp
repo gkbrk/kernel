@@ -1,30 +1,46 @@
 #include <arch/x86/idt.h>
 #include <kernel/Minitask/TaskRunner.h>
+#include <kernel/scheduler.h>
 
 namespace Kernel::Multitasking {
 class Idle : public Minitask {
   [[nodiscard]] String name() const override { return String("idle-task"); }
 
-  bool step() override { return true; }
+  bool step() override {
+    hlt();
+    yield();
+    return true;
+  }
 };
 
+static Minitask *idleTask;
 Minitask *TaskRunner::cTask;
 
 void TaskRunner::InitTasking() {
-  TaskRunner::cTask = new Idle();
-  TaskRunner::cTask->next = TaskRunner::cTask;
+  idleTask = new Idle();
+  cTask = idleTask;
+  cTask->next = cTask;
 }
 
 void TaskRunner::SpawnTask(Minitask *mt) {
+  dbg("ProtoThread Runner") << "Spawning task: " << mt->name();
+
   Minitask *n = TaskRunner::cTask->next;
   TaskRunner::cTask->next = mt;
   mt->next = n;
 }
 
 void TaskRunner::Step() {
+  Minitask *start = cTask;
   while (true) {
     cTask = cTask->next;
+
     if (cTask->remainingSleep() == 0.0) {
+      break;
+    }
+
+    if (cTask == start) {
+      cTask = idleTask;
       break;
     }
   }
@@ -33,6 +49,7 @@ void TaskRunner::Step() {
 }
 
 void TaskRunner::KillTask(Minitask *mt) {
+  dbg("ProtoThread Runner") << "Goodbye " << mt->name();
   Minitask *p = mt;
   while (p->next != mt)
     p = p->next;

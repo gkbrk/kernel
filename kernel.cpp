@@ -95,7 +95,6 @@ extern "C" void kernel_main() {
 
   spawnTask(shell, "shell");
 
-  Multitasking::TaskRunner::InitTasking();
   Multitasking::TaskRunner::SpawnTask(new LogSpammer("Hello", 5));
   Multitasking::TaskRunner::SpawnTask(new LogSpammer("World", 6));
   Multitasking::TaskRunner::SpawnTask(new TimeDisplay());
