@@ -1,9 +1,11 @@
+#include <kernel/Minitask/TaskRunner.h>
 #include <kernel/drivers/serial.h>
-#include <kernel/scheduler.h>
 #include <libk/assert.h>
 #include <libk/debug.h>
 
-DebugPrinter dbg() { return dbg(*currentTask->name()); }
+DebugPrinter dbg() {
+  return dbg(Kernel::Multitasking::TaskRunner::cTask->name());
+}
 DebugPrinter dbg(const String &name) { return DebugPrinter(name); }
 DebugPrinter dbg(const char *name) { return DebugPrinter(String(name)); }
 

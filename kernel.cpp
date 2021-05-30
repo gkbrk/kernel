@@ -50,15 +50,15 @@ public:
     m_limit = limit;
   }
   String name() const override {
-    auto sb = new StringBuilder();
-    sb->append("log-spammer[");
-    sb->append(logStr);
-    sb->append("]");
-    return sb->to_string();
+    auto sb = StringBuilder();
+    sb.append("log-spammer[");
+    sb.append(logStr);
+    sb.append("]");
+    return sb.to_string();
   }
 
   bool step() override {
-    dbg("log spammer") << logStr << " " << m_iter;
+    dbg() << logStr << " " << m_iter;
     addRemainingSleep(1.0);
     if (m_iter == m_limit)
       return false;
@@ -80,9 +80,9 @@ class MemUsageLogger : public Multitasking::Minitask {
     size_t bytes = getMemUsage();
     Kernel::Random::feed_data((uint8_t *)&bytes, sizeof(bytes));
 
-    dbg("mem-usage") << "Current memory usage is " << bytes / 1000 << " KB";
-    dbg("mem-usage") << "Physical memory usage: "
-                     << (size_t)(alloc_begin - alloc_start) / 1000 << "KB";
+    dbg() << "Current memory usage is " << bytes / 1000 << " KB";
+    dbg() << "Physical memory usage: "
+          << (size_t)(alloc_begin - alloc_start) / 1000 << "KB";
     addRemainingSleep(5.0f);
     return true;
   }
