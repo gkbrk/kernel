@@ -38,6 +38,7 @@ void shell_ps(char *);
 void shell_rand(char *);
 [[noreturn]] void shell_vgademo(char *);
 [[noreturn]] void shell_vgarand(char *);
+void shell_playMelody(char *);
 
 void shell_help(char *args);
 
@@ -60,24 +61,6 @@ void shell_ls(char *arg) {
   String s = b.to_string();
   Drivers::VGATerminal::write(s.c_str());
   */
-}
-
-void shell_playMelody(char *file) {
-  spawnTask(
-      []() {
-        auto file = currentTask->PopFromStack<const char *>();
-        auto contents = FS::TarFS::inst()->readFile(file);
-
-        for (size_t i = 0; i < contents.length(); i++) {
-          Drivers::PCSpeaker::playFreq(contents[i]);
-          sleep(0.2);
-        }
-
-        Drivers::PCSpeaker::noSound();
-        exitTask();
-      },
-      "music-player", file);
-  // TODO: strdup the file argument and free in the subprocess
 }
 
 void shell_cat(char *file) {
