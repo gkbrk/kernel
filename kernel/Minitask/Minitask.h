@@ -16,7 +16,7 @@ public:
 
   void sleepDeadline(double amount) {
     m_remaining_sleep = amount;
-    m_deadline = amount;
+    m_deadline = amount + 0.1;
   }
 
   void setDeadline(double deadline) { m_deadline = deadline; }

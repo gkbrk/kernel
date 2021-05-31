@@ -43,7 +43,7 @@ void shell_clear(char *);
 void shell_mem(char *);
 void shell_ps(char *);
 void shell_rand(char *);
-[[noreturn]] void shell_vgademo(char *);
+Multitasking::Minitask *shell_vgademo(char *);
 [[noreturn]] void shell_vgarand(char *);
 Multitasking::Minitask *shell_playMelody(char *);
 Multitasking::Minitask *shell_read(char *);
@@ -94,7 +94,6 @@ ShellCommand commands[] = {
     {"cat", "Print the contents of a file", shell_cat},
     {"shutdown", "Shut down machine",
      [](char *) { Drivers::Machine::shutdown(); }},
-    {"vgademo", "VGA test", shell_vgademo},
     {"vgarand", "VGA test", shell_vgarand},
     {"uname", "",
      [](char *) { kprintf("unnamed kernel compiled on %s\n", __DATE__); }}};
@@ -102,6 +101,7 @@ ShellCommand commands[] = {
 ShellCommandMT mtCommands[] = {
     {"read", "Read the contents of a file", shell_read},
     {"play", "Play a melody", shell_playMelody},
+    {"vgademo", "VGA test", shell_vgademo},
 };
 
 void shell_help(char *) {

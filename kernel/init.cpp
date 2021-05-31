@@ -19,6 +19,11 @@ extern "C" uint8_t __KERNEL_END;
 
 extern "C" void kernel_main();
 
+extern "C" void __cxa_pure_virtual() {
+  while (true)
+    ;
+}
+
 extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
   // If we are getting booted by something that implements the multiboot spec,
   // the magic number we are passed will be 0x2BADB002.
@@ -75,7 +80,7 @@ extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
     (*ctor)();
   }
 
-  init_timer(100);
+  init_timer(500);
 
   kernel_main();
 

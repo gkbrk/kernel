@@ -5,7 +5,7 @@
 void endOfInterrupt() { outb(0x20, 0x20); }
 
 extern "C" void irq0_handler(void) {
-  Kernel::Multitasking::TaskRunner::schedulerTimerTick(100);
+  Kernel::Multitasking::TaskRunner::schedulerTimerTick(500);
   endOfInterrupt();
 }
 
