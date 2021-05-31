@@ -29,17 +29,21 @@ private:
   String name() const override { return String("serial-writer"); }
 
   bool step() override {
+    setDeadline(2);
     if (m_count == 0)
       return true;
 
-    while (m_count) {
-      while (serial_sent() == 0)
-        ;
-
-      auto byte = m_buf[(m_head - m_count) % BUFSIZE];
-      m_count--;
-      outb(COM1, byte);
+    if (serial_sent() == 0) {
+      setDeadline(0.05);
+      return true;
     }
+
+    auto byte = m_buf[(m_head - m_count) % BUFSIZE];
+    m_count--;
+    outb(COM1, byte);
+
+    if (m_count > 0)
+      setDeadline(0.1);
 
     return true;
   }

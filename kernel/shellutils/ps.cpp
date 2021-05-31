@@ -1,5 +1,6 @@
 #include <kernel/Minitask/TaskRunner.h>
 #include <kernel/Task.h>
+#include <libk/debug.h>
 #include <libk/printf.h>
 
 void shell_ps(char *) {
@@ -28,6 +29,8 @@ void shell_ps(char *) {
       c = "[current task]";
     }
     kprintf("%s %s -> %s\n", mt->name().c_str(), c, mt->next->name().c_str());
+    dbg("ps") << mt->name() << " " << c << " " << mt->next->name()
+              << " [deadline: " << (int)(mt->deadline() * 1000) << "]";
     mt = mt->next;
     if (mt == Kernel::Multitasking::TaskRunner::cTask)
       break;

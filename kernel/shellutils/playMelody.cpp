@@ -15,6 +15,7 @@ private:
       Kernel::Drivers::PCSpeaker::playFreq(m_melody[m_currentNote]);
       m_currentNote++;
       addRemainingSleep(0.2);
+      setDeadline(0.2);
       return true;
     }
 

@@ -37,6 +37,7 @@ class TimeDisplay : public Multitasking::Minitask {
     oldLen = len;
 
     addRemainingSleep(0.5);
+    setDeadline(1);
     return true;
   }
 
@@ -59,7 +60,7 @@ public:
 
   bool step() override {
     dbg() << logStr << " " << m_iter;
-    addRemainingSleep(1.0);
+    sleepDeadline(1.0);
     if (m_iter == m_limit)
       return false;
 
@@ -83,7 +84,7 @@ class MemUsageLogger : public Multitasking::Minitask {
     dbg() << "Current memory usage is " << bytes / 1000 << " KB";
     dbg() << "Physical memory usage: "
           << (size_t)(alloc_begin - alloc_start) / 1000 << "KB";
-    addRemainingSleep(5.0f);
+    sleepDeadline(5.0);
     return true;
   }
 };

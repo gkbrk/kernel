@@ -14,10 +14,19 @@ public:
   void setRemainingSleep(double amount) { m_remaining_sleep = amount; }
   [[nodiscard]] double remainingSleep() const { return m_remaining_sleep; }
 
+  void sleepDeadline(double amount) {
+    m_remaining_sleep = amount;
+    m_deadline = amount;
+  }
+
+  void setDeadline(double deadline) { m_deadline = deadline; }
+  [[nodiscard]] double deadline() const { return m_deadline; }
+
   Minitask *next = nullptr;
 
 private:
   double m_remaining_sleep = 0.0;
+  double m_deadline = 1.0;
 };
 
 } // namespace Kernel::Multitasking

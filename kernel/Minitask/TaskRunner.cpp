@@ -7,8 +7,8 @@ class Idle : public Minitask {
   [[nodiscard]] String name() const override { return String("idle-task"); }
 
   bool step() override {
+    setDeadline(1.0);
     hlt();
-    yield();
     return true;
   }
 };
@@ -31,14 +31,17 @@ void TaskRunner::SpawnTask(Minitask *mt) {
 }
 
 void TaskRunner::Step() {
-  while (true) {
-    cTask = cTask->next;
+  cTask = idleTask;
 
-    if (cTask->remainingSleep() == 0.0) {
-      break;
-    }
+  for (auto t = idleTask->next; t != idleTask; t = t->next) {
+    if (t->remainingSleep() == 0.0 && t->deadline() < cTask->deadline())
+      cTask = t;
   }
 
+  if (cTask->deadline() < -0.01)
+    dbg("task-runner") << cTask->name() << " deadline was "
+                       << (int)(cTask->deadline() * 1000000) << " us";
+  cTask->setDeadline(60);
   if (!TaskRunner::cTask->step())
     KillTask(TaskRunner::cTask);
 }
@@ -66,6 +69,7 @@ void TaskRunner::schedulerTimerTick(size_t freq) {
     } else {
       t->setRemainingSleep(0.0);
     }
+    t->setDeadline(t->deadline() - amount);
     t = t->next;
 
     if (t == cTask)
