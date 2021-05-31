@@ -1,8 +1,5 @@
-#include "../../kernel/drivers/io.h"
-#include "../../kernel/drivers/serial.h"
-#include "../../kernel/scheduler.h"
-#include "idt.h"
 #include <kernel/Minitask/TaskRunner.h>
+#include <kernel/drivers/io.h>
 #include <kernel/drivers/ps2/ps2.h>
 
 void endOfInterrupt() { outb(0x20, 0x20); }

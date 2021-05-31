@@ -5,7 +5,7 @@
 namespace Kernel::Drivers {
 
 static volatile uint8_t newScancode = 0;
-static volatile bool newKey = 0;
+static volatile bool newKey = false;
 
 void KeyboardDriver::kernelKeypress(uint8_t sc) {
   newScancode = sc;
@@ -55,5 +55,18 @@ char keyboardSpinLoop() {
     if (key) {
       return key;
     }
+  }
+}
+
+Option<char> keyboardTry() {
+  auto opt = Kernel::Drivers::KeyboardDriver::getRawKeycode();
+  if (!opt.is_some())
+    return {};
+  uint8_t scancode = opt.value();
+  if ((scancode & 128) == 128)
+    return {};
+  char key = scanCodes[scancode];
+  if (key) {
+    return Option(key);
   }
 }

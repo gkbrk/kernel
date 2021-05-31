@@ -16,3 +16,4 @@ public:
 } // namespace Kernel::Drivers
 
 char keyboardSpinLoop();
+Option<char> keyboardTry();

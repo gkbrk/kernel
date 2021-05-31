@@ -13,6 +13,7 @@
 #include "libk/string.h"
 #include "libk/vector.h"
 #include "scheduler.h"
+#include <kernel/Minitask/TaskRunner.h>
 #include <kernel/Random.h>
 #include <stddef.h>
 
@@ -121,47 +122,110 @@ void shell_help(char *) {
           "`read help.txt`\n");
 }
 
-String shell_read_line() {
-  dbg() << "Reading a line";
-  Drivers::VGATerminal::lock();
-  Drivers::TextVGA::setColor(Drivers::TextVGA::color::LIGHT_BLUE,
-                             Drivers::TextVGA::color::BLACK);
-  Drivers::VGATerminal::write("> ");
-  Drivers::TextVGA::setColor(Drivers::TextVGA::color::WHITE,
-                             Drivers::TextVGA::color::BLACK);
-  Drivers::VGATerminal::unlock();
-  StringBuilder cmd;
+class LineReader {
+public:
+  LineReader() { reset(); }
 
-  while (true) {
+  void reset() {
+    m_cmd.unsafe_set_length(0);
+    Drivers::VGATerminal::lock();
+    Drivers::TextVGA::setColor(Drivers::TextVGA::color::LIGHT_BLUE,
+                               Drivers::TextVGA::color::BLACK);
+    Drivers::VGATerminal::write("> ");
+    Drivers::TextVGA::setColor(Drivers::TextVGA::color::WHITE,
+                               Drivers::TextVGA::color::BLACK);
+    Drivers::VGATerminal::unlock();
+  }
+
+  bool step() {
     Drivers::VGATerminal::lock();
     Drivers::TextVGA::moveCursor(Drivers::VGATerminal::col,
                                  Drivers::VGATerminal::row);
     Drivers::VGATerminal::unlock();
-    char key = keyboardSpinLoop();
+    auto keyOpt = keyboardTry();
+    if (!keyOpt.is_some())
+      return true;
+    char key = keyOpt.value();
+
     if (key == '\b') {
-      if (cmd.length() > 0) {
-        cmd.unsafe_set_length(cmd.length() - 1);
+      if (m_cmd.length() > 0) {
+        m_cmd.unsafe_set_length(m_cmd.length() - 1);
         Drivers::VGATerminal::lock();
         Drivers::VGATerminal::col--;
         Drivers::VGATerminal::write(' ');
         Drivers::VGATerminal::col--;
         Drivers::VGATerminal::unlock();
       }
-      continue;
+      return true;
     }
     Drivers::VGATerminal::lock();
     Drivers::VGATerminal::write(key);
     Drivers::VGATerminal::unlock();
 
     if (key == '\n') {
-      break;
+      return false;
     } else {
-      cmd.append(key);
+      m_cmd.append(key);
     }
+
+    return true;
   }
 
-  return cmd.to_string();
-}
+  String line() { return m_cmd.to_string(); }
+
+private:
+  StringBuilder m_cmd;
+};
+
+class DemoShell : public Multitasking::Minitask {
+private:
+  String name() const override { return String("demo-shell"); }
+  bool step() override {
+      setDeadline(0.3);
+    if (lr.step())
+      return true;
+
+    auto input = lr.line();
+
+    dbg() << "Input: " << input;
+
+    auto parts = input.split_at(' ');
+
+    auto cmd = parts.first();
+
+    if (cmd == "") {
+      lr.reset();
+      return true;
+    }
+
+    if (cmd == "exit")
+      return false;
+
+    dbg() << "Executing command " << cmd;
+
+    bool executed = false;
+    for (auto &command : commands) {
+      if (cmd == command.name) {
+        command.function(parts.second().c_str());
+        executed = true;
+        break;
+      }
+    }
+
+    lr.reset();
+
+    if (!executed) {
+      StringBuilder b;
+      b.append("Unknown command ");
+      b.append(cmd);
+      b.append(". Try typing \"help\".\n");
+      b.to_string().print();
+    }
+
+    return true;
+  };
+  LineReader lr;
+};
 
 void shell() {
 #ifdef GITCOMMIT
@@ -179,38 +243,5 @@ void shell() {
           "\n"
           "In order to read the quickstart guide, type `read help.txt`.\n");
 
-  while (true) {
-    String input = shell_read_line();
-    dbg() << "Input: " << input;
-
-    auto parts = input.split_at(' ');
-
-    auto cmd = parts.first();
-
-    if (cmd == "") {
-      continue;
-    }
-
-    if (cmd == "exit")
-      return;
-
-    dbg() << "Executing command " << cmd;
-
-    bool executed = false;
-    for (auto &command : commands) {
-      if (cmd == command.name) {
-        command.function(parts.second().c_str());
-        executed = true;
-        break;
-      }
-    }
-
-    if (!executed) {
-      StringBuilder b;
-      b.append("Unknown command ");
-      b.append(cmd);
-      b.append(". Try typing \"help\".\n");
-      b.to_string().print();
-    }
-  }
+  Multitasking::TaskRunner::SpawnTask(new DemoShell());
 }

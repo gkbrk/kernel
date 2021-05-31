@@ -4,7 +4,6 @@
 #include <kernel/drivers/cmos.h>
 #include <kernel/drivers/terminal.h>
 #include <kernel/drivers/vga.h>
-#include <kernel/scheduler.h>
 #include <kernel/shell.h>
 #include <libk/String.h>
 #include <libk/alloc.h>
@@ -94,7 +93,7 @@ extern "C" void kernel_main() {
   dbg() << "Booting kernel";
   Kernel::Drivers::VGATerminal::write("Booting kernel...\n");
 
-  spawnTask(shell, "shell");
+  shell();
 
   Multitasking::TaskRunner::SpawnTask(new LogSpammer("Hello", 5));
   Multitasking::TaskRunner::SpawnTask(new LogSpammer("World", 6));
