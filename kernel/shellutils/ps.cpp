@@ -29,7 +29,7 @@ void shell_ps(char *) {
       c = "[current task]";
     }
     kprintf("%s %s -> %s\n", mt->name().c_str(), c, mt->next->name().c_str());
-    dbg("ps") << mt->name() << " " << c << " " << mt->next->name()
+    dbg("ps") << mt->name() << " " << c
               << " [deadline: " << (int)(mt->deadline() * 1000) << "]";
     mt = mt->next;
     if (mt == Kernel::Multitasking::TaskRunner::cTask)

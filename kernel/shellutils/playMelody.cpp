@@ -26,8 +26,7 @@ private:
   size_t m_currentNote = 0;
 };
 
-void shell_playMelody(char *path) {
+Kernel::Multitasking::Minitask *shell_playMelody(char *path) {
   auto contents = Kernel::FS::TarFS::inst()->readFile(path);
-  auto melodyPlayer = new MelodyPlayer(contents);
-  Kernel::Multitasking::TaskRunner::SpawnTask(melodyPlayer);
+  return new MelodyPlayer(contents);
 }

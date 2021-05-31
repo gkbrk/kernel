@@ -25,6 +25,12 @@ typedef struct {
   void (*function)(char *args);
 } ShellCommand;
 
+typedef struct {
+  const char *name;
+  const char *desc;
+  Multitasking::Minitask *(*function)(char *args);
+} ShellCommandMT;
+
 void shell_echo(char *arg) {
   if (arg != nullptr) {
     kprintf("%s\n", arg);
@@ -39,7 +45,8 @@ void shell_ps(char *);
 void shell_rand(char *);
 [[noreturn]] void shell_vgademo(char *);
 [[noreturn]] void shell_vgarand(char *);
-void shell_playMelody(char *);
+Multitasking::Minitask *shell_playMelody(char *);
+Multitasking::Minitask *shell_read(char *);
 
 void shell_help(char *args);
 
@@ -75,41 +82,15 @@ void shell_cat(char *file) {
   contents.print();
 }
 
-void shell_read(char *path) {
-  auto contents = FS::TarFS::inst()->readFile(path);
-
-  size_t i = 0;
-  while (true) {
-    auto parts = contents.split_at('\n');
-    auto line = parts.first();
-    contents = parts.second();
-
-    line.print();
-    Drivers::VGATerminal::write('\n');
-
-    if (contents.length() == 0)
-      break;
-
-    if (i >= Drivers::TextVGA::HEIGHT - 3) {
-      char key = keyboardSpinLoop();
-      if (key == 'q')
-        break;
-    }
-    i++;
-  }
-}
-
 ShellCommand commands[] = {
     {"echo", "Print text", shell_echo},
     {"ls", "List files", shell_ls},
     {"clear", "Clears the screen", shell_clear},
     {"help", "Get help on commands", shell_help},
-    {"read", "Read the contents of a file", shell_read},
     {"ps", "Process list", shell_ps},
     {"pkill", "Kill a process", shell_pkill},
     {"mem", "Display memory usage", shell_mem},
     {"rand", "Generate a random number", shell_rand},
-    {"play", "Play a melody", shell_playMelody},
     {"cat", "Print the contents of a file", shell_cat},
     {"shutdown", "Shut down machine",
      [](char *) { Drivers::Machine::shutdown(); }},
@@ -117,6 +98,11 @@ ShellCommand commands[] = {
     {"vgarand", "VGA test", shell_vgarand},
     {"uname", "",
      [](char *) { kprintf("unnamed kernel compiled on %s\n", __DATE__); }}};
+
+ShellCommandMT mtCommands[] = {
+    {"read", "Read the contents of a file", shell_read},
+    {"play", "Play a melody", shell_playMelody},
+};
 
 void shell_help(char *) {
   for (auto &command : commands) {
@@ -187,6 +173,19 @@ private:
   String name() const override { return String("demo-shell"); }
   bool step() override {
     setDeadline(0.3);
+    if (m_task != nullptr) {
+      m_task->setRemainingSleep(0.0);
+      if (!m_task->step()) {
+        delete m_task;
+        m_task = nullptr;
+        lr.reset();
+      } else {
+        setRemainingSleep(m_task->remainingSleep());
+        setDeadline(m_task->deadline());
+      }
+      return true;
+    }
+
     if (lr.step())
       return true;
 
@@ -213,11 +212,20 @@ private:
       if (cmd == command.name) {
         command.function(parts.second().c_str());
         executed = true;
+        lr.reset();
         break;
       }
     }
 
-    lr.reset();
+    if (!executed) {
+      for (auto &command : mtCommands) {
+        if (cmd == command.name) {
+          m_task = command.function(parts.second().c_str());
+          executed = true;
+          break;
+        }
+      }
+    }
 
     if (!executed) {
       StringBuilder b;
@@ -229,7 +237,9 @@ private:
 
     return true;
   };
+
   LineReader lr;
+  Multitasking::Minitask *m_task = nullptr;
 };
 
 void shell() {
