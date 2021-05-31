@@ -12,7 +12,9 @@ struct DirEntry {
 class FS {
 public:
   virtual bool open(String path, String flags) = 0;
-  virtual bool readDir(String path, void (*function)(DirEntry)) = 0;
+  virtual void *openDir(String path) = 0;
+  virtual void closeDir(void *) = 0;
+  virtual bool readDir(void *, DirEntry *) = 0;
 };
 
 } // namespace Kernel::FS

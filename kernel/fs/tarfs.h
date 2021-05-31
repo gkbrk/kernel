@@ -1,8 +1,7 @@
 #pragma once
 
-#include "FS.h"
+#include <kernel/fs/FS.h>
 #include <libk/String.h>
-#include <libk/vector.h>
 
 namespace Kernel::FS {
 
@@ -19,7 +18,9 @@ public:
 
   // FS API
   bool open(String, String) override;
-  bool readDir(String path, void (*function)(DirEntry)) override;
+  void *openDir(String) override;
+  void closeDir(void *) override;
+  bool readDir(void *, DirEntry *) override;
 
 private:
   TarFS() = default;

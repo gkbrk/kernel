@@ -51,17 +51,22 @@ void shell_pkill(char *) {
 void shell_ls(char *arg) {
   FS::FS *fs = FS::TarFS::inst();
 
-  /*
+  auto ds = fs->openDir(String(arg));
   StringBuilder b;
-  fs->readDir(String(arg), [&](FS::DirEntry &dir) {
+
+  FS::DirEntry dir;
+
+  while (fs->readDir(ds, &dir)) {
     b.append(dir.path);
     b.append(" [");
     b.append(dir.size);
     b.append("]\n");
-  });
+  }
+
+  fs->closeDir(ds);
+
   String s = b.to_string();
   Drivers::VGATerminal::write(s.c_str());
-  */
 }
 
 void shell_cat(char *file) {
@@ -181,7 +186,7 @@ class DemoShell : public Multitasking::Minitask {
 private:
   String name() const override { return String("demo-shell"); }
   bool step() override {
-      setDeadline(0.3);
+    setDeadline(0.3);
     if (lr.step())
       return true;
 

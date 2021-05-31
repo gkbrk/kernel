@@ -71,37 +71,49 @@ template <typename T> static constexpr T max(T v1, T v2) {
   }
 }
 
-bool TarFS::readDir(String path, void (*function)(DirEntry)) {
-  uint8_t *buf = (uint8_t *)(kmalloc(512));
-  uint8_t sec = 1;
+struct DirStream {
+  String path;
+  size_t sector;
+};
+
+void *TarFS::openDir(String path) {
+  auto ds = new DirStream;
+  ds->path = path;
+  ds->sector = 1;
+  return ds;
+}
+
+void TarFS::closeDir(void *ptr) {
+  auto ds = (DirStream *)ptr;
+  delete ds;
+}
+
+bool TarFS::readDir(void *dirStream, DirEntry *dir) {
+  auto ds = (DirStream *)dirStream;
+  uint8_t buf[512] = {0};
   size_t prev_sum = 1;
 
   while (true) {
-    Drivers::ataDrives[0].read_sectors(sec, 1, buf);
-
-    DirEntry dir;
+    Drivers::ataDrives[0].read_sectors(ds->sector, 1, buf);
 
     auto type = buf[156];
 
     size_t filesize = octaltoint(&buf[124]);
-    dir.size = filesize;
+    ds->sector += filesize / 512 + 2;
+    dir->size = filesize;
 
     if (type == '0') {
       auto name = (char *)buf;
-      dir.path = String(name, strlen(name));
+      dir->path = String(name, strlen(name));
 
-      if (dir.path.starts_with(path))
-        function(dir);
+      if (dir->path.starts_with(ds->path))
+        return true;
     }
-    sec += filesize / 512 + 2;
 
     if (sum(buf) == 0 && prev_sum == 0)
-      break;
+      return false;
     prev_sum = sum(buf);
   }
-
-  kmfree(buf);
-  return true;
 }
 
 TarFS *TarFS::s_inst;
