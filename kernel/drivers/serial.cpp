@@ -52,7 +52,7 @@ private:
   size_t m_count = 0;
 };
 
-static SerialWriteTask<2048> *writeTask;
+static SerialWriteTask<4096> *writeTask;
 
 namespace Kernel::Drivers {
 
@@ -73,7 +73,6 @@ bool Serial::initialize() {
   outb(COM1 + 2, 0xC7); // Enable FIFO, clear them, with 14-byte threshold
   outb(COM1 + 4, 0x0B); // IRQs enabled, RTS/DSR set
 
-  writeTask = new SerialWriteTask<2048>();
   Kernel::Multitasking::TaskRunner::SpawnTask(writeTask);
   return true;
 }
@@ -95,7 +94,12 @@ char serial_read() {
   return inb(COM1);
 }
 
-void serial_write_char(char a) { writeTask->Write(a); }
+void serial_write_char(char a) {
+  if (writeTask == nullptr) {
+    writeTask = new SerialWriteTask<4096>();
+  }
+  writeTask->Write(a);
+}
 
 void serial_write(const char *data, size_t size) {
   for (size_t i = 0; i < size; i++) {
