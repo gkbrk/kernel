@@ -5,11 +5,10 @@
 #include <kernel/drivers/io.h>
 #include <kernel/scheduler.h>
 #include <libk/StringBuilder.h>
-#include <libk/alloc.h>
 
 namespace Kernel::Drivers {
 
-static const size_t CURRENT_YEAR = 2020;
+static const size_t CURRENT_YEAR = 2021;
 
 static unsigned char cmos_second;
 static unsigned char cmos_minute;
