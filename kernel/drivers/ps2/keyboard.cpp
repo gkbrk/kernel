@@ -7,8 +7,38 @@ namespace Kernel::Drivers {
 static volatile uint8_t newScancode = 0;
 static volatile bool newKey = false;
 
+template <const size_t BUFSIZE> class KeyboardBuffer {
+public:
+  void Write(uint8_t key) {
+    m_buf[m_head++] = key;
+    m_count++;
+
+    if (m_head == BUFSIZE)
+      m_head = 0;
+
+    if (m_count > BUFSIZE)
+      m_count = BUFSIZE;
+  }
+
+  bool Available() const { return m_count > 0; }
+
+  uint8_t Read() {
+    auto byte = m_buf[(m_head - m_count) % BUFSIZE];
+    m_count--;
+    return byte;
+  }
+
+private:
+  uint8_t m_buf[BUFSIZE];
+  size_t m_head = 0;
+  size_t m_count = 0;
+};
+
+static KeyboardBuffer<512> kbuf;
+
 void KeyboardDriver::kernelKeypress(uint8_t sc) {
   newScancode = sc;
+  kbuf.Write(sc);
   newKey = true;
 }
 
@@ -59,10 +89,9 @@ char keyboardSpinLoop() {
 }
 
 Option<char> keyboardTry() {
-  auto opt = Kernel::Drivers::KeyboardDriver::getRawKeycode();
-  if (!opt.is_some())
+  if (!Kernel::Drivers::kbuf.Available())
     return {};
-  uint8_t scancode = opt.value();
+  uint8_t scancode = Kernel::Drivers::kbuf.Read();
   if ((scancode & 128) == 128)
     return {};
   char key = scanCodes[scancode];

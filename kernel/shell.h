@@ -172,7 +172,7 @@ class DemoShell : public Multitasking::Minitask {
 private:
   String name() const override { return String("demo-shell"); }
   bool step() override {
-    setDeadline(0.3);
+    setDeadline(1.0);
     if (m_task != nullptr) {
       m_task->setRemainingSleep(0.0);
       if (!m_task->step()) {
@@ -233,6 +233,7 @@ private:
       b.append(cmd);
       b.append(". Try typing \"help\".\n");
       b.to_string().print();
+      lr.reset();
     }
 
     return true;
