@@ -47,6 +47,7 @@ Multitasking::Minitask *shell_vgademo(char *);
 [[noreturn]] void shell_vgarand(char *);
 Multitasking::Minitask *shell_playMelody(char *);
 Multitasking::Minitask *shell_read(char *);
+Multitasking::Minitask *shell_bfrun(char *);
 
 void shell_help(char *args);
 
@@ -102,6 +103,7 @@ ShellCommandMT mtCommands[] = {
     {"read", "Read the contents of a file", shell_read},
     {"play", "Play a melody", shell_playMelody},
     {"vgademo", "VGA test", shell_vgademo},
+    {"bfrun", "Run BF program", shell_bfrun},
 };
 
 void shell_help(char *) {
