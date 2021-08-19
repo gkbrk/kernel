@@ -10,7 +10,7 @@ CFLAGS="${CFLAGS} ${ORIG}"
 # CPP
 ORIG=${CXXFLAGS}
 CXXFLAGS="-Ofast -flto -DDEBUG"
-CXXFLAGS="${CXXFLAGS} -Wall -Wextra"
+CXXFLAGS="${CXXFLAGS} -Wall -Wextra -pedantic"
 CXXFLAGS="${CXXFLAGS} -fno-exceptions -fno-rtti -ffreestanding"
 CXXFLAGS="${CXXFLAGS} -std=c++17"
 CXXFLAGS="${CXXFLAGS} -I."
