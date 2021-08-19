@@ -63,7 +63,7 @@ const DebugPrinter &operator<<(const DebugPrinter &printer, int32_t num) {
 }
 
 const DebugPrinter &operator<<(const DebugPrinter &printer, void *ptr) {
-  char buf[32];
+  char buf[32] = {0};
   int i = 30;
   for (auto val = (size_t)ptr; val && i; --i, val /= 16)
     buf[i] = "0123456789abcdef"[val % 16];
