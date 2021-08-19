@@ -34,7 +34,8 @@ void TaskRunner::Step() {
   cTask = idleTask;
 
   for (auto t = idleTask->next; t != idleTask; t = t->next) {
-    if (t->remainingSleep() == 0.0 && t->deadline() < cTask->deadline())
+    if (!t->isBlocked() && t->remainingSleep() == 0.0 &&
+        t->deadline() < cTask->deadline())
       cTask = t;
   }
 
