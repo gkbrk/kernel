@@ -15,6 +15,7 @@ template <const size_t BUFSIZE>
 class SerialWriteTask : public Kernel::Multitasking::Minitask {
 public:
   void Write(uint8_t byte) {
+    unblock();
     m_buf[m_head++] = byte;
     m_count++;
 
@@ -29,9 +30,10 @@ private:
   String name() const override { return String("serial-writer"); }
 
   bool step() override {
-    setDeadline(2);
-    if (m_count == 0)
+    if (m_count == 0) {
+      block();
       return true;
+    }
 
     if (serial_sent() == 0) {
       setDeadline(0.05);
@@ -42,12 +44,10 @@ private:
     m_count--;
     outb(COM1, byte);
 
-    if (m_count > 0)
-      setDeadline(0.1);
-
+    setDeadline(0.1);
     return true;
   }
-  uint8_t m_buf[BUFSIZE];
+  uint8_t m_buf[BUFSIZE] = {0};
   size_t m_head = 0;
   size_t m_count = 0;
 };
