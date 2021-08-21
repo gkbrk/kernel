@@ -43,6 +43,7 @@ void shell_clear(char *);
 void shell_mem(char *);
 void shell_ps(char *);
 void shell_rand(char *);
+void shell_lspci(char *);
 Multitasking::Minitask *shell_vgademo(char *);
 [[noreturn]] void shell_vgarand(char *);
 Multitasking::Minitask *shell_playMelody(char *);
@@ -96,6 +97,7 @@ ShellCommand commands[] = {
     {"shutdown", "Shut down machine",
      [](char *) { Drivers::Machine::shutdown(); }},
     {"vgarand", "VGA test", shell_vgarand},
+    {"lspci", "List PCI devices", shell_lspci},
     {"uname", "",
      [](char *) { kprintf("unnamed kernel compiled on %s\n", __DATE__); }}};
 
