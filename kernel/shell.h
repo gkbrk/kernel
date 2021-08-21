@@ -113,6 +113,10 @@ void shell_help(char *) {
     kprintf("%s - %s\n", command.name, command.desc);
   }
 
+  for (auto &command : mtCommands) {
+    kprintf("%s - %s\n", command.name, command.desc);
+  }
+
   kprintf("To get more information, please run the command "
           "`read help.txt`\n");
 }
