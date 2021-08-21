@@ -78,4 +78,20 @@ bool PCI::initialize() {
   checkAllBuses();
   return true;
 }
+
+void PCI::iterateDevices(void (*fn)(uint8_t, uint8_t, uint16_t, uint16_t,
+                                    uint16_t)) {
+  for (uint32_t bus = 0; bus < 256; bus++) {
+    for (uint32_t slot = 0; slot < 32; slot++) {
+      for (uint32_t function = 0; function < 8; function++) {
+        uint16_t vendor = getVendorID(bus, slot, function);
+        if (vendor == 0xffff)
+          continue;
+        uint16_t device = getDeviceID(bus, slot, function);
+        fn(bus, slot, function, vendor, device);
+      }
+    }
+  }
+}
+
 } // namespace Kernel::Drivers
