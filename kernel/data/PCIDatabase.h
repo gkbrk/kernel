@@ -13,5 +13,5 @@ struct Device {
   const char *name;
 };
 
-extern Vendor vendors[3];
-extern Device devices[6];
+extern Vendor vendors[4];
+extern Device devices[8];
