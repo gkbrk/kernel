@@ -44,6 +44,11 @@ static uint16_t pciConfigReadWord(uint8_t bus, uint8_t slot, uint8_t func,
   return tmp;
 }
 
+uint16_t PCIAddress::pciConfigReadWord(uint8_t offset) {
+  return ::Kernel::Drivers::pciConfigReadWord(bus(), slot(), function(),
+                                              offset);
+}
+
 static uint16_t getVendorID(uint16_t bus, uint16_t device, uint16_t function) {
   return pciConfigReadWord(bus, device, function, 0);
 }
@@ -79,8 +84,7 @@ bool PCI::initialize() {
   return true;
 }
 
-void PCI::iterateDevices(void (*fn)(uint8_t, uint8_t, uint16_t, uint16_t,
-                                    uint16_t)) {
+void PCI::iterateDevices(void (*fn)(PCIAddress, uint16_t, uint16_t)) {
   for (uint32_t bus = 0; bus < 256; bus++) {
     for (uint32_t slot = 0; slot < 32; slot++) {
       for (uint32_t function = 0; function < 8; function++) {
@@ -88,7 +92,9 @@ void PCI::iterateDevices(void (*fn)(uint8_t, uint8_t, uint16_t, uint16_t,
         if (vendor == 0xffff)
           continue;
         uint16_t device = getDeviceID(bus, slot, function);
-        fn(bus, slot, function, vendor, device);
+
+        auto addr = PCIAddress(bus, slot, function);
+        fn(addr, vendor, device);
       }
     }
   }
