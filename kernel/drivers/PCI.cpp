@@ -1,5 +1,6 @@
 #include <kernel/drivers/PCI.h>
 #include <kernel/drivers/io.h>
+#include <kernel/drivers/net/rtl8139.h>
 #include <libk/debug.h>
 
 constexpr uint16_t CONFIG_ADDRESS = 0xCF8;
@@ -81,6 +82,13 @@ bool PCI::isAvailable() { return pci_io_available(); }
 
 bool PCI::initialize() {
   checkAllBuses();
+
+  inst()->iterateDevices([](PCIAddress addr, uint16_t vendor, uint16_t device) {
+    if (vendor == 0x10ec && device == 0x8139) {
+      auto rtl = new RTL8139(addr);
+    }
+  });
+
   return true;
 }
 
