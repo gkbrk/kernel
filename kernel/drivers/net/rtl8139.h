@@ -1,34 +1,40 @@
 #pragma once
 
+#include <kernel/Minitask/TaskRunner.h>
 #include <kernel/drivers/PCI.h>
-#include <kernel/drivers/io.h>
+#include <kernel/network/ethernet-frame.h>
 #include <kernel/network/mac-address.h>
-#include <libk/debug.h>
-
-static DebugPrinter mdbg() { return dbg("RTL8139 driver"); }
 
 namespace Kernel::Drivers {
 
-class RTL8139 {
+class RTL8139 : public Multitasking::Minitask {
 public:
-  RTL8139(PCIAddress pci_addr) : m_pci_addr(pci_addr) {
-    mdbg() << "Found network card at PCI bus " << pci_addr.bus() << " slot "
-           << pci_addr.slot();
+  RTL8139(PCIAddress pci_addr) : m_pci_addr(pci_addr) {}
+  ~RTL8139();
 
-    m_bar0 = pci_addr.pciConfigReadWord(16);
-    mdbg() << "Base IO address is " << (void *)m_bar0;
+  String name() const override { return String("rtl8139"); };
+  bool step() override;
 
-    mdbg() << "Reading MAC address...";
-    auto mac = MACAddress(in8(0), in8(1), in8(2), in8(3), in8(4), in8(5));
+  bool initialize();
 
-    mdbg() << "MAC address is " << mac.to_string();
-  }
+  void send_raw_frame(uint8_t *buf, uint16_t size);
 
-  uint8_t in8(uint16_t offset) const { return IO::in8(m_bar0 + offset); }
+  [[nodiscard]] MACAddress read_mac_addr() const;
 
 private:
-  uint16_t m_bar0;
+  void power_on() const;
+  void software_reset() const;
+  [[nodiscard]] uint8_t in8(uint16_t offset) const;
+  [[nodiscard]] uint16_t in16(uint16_t offset) const;
+  [[nodiscard]] uint32_t in32(uint16_t offset) const;
+  void out8(uint16_t offset, uint8_t data) const;
+  void out16(uint16_t offset, uint16_t data) const;
+  void out32(uint16_t offset, uint32_t data) const;
+
+  uint8_t *m_rxbuf = nullptr;
+  uint16_t m_bar0 = {0};
   PCIAddress m_pci_addr;
+  uint8_t m_tx_roundrobin = 0;
 };
 
 } // namespace Kernel::Drivers

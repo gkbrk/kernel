@@ -145,6 +145,9 @@ bool PCI::initialize() {
   inst()->iterateDevices([](PCIAddress addr, uint16_t vendor, uint16_t device) {
     if (vendor == 0x10ec && device == 0x8139) {
       auto rtl = new RTL8139(addr);
+
+      if (!rtl->initialize())
+        delete rtl;
     }
   });
 
