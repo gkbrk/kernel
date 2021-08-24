@@ -3,7 +3,7 @@
 # C rules
 ORIG=${CFLAGS}
 CFLAGS="-std=gnu99 -ffreestanding"
-CFLAGS="${CFLAGS} -Os -flto"
+CFLAGS="${CFLAGS} -Os"
 CFLAGS="${CFLAGS} -Wall -Wextra -pedantic"
 CFLAGS="${CFLAGS} ${ORIG}"
 
@@ -47,15 +47,15 @@ build_gas_makefile () {
 build_tar_makefile () {
     objname="${1}";shift
     file="${1}";shift
-    printf "%s: %s\n" "${objname}" "${file}"
-    printf "	%s\n\n" "tar cvf ${objname} ${file}"
+    printf "%s: %s\n" "${objname}"
+    printf "	%s\n\n" "tar cvf ${objname} -C tar-drive/ ${file}"
 }
 
 build_link_makefile () {
     objname="${1}";shift
     file="${1}";shift
     printf "%s: %s\n" "${objname}" "${file}"
-    printf "	%s\n\n" "i686-elf-c++ -T linker.ld -Os -flto -s -nostdlib -fno-stack-protector -Os -o ${objname} ${file} -lgcc"
+    printf "	%s\n\n" "i686-elf-c++ -T linker.ld -Ofast -flto -s -nostdlib -fno-stack-protector -o ${objname} ${file} -lgcc"
 }
 
 getobjname () {
@@ -79,7 +79,7 @@ toClean=""
 printf "# C files\n\n"
 for file in $(find . -type f -iname '*.c')
 do
-    objname=${file%.c}.o
+    objname=$(getobjname "${file}")
     build_cc_makefile "${objname}" "${file}"
     objfiles="${objfiles} ${objname}"
     toClean="${toClean} ${objname}"
@@ -114,10 +114,12 @@ done
 
 printf "# tar drive\n\n"
 tarfiles=""
-for file in $(find tar-drive/ -type f)
+cd tar-drive/
+for file in $(find . -type f)
 do
     tarfiles="${tarfiles} ${file}"
 done
+cd ..
 build_tar_makefile "tar-drive.tar" "${tarfiles}"
 toClean="${toClean} tar-drive.tar"
 
