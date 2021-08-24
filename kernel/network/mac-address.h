@@ -18,6 +18,11 @@ public:
     m_octets[5] = o6;
   }
 
+  void write_octets(uint8_t *dest) const {
+    for (size_t i = 0; i < 6; i++)
+      dest[i] = m_octets[i];
+  }
+
   String to_string() const {
     auto sb = StringBuilder();
 
