@@ -1,6 +1,7 @@
 #include <kernel/drivers/PCI.h>
 #include <kernel/drivers/io.h>
 #include <kernel/drivers/net/rtl8139.h>
+#include <libk/assert.h>
 #include <libk/debug.h>
 
 constexpr uint16_t CONFIG_ADDRESS = 0xCF8;
@@ -25,8 +26,48 @@ static bool pci_io_available() {
   return false;
 }
 
+static uint32_t pci_config_address(uint8_t bus, uint8_t slot, uint8_t func,
+                                   uint8_t offset) {
+  ASSERT(slot <= 32);
+  ASSERT(func <= 8);
+  ASSERT(!(offset & 0b00000011));
+
+  // For the address format, you can check
+  // https://wiki.osdev.org/PCI#Configuration_Space_Access_Mechanism_.231
+  uint32_t addr = 0;
+
+  // Enable bit
+  addr |= (1 << 31);
+
+  // Reserved (7 bits)
+  // We leave this part empty.
+
+  // Bus number (8 bits)
+  auto bus32 = (uint32_t)bus;
+  addr |= bus32 << 16;
+
+  // Device number (5 bits)
+  // This contains the slot.
+  auto slot32 = (uint32_t)slot & 0b11111;
+  addr |= slot32 << 11;
+
+  // Function number (3 bits)
+  auto func32 = (uint32_t)func & 0b111;
+  addr |= func32 << 8;
+
+  // Offset (8 bits)
+  // The offset needs to be aligned to 32 bits. The last two bits need to be
+  // zero for maximum compatibility.
+  addr |= offset;
+
+  return addr;
+}
+
 static uint16_t pciConfigReadWord(uint8_t bus, uint8_t slot, uint8_t func,
                                   uint8_t offset) {
+  ASSERT(slot <= 32);
+  ASSERT(func <= 8);
+
   uint32_t address;
   auto lbus = (uint32_t)bus;
   auto lslot = (uint32_t)slot;
@@ -45,27 +86,45 @@ static uint16_t pciConfigReadWord(uint8_t bus, uint8_t slot, uint8_t func,
   return tmp;
 }
 
-uint16_t PCIAddress::pciConfigReadWord(uint8_t offset) {
-  return ::Kernel::Drivers::pciConfigReadWord(bus(), slot(), function(),
-                                              offset);
+uint32_t PCIConfig::read_dword(uint8_t offset) const {
+  auto addr = pci_config_address(m_bus, m_slot, m_function, offset);
+
+  IO::out32(CONFIG_ADDRESS, addr);
+  return IO::in32(CONFIG_DATA);
 }
 
-static uint16_t getVendorID(uint16_t bus, uint16_t device, uint16_t function) {
-  return pciConfigReadWord(bus, device, function, 0);
+void PCIConfig::write_dword(uint8_t offset, uint32_t dword) const {
+  auto addr = pci_config_address(m_bus, m_slot, m_function, offset);
+
+  IO::out32(CONFIG_ADDRESS, addr);
+  IO::out32(CONFIG_DATA, dword);
 }
 
-uint16_t getDeviceID(uint16_t bus, uint16_t device, uint16_t function) {
-  return pciConfigReadWord(bus, device, function, 2);
+uint16_t PCIConfig::readWord(uint8_t offset) const {
+  return pciConfigReadWord(m_bus, m_slot, m_function, offset);
 }
+
+void PCIConfig::dump_config() const {
+  for (uint8_t i = 0; i < 16; i++) {
+    dbg("PCI Config Dump") << (void *)read_dword(i << 2);
+  }
+}
+
+uint16_t PCIConfig::vendorId() const { return readWord(0); }
+
+uint16_t PCIConfig::deviceId() const { return readWord(2); }
+
+PCIConfig PCIAddress::config() const { return {m_bus, m_slot, m_function}; }
 
 static void checkAllBuses() {
   for (uint32_t bus = 0; bus < 256; bus++) {
     for (uint32_t slot = 0; slot < 32; slot++) {
       for (uint32_t function = 0; function < 8; function++) {
-        uint16_t vendor = getVendorID(bus, slot, function);
+        auto addr = PCIAddress(bus, slot, function);
+        auto vendor = addr.config().vendorId();
         if (vendor == 0xffff)
           continue;
-        uint16_t device = getDeviceID(bus, slot, function);
+        auto device = addr.config().deviceId();
         dbg("PCI") << "Vendor: " << (void *)(vendor & 0xFFFFFFFF)
                    << " Device: " << (void *)(device & 0xFFFFFFFF)
                    << " Function: " << (void *)(function & 0xFFFFFFFF);
@@ -96,12 +155,13 @@ void PCI::iterateDevices(void (*fn)(PCIAddress, uint16_t, uint16_t)) {
   for (uint32_t bus = 0; bus < 256; bus++) {
     for (uint32_t slot = 0; slot < 32; slot++) {
       for (uint32_t function = 0; function < 8; function++) {
-        uint16_t vendor = getVendorID(bus, slot, function);
+        auto addr = PCIAddress(bus, slot, function);
+        auto conf = addr.config();
+        auto vendor = conf.vendorId();
         if (vendor == 0xffff)
           continue;
-        uint16_t device = getDeviceID(bus, slot, function);
+        auto device = conf.deviceId();
 
-        auto addr = PCIAddress(bus, slot, function);
         fn(addr, vendor, device);
       }
     }

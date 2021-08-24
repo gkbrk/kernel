@@ -5,6 +5,26 @@
 
 namespace Kernel::Drivers {
 
+class PCIConfig {
+public:
+  PCIConfig(uint8_t bus, uint8_t slot, uint8_t function)
+      : m_bus(bus), m_slot(slot), m_function(function) {}
+
+  [[nodiscard]] uint16_t vendorId() const;
+  [[nodiscard]] uint16_t deviceId() const;
+
+  uint32_t read_dword(uint8_t offset) const;
+  void write_dword(uint8_t offset, uint32_t dword) const;
+  [[nodiscard]] uint16_t readWord(uint8_t offset) const;
+
+  void dump_config() const;
+
+private:
+  uint8_t m_bus;
+  uint8_t m_slot;
+  uint8_t m_function;
+};
+
 class PCIAddress {
 public:
   PCIAddress(uint8_t bus, uint8_t slot, uint8_t function) {
@@ -19,7 +39,7 @@ public:
 
   [[nodiscard]] uint8_t function() const { return m_function; }
 
-  uint16_t pciConfigReadWord(uint8_t offset);
+  [[nodiscard]] PCIConfig config() const;
 
 private:
   uint8_t m_bus = {0};
