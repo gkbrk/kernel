@@ -63,11 +63,18 @@ const DebugPrinter &operator<<(const DebugPrinter &printer, int32_t num) {
 }
 
 const DebugPrinter &operator<<(const DebugPrinter &printer, void *ptr) {
-  char buf[32] = {0};
-  int i = 30;
-  for (auto val = (size_t)ptr; val && i; --i, val /= 16)
-    buf[i] = "0123456789abcdef"[val % 16];
+  const char *hex_alphabet = "0123456789abcdef";
+  auto val = (uint32_t)ptr;
+
   printer << "0x";
-  printer << &buf[i + 1];
+  printer << hex_alphabet[(val >> 28) & 0xF];
+  printer << hex_alphabet[(val >> 24) & 0xF];
+  printer << hex_alphabet[(val >> 20) & 0xF];
+  printer << hex_alphabet[(val >> 16) & 0xF];
+  printer << hex_alphabet[(val >> 12) & 0xF];
+  printer << hex_alphabet[(val >> 8) & 0xF];
+  printer << hex_alphabet[(val >> 4) & 0xF];
+  printer << hex_alphabet[(val >> 0) & 0xF];
+
   return printer;
 }
