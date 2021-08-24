@@ -52,7 +52,7 @@ private:
   size_t m_count = 0;
 };
 
-static SerialWriteTask<4096> *writeTask;
+static SerialWriteTask<16384> *writeTask;
 
 namespace Kernel::Drivers {
 
@@ -96,7 +96,7 @@ char serial_read() {
 
 void serial_write_char(char a) {
   if (writeTask == nullptr) {
-    writeTask = new SerialWriteTask<4096>();
+    writeTask = new SerialWriteTask<16384>();
   }
   writeTask->Write(a);
 }
