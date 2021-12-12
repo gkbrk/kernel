@@ -9,6 +9,7 @@ class Minitask : public Progressable {
 public:
   [[nodiscard]] virtual String name() const = 0;
   bool step() override = 0;
+  virtual void handleCpuInterrupt() {}
 
   void addRemainingSleep(double amount) { m_remaining_sleep += amount; }
   void setRemainingSleep(double amount) { m_remaining_sleep = amount; }

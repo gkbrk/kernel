@@ -4,6 +4,19 @@
 
 void endOfInterrupt() { outb(0x20, 0x20); }
 
+void notifyHandlers() {
+  auto orig = Kernel::Multitasking::TaskRunner::cTask;
+  auto t = orig;
+
+  while (true) {
+    t->handleCpuInterrupt();
+    t = t->next;
+
+    if (t == orig)
+      break;
+  }
+}
+
 extern "C" void irq0_handler(void) {
   Kernel::Multitasking::TaskRunner::schedulerTimerTick(500);
   endOfInterrupt();
@@ -11,6 +24,7 @@ extern "C" void irq0_handler(void) {
 
 extern "C" void irq1_handler(void) {
   Kernel::Drivers::PS2::inst()->ps2Tick(false);
+  notifyHandlers();
   endOfInterrupt();
 }
 
@@ -48,6 +62,7 @@ extern "C" void irq11_handler(void) {
 
 extern "C" void irq12_handler(void) {
   Kernel::Drivers::PS2::inst()->ps2Tick(true);
+  notifyHandlers();
   outb(0xA0, 0x20);
   endOfInterrupt();
 }
