@@ -1,11 +1,13 @@
 #pragma once
 
+#include <stdbool.h>
 #include <arch/x86/idt.h>
 #include <kernel/drivers/serial.h>
 
 #define ASSERT(x)                                                              \
   do {                                                                         \
-    if (!(x)) {                                                                \
+    bool val = static_cast<bool>(x);                                           \
+    if (!val) {                                                                \
       serial_force_unlock();                                                   \
       serial_lock();                                                           \
       serial_writestring("ASSERTION FAILED\n");                                \
@@ -13,6 +15,6 @@
       interrupt_disable();                                                     \
       hlt();                                                                   \
     }                                                                          \
-  } while (0)
+  } while (false)
 
 #define ASSERT_NOT_REACHED ASSERT(false)
