@@ -1,5 +1,4 @@
 #include <kernel/Minitask/TaskRunner.h>
-#include <kernel/drivers/serial.h>
 #include <libk/assert.h>
 #include <libk/debug.h>
 
@@ -9,7 +8,7 @@ DebugPrinter dbg() {
 DebugPrinter dbg(const String &name) { return DebugPrinter(name); }
 DebugPrinter dbg(const char *name) { return DebugPrinter(String(name)); }
 
-DebugPrinter::DebugPrinter(String name) {
+DebugPrinter::DebugPrinter(const String &name) {
   serial_lock();
   serial_writestring("\033[33m[");
   serial_writestring(name.c_str());
@@ -35,7 +34,7 @@ const DebugPrinter &operator<<(const DebugPrinter &printer, const char *str) {
   return printer;
 }
 
-const DebugPrinter &operator<<(const DebugPrinter &printer, const String str) {
+const DebugPrinter &operator<<(const DebugPrinter &printer, const String &str) {
   for (size_t i = 0; i < str.length(); i++)
     printer.write(str[i]);
   return printer;

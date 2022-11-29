@@ -4,14 +4,14 @@
 
 class DebugPrinter {
 public:
-  explicit DebugPrinter(String);
+  explicit DebugPrinter(const String &);
   ~DebugPrinter();
   static void write(char c);
 };
 
 const DebugPrinter &operator<<(const DebugPrinter &, char);
 const DebugPrinter &operator<<(const DebugPrinter &, const char *);
-const DebugPrinter &operator<<(const DebugPrinter &, String);
+const DebugPrinter &operator<<(const DebugPrinter &, const String &);
 const DebugPrinter &operator<<(const DebugPrinter &, size_t);
 const DebugPrinter &operator<<(const DebugPrinter &, int);
 const DebugPrinter &operator<<(const DebugPrinter &, int32_t);
