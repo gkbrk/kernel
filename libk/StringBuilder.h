@@ -1,6 +1,6 @@
 #pragma once
 
-#include "String.h"
+#include <libk/String.h>
 
 class StringBuilder {
 public:

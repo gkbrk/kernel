@@ -1,8 +1,5 @@
-#include <kernel/drivers/serial.h>
 #include <libk/String.h>
 #include <libk/StringBuilder.h>
-#include <libk/alloc.h>
-#include <libk/assert.h>
 
 StringBuilder::StringBuilder() {
   m_size = 0;
