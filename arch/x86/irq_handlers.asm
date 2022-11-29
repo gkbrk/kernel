@@ -40,7 +40,7 @@ irq0:
   call irq0_handler
   popa
   iret
- 
+
 irq1:
   pusha
   call irq1_handler

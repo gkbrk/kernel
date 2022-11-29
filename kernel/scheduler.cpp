@@ -1,11 +1,7 @@
+#include <arch/x86/idt.h>
 #include <kernel/Task.h>
+#include <kernel/drivers/BasicSerial.h>
 #include <kernel/scheduler.h>
-
-#include <libk/String.h>
-#include <libk/alloc.h>
-#include <libk/string.h>
-
-#include "../arch/x86/idt.h"
 
 Task::Task(void (*main)(), uint32_t flags, uint32_t pagedir) {
   regs.eflags = flags;

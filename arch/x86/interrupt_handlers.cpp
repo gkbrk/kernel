@@ -1,6 +1,7 @@
 #include <kernel/Minitask/TaskRunner.h>
 #include <kernel/drivers/io.h>
 #include <kernel/drivers/ps2/ps2.h>
+#include <kernel/scheduler.h>
 
 void endOfInterrupt() { outb(0x20, 0x20); }
 
@@ -19,7 +20,10 @@ void notifyHandlers() {
 
 extern "C" void irq0_handler(void) {
   Kernel::Multitasking::TaskRunner::schedulerTimerTick(500);
+  schedulerTimerTick(500);
   endOfInterrupt();
+  asm volatile("sti");
+  yield();
 }
 
 extern "C" void irq1_handler(void) {

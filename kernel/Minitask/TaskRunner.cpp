@@ -1,16 +1,12 @@
-#include <arch/x86/idt.h>
 #include <kernel/Minitask/TaskRunner.h>
+#include <kernel/drivers/BasicSerial.h>
 #include <kernel/scheduler.h>
 
 namespace Kernel::Multitasking {
 class Idle : public Minitask {
   [[nodiscard]] String name() const override { return String("idle-task"); }
 
-  bool step() override {
-    setDeadline(1.0);
-    hlt();
-    return true;
-  }
+  bool step() override { return true; }
 };
 
 static Minitask *idleTask;
@@ -23,7 +19,8 @@ void TaskRunner::InitTasking() {
 }
 
 void TaskRunner::SpawnTask(Minitask *mt) {
-  dbg("ProtoThread Runner") << "Spawning task: " << mt->name();
+  basic_serial_printf("[ProtoThread runner] Spawning task: %s\n",
+                      mt->name().c_str());
 
   Minitask *n = TaskRunner::cTask->next;
   TaskRunner::cTask->next = mt;

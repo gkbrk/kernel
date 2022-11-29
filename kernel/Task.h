@@ -27,7 +27,7 @@ public:
   template <typename T> void PushToStack(T val) {
     // TODO: Check stack size before doing this.
     // Turn the ESP register into a void pointer
-    auto esp = (void *)(size_t)regs.esp;
+    auto *esp = reinterpret_cast<void *>(regs.esp);
 
     // Copy bytes from value to stack
     memcpy(esp, &val, sizeof(T));
@@ -44,7 +44,7 @@ public:
     regs.esp += sizeof(T);
 
     // Turn the ESP register into a void pointer
-    auto esp = (void *)(size_t)regs.esp;
+    auto *esp = reinterpret_cast<void *>(regs.esp);
 
     // Copy bytes from stack to value
     memcpy(&val, esp, sizeof(T));
@@ -62,4 +62,4 @@ private:
 };
 
 extern Task *currentTask;
-void killTask(Task *t);
+void killTask(Task *task);

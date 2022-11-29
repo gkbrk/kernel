@@ -27,8 +27,8 @@ extern "C" void __cxa_pure_virtual() {
 extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
   // If we are getting booted by something that implements the multiboot spec,
   // the magic number we are passed will be 0x2BADB002.
-  ASSERT(magic == 0x2BADB002);
-  uint64_t maxMem = 0;
+  ASSERT(magic == 0x2BADB002U);
+  uint64_t maxMem = 0U;
 
   // One of the first things we want to do is initialize the kernel entropy pool
   // in order to collect as much entropy as we can during boot time. If we are
@@ -58,6 +58,7 @@ extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
 
   alloc_start = alloc_begin;
 
+  basic_serial_init();
   kmalloc_init();
 
   initTasking();
@@ -80,11 +81,12 @@ extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
     (*ctor)();
   }
 
-  init_timer(500);
+  init_timer(500U);
+  interrupt_enable();
 
   kernel_main();
 
   while (true) {
-    Kernel::Multitasking::TaskRunner::Step();
+    yield();
   }
 }
