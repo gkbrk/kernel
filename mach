@@ -1,12 +1,12 @@
 #!/bin/sh
 
 build() {
-  ./configure >Makefile
+  ./configure.py >Makefile
   make -j8
 }
 
 clean() {
-  ./configure >Makefile
+  ./configure.py >Makefile
   make clean
 }
 
