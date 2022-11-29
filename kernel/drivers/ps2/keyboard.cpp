@@ -89,13 +89,19 @@ char keyboardSpinLoop() {
 }
 
 Option<char> keyboardTry() {
-  if (!Kernel::Drivers::kbuf.Available())
+  if (!Kernel::Drivers::kbuf.Available()) {
     return {};
+  }
+
   uint8_t scancode = Kernel::Drivers::kbuf.Read();
-  if ((scancode & 128) == 128)
+  if ((scancode & 128) == 128) {
     return {};
+  }
+
   char key = scanCodes[scancode];
   if (key) {
     return Option(key);
   }
+
+  return {};
 }
