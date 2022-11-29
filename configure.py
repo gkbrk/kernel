@@ -155,6 +155,18 @@ for c_file in no_flto_c_files:
     print(f"build/{sha256(path)}", ":", path, " ".join(get_c_dependencies(c_file)))
     print(f"\t{CC} -c {path} -o build/{sha256(path)} {' '.join(flags)}")
 
+no_flto_cpp_files = []
+no_flto_cpp_files += Path("no_flto_cpp").glob("**/*.cpp")
+
+for cpp_file in no_flto_cpp_files:
+    cpp_file = relative(cpp_file)
+    path = str(cpp_file)
+    flags = CXXFLAGS.copy()
+    flags.remove("-flto")
+    OBJ_FILES.append(f"build/{sha256(path)}")
+    print(f"build/{sha256(path)}", ":", path, " ".join(get_cpp_dependencies(cpp_file)))
+    print(f"\t{CXX} -c {path} -o build/{sha256(path)} {' '.join(flags)}")
+
 print(f"leonardo.bin: {' '.join(OBJ_FILES)}")
 print(f"\t{CC} -T linker.ld -o leonardo.bin {' '.join(CFLAGS)} {' '.join(OBJ_FILES)}")
 OBJ_FILES.append("leonardo.bin")

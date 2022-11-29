@@ -1,6 +1,6 @@
-#include <kernel/drivers/BasicSerial.h>
-#include <libk/Noncopyable.h>
-#include <libk/assert.h>
+#include "kernel/drivers/BasicSerial.h"
+#include "libk/Noncopyable.h"
+#include "libk/assert.h"
 #include <stdint.h>
 
 // UBSan data structures
@@ -152,10 +152,27 @@ extern "C" void __ubsan_handle_negate_overflow(OverflowData *overflow,
   ASSERT_NOT_REACHED;
 }
 
+extern "C" void __ubsan_handle_pointer_overflow(OverflowData *overflow,
+                                                unsigned long base,
+                                                unsigned long result) {
+  basic_serial_printf("UBSAN: Pointer overflow: ");
+  overflow->WriteToSerial();
+  basic_serial_write_char('\n');
+  ASSERT_NOT_REACHED;
+}
+
 extern "C" void __ubsan_handle_shift_out_of_bounds(ShiftOutOfBoundsData *data,
                                                    unsigned long lhs,
                                                    unsigned long rhs) {
   basic_serial_printf("UBSAN: Shift out of bounds: ");
+  data->WriteToSerial();
+  basic_serial_write_char('\n');
+  ASSERT_NOT_REACHED;
+}
+
+extern "C" void __ubsan_handle_type_mismatch_v1(InvalidValueData *data,
+                                                unsigned long ptr) {
+  basic_serial_printf("UBSAN: Type mismatch V1: ");
   data->WriteToSerial();
   basic_serial_write_char('\n');
   ASSERT_NOT_REACHED;
