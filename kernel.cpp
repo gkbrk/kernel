@@ -3,11 +3,7 @@
 #include <kernel/Minitask/TaskRunner.h>
 #include <kernel/drivers/cmos.h>
 #include <kernel/drivers/terminal.h>
-#include <kernel/drivers/vga.h>
 #include <kernel/shell.h>
-#include <libk/String.h>
-#include <libk/alloc.h>
-#include <libk/debug.h>
 
 class TimeDisplay : public Multitasking::Minitask {
   [[nodiscard]] String name() const override { return String("time-display"); }
@@ -45,10 +41,9 @@ class TimeDisplay : public Multitasking::Minitask {
 
 class LogSpammer : public Multitasking::Minitask {
 public:
-  LogSpammer(const char *k, size_t limit) {
-    logStr = k;
-    m_limit = limit;
-  }
+  LogSpammer(const char *k, size_t limit)
+      : logStr(k), m_iter(0), m_limit(limit) {}
+
   String name() const override {
     auto sb = StringBuilder();
     sb.append("log-spammer[");
@@ -69,8 +64,8 @@ public:
 
 private:
   const char *logStr = nullptr;
-  size_t m_iter = 0;
-  size_t m_limit = 0;
+  size_t m_iter;
+  size_t m_limit;
 };
 
 class MemUsageLogger : public Multitasking::Minitask {
