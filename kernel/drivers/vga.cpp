@@ -1,4 +1,5 @@
 #include <kernel/drivers/vga.h>
+#include <libk/InterruptDisabler.h>
 
 namespace Kernel::Drivers::TextVGA {
 
@@ -18,9 +19,9 @@ void setColor(enum color fg, enum color bg) { s_color = entry_color(fg, bg); }
 void moveCursor(size_t x, size_t y) {
   ASSERT(x <= WIDTH);
   ASSERT(y <= HEIGHT);
-
   uint16_t pos = y * WIDTH + x;
 
+  InterruptDisabler disabler;
   outb(0x3D4, 0x0F);
   outb(0x3D5, (uint8_t)(pos & 0xFF));
   outb(0x3D4, 0x0E);
