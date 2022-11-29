@@ -20,8 +20,16 @@ void init_timer(uint32_t freq) {
   outb(0x40, h);
 }
 
+void set_exception_handler(size_t interrupt_index, void (*handler)()) {
+  IDT[interrupt_index].offset_lowerbits = (unsigned long)handler & 0xffff;
+  IDT[interrupt_index].selector = 0x08; /* KERNEL_CODE_SEGMENT_OFFSET */
+  IDT[interrupt_index].zero = 0;
+  IDT[interrupt_index].type_attr = 0x8e; /* INTERRUPT_GATE */
+  IDT[interrupt_index].offset_higherbits =
+      ((unsigned long)handler & 0xffff0000) >> 16;
+}
+
 extern "C" void idt_init() {
-  dbg() << "IDT init";
   extern int load_idt(void *);
   extern int irq0();
   extern int irq1();
@@ -70,6 +78,96 @@ extern "C" void idt_init() {
   outb(0xA1, 0x01);
   outb(0x21, 0x0);
   outb(0xA1, 0x0);
+
+  set_exception_handler(0, []() {
+    basic_serial_printf("Divide by zero!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(1, []() {
+    basic_serial_printf("Debug!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(2, []() {
+    basic_serial_printf("Non Maskable Interrupt!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(3, []() {
+    basic_serial_printf("Breakpoint!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(4, []() {
+    basic_serial_printf("Overflow!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(5, []() {
+    basic_serial_printf("Bound Range Exceeded!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(6, []() {
+    basic_serial_printf("Invalid Opcode!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(7, []() {
+    basic_serial_printf("Device Not Available!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(8, []() {
+    basic_serial_printf("Double fault!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(9, []() {
+    basic_serial_printf("Coprocessor Segment Overrun!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(10, []() {
+    basic_serial_printf("Invalid TSS!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(11, []() {
+    basic_serial_printf("Segment Not Present!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(12, []() {
+    basic_serial_printf("Stack-Segment Fault!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(13, []() {
+    basic_serial_printf("General Protection Fault!\n");
+    basic_serial_printf("Did you access a null pointer?\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(14, []() {
+    basic_serial_printf("Page Fault!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(15, []() {
+    basic_serial_printf("Reserved!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(16, []() {
+    basic_serial_printf("x87 Floating-Point Exception!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(17, []() {
+    basic_serial_printf("Alignment Check!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(18, []() {
+    basic_serial_printf("Machine Check!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(19, []() {
+    basic_serial_printf("SIMD Floating-Point Exception!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(20, []() {
+    basic_serial_printf("Virtualization Exception!\n");
+    ASSERT_NOT_REACHED;
+  });
+  set_exception_handler(21, []() {
+    basic_serial_printf("Control Protection Exception!\n");
+    ASSERT_NOT_REACHED;
+  });
 
   irq0_address = (unsigned long)irq0;
   IDT[32].offset_lowerbits = irq0_address & 0xffff;
