@@ -30,7 +30,8 @@ run () {
         -kernel leonardo.bin \
         -hda tar-drive.tar \
         -d guest_errors \
-        -soundhw pcspk \
+        -audiodev pa,id=snd0 -machine pcspk-audiodev=snd0 \
+        -machine pcspk-audiodev=snd0 \
         -vga std \
         -d cpu_reset \
         -m 64
