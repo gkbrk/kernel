@@ -1,8 +1,8 @@
 #pragma once
 
-#include <stdbool.h>
 #include <arch/x86/idt.h>
 #include <kernel/drivers/serial.h>
+#include <stdbool.h>
 
 #define ASSERT(x)                                                              \
   do {                                                                         \
