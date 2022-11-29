@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libk/InterruptDisabler.h>
 #include <libk/String.h>
 
 class DebugPrinter {
@@ -7,6 +8,9 @@ public:
   explicit DebugPrinter(const String &);
   ~DebugPrinter();
   static void write(char c);
+
+private:
+  InterruptDisabler disabler;
 };
 
 const DebugPrinter &operator<<(const DebugPrinter &, char);
