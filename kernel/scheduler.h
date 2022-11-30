@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Task.h"
-#include "libk/debug.h"
+#include <kernel/Task.h>
+#include <libk/debug.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -15,7 +15,7 @@ void exitTask();
 
 template <typename... T>
 void spawnTask(void (*main)(), const char *name, T... args) {
-  dbg() << "Spawning new task: " << name;
+  basic_serial_printf("[scheduler] Spawning new task: %s\n", name);
   Task *t = new Task(main, currentTask->regs.eflags, currentTask->regs.cr3);
   (t->PushToStack(args), ...);
 

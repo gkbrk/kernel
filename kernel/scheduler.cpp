@@ -1,7 +1,6 @@
+#include <libk/InterruptDisabler.h>
 #include <arch/x86/idt.h>
 #include <kernel/Task.h>
-#include <kernel/drivers/BasicSerial.h>
-#include <kernel/scheduler.h>
 
 Task::Task(void (*main)(), uint32_t flags, uint32_t pagedir) {
   regs.eflags = flags;
@@ -59,6 +58,8 @@ void initTasking() {
 extern "C" void switchTask(Registers *r1, Registers *r2);
 
 void yield() {
+  InterruptDisabler disabler;
+
   Task *last = currentTask;
 
   while (true) {
@@ -66,6 +67,11 @@ void yield() {
     if (currentTask->remainingSleep() == 0.0) {
       break;
     }
+  }
+
+  if (last == currentTask) {
+    currentTask = last;
+    return;
   }
 
   switchTask(&last->regs, &currentTask->regs);
