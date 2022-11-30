@@ -5,39 +5,37 @@
 #include <kernel/drivers/terminal.h>
 #include <kernel/shell.h>
 
-class TimeDisplay : public Multitasking::Minitask {
-  [[nodiscard]] String name() const override { return String("time-display"); }
+void time_display_task() {
+  auto cmos = Kernel::Drivers::CMOS::inst();
+  auto oldLen = 0U;
 
-  bool step() override {
-    using namespace Kernel::Drivers;
-    auto cmos = CMOS::inst();
+  while (true) {
     cmos->updateTime();
-    String t = cmos->formattedString();
-    size_t len = t.length();
+    auto time = cmos->formattedString();
+    auto len = time.length();
 
-    size_t old_color = TextVGA::s_color;
+    auto old_color = Kernel::Drivers::TextVGA::s_color;
 
     if (oldLen != len) {
-      for (size_t x = TextVGA::WIDTH - oldLen; x < TextVGA::WIDTH; x++) {
-        TextVGA::write(x, 0, ' ');
+      for (size_t x = Kernel::Drivers::TextVGA::WIDTH - oldLen;
+           x < Kernel::Drivers::TextVGA::WIDTH; x++) {
+        Kernel::Drivers::TextVGA::write(x, 0, ' ');
       }
     }
 
-    TextVGA::setColor(TextVGA::color::BLACK, TextVGA::color::WHITE);
-    for (size_t i = 0; i < len; i++) {
-      TextVGA::write(TextVGA::WIDTH - len + i, 0, t[i]);
+    Kernel::Drivers::TextVGA::setColor(Kernel::Drivers::TextVGA::color::BLACK,
+                                       Kernel::Drivers::TextVGA::color::WHITE);
+    for (size_t i = 0U; i < len; i++) {
+      Kernel::Drivers::TextVGA::write(Kernel::Drivers::TextVGA::WIDTH - len + i,
+                                      0, time[i]);
     }
-    TextVGA::s_color = old_color;
+    Kernel::Drivers::TextVGA::s_color = old_color;
 
     oldLen = len;
 
-    addRemainingSleep(0.5);
-    setDeadline(1);
-    return true;
+    sleep(0.1F);
   }
-
-  size_t oldLen = 0;
-};
+}
 
 class LogSpammer : public Multitasking::Minitask {
 public:
@@ -68,20 +66,11 @@ private:
   size_t m_limit;
 };
 
-class MemUsageLogger : public Multitasking::Minitask {
-  [[nodiscard]] String name() const override { return String("memory-usage"); }
-
-  bool step() override {
-    size_t bytes = getMemUsage();
-    Kernel::Random::feed_data((uint8_t *)&bytes, sizeof(bytes));
-
-    dbg() << "Current memory usage is " << bytes / 1000 << " KB";
-    dbg() << "Physical memory usage: "
-          << (size_t)(alloc_begin - alloc_start) / 1000 << "KB";
-    sleepDeadline(5.0);
-    return true;
-  }
-};
+static void dump_memory_usage() {
+  basic_serial_printf(
+      "[MemUsage] Current usage is %d KB. Physical mem usage is %d KB\n",
+      getMemUsage() / 1000, (size_t)(alloc_begin - alloc_start) / 1000);
+}
 
 extern "C" void kernel_main() {
   dbg() << "Enter kernel main";
@@ -90,8 +79,26 @@ extern "C" void kernel_main() {
 
   shell();
 
+  spawnTask(time_display_task, "time-display");
+
+  spawnTask(
+      []() {
+        while (true) {
+          Multitasking::TaskRunner::Step();
+          yield();
+        }
+      },
+      "minitask-runner");
+
+  spawnTask(
+      []() {
+        while (true) {
+          dump_memory_usage();
+          sleep(1.0F);
+        }
+      },
+      "mem-usage-dumper");
+
   Multitasking::TaskRunner::SpawnTask(new LogSpammer("Hello", 5));
   Multitasking::TaskRunner::SpawnTask(new LogSpammer("World", 6));
-  Multitasking::TaskRunner::SpawnTask(new TimeDisplay());
-  Multitasking::TaskRunner::SpawnTask(new MemUsageLogger());
 }
