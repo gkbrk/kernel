@@ -9,8 +9,9 @@ static void drawRect(Drivers::BGA *bga, int x, int y, size_t width,
                      size_t height, uint8_t r, uint8_t g, uint8_t b) {
   auto xEnd = x + width;
   auto yEnd = y + height;
-  for (size_t _x = x; _x < xEnd; _x++)
-    for (size_t _y = y; _y < yEnd; _y++)
+
+  for (int64_t _x = x; _x < xEnd; _x++)
+    for (int64_t _y = y; _y < yEnd; _y++)
       if (_x >= 0 && _x <= 800 && _y >= 0 && _y <= 600)
         bga->setPixel(_x, _y, r, g, b);
 }
