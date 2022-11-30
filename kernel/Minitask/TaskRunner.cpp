@@ -19,8 +19,11 @@ void TaskRunner::InitTasking() {
 }
 
 void TaskRunner::SpawnTask(Minitask *mt) {
-  basic_serial_printf("[ProtoThread runner] Spawning task: %s\n",
-                      mt->name().c_str());
+  {
+    auto name = mt->name();
+    basic_serial_printf("[ProtoThread runner] Spawning task: %s\n",
+                        name.c_str());
+  }
 
   Minitask *n = TaskRunner::cTask->next;
   TaskRunner::cTask->next = mt;
@@ -57,6 +60,7 @@ void TaskRunner::KillTask(Minitask *mt) {
 void TaskRunner::ExitTask() { KillTask(TaskRunner::cTask); }
 
 void TaskRunner::schedulerTimerTick(size_t freq) {
+  return;
   double amount = 1.0 / (double)freq;
 
   Minitask *t = cTask;
