@@ -1,13 +1,10 @@
-#include "../arch/multiboot.h"
-#include "../arch/x86/idt.h"
-#include "drivers/loader.h"
-#include "drivers/serial.h"
-#include "drivers/terminal.h"
-#include "libk/alloc.h"
-#include "libk/debug.h"
-#include "scheduler.h"
+#include <arch/multiboot.h>
+#include <arch/x86/idt.h>
 #include <kernel/Minitask/TaskRunner.h>
 #include <kernel/Random.h>
+#include <kernel/drivers/GDT.h>
+#include <kernel/drivers/loader.h>
+#include <kernel/drivers/terminal.h>
 #include <stdint.h>
 
 // Defined in the linker script
@@ -59,7 +56,24 @@ extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
   alloc_start = alloc_begin;
 
   basic_serial_init();
+  basic_serial_write_cstr("Serial init done!\n");
   kmalloc_init();
+  basic_serial_write_cstr("Kmalloc init done!\n");
+
+  basic_serial_write_cstr("Trying GDT...\n");
+  Kernel::Drivers::GDT::inst();
+  basic_serial_write_cstr("GDT init done!\n");
+
+  basic_serial_write_cstr("Trying IDT...\n");
+  idt_init();
+  basic_serial_write_cstr("IDT init done!\n");
+
+  basic_serial_printf("Start ctors at 0x%x\n", &start_ctors);
+  basic_serial_printf("End ctors at 0x%x\n", &end_ctors);
+  for (ctor_func_t *ctor = &start_ctors; ctor < &end_ctors; ctor++) {
+    basic_serial_printf("Calling ctor at 0x%x\n", ctor);
+    (*ctor)();
+  }
 
   initTasking();
   Kernel::Multitasking::TaskRunner::InitTasking();
@@ -71,22 +85,13 @@ extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
   Kernel::Drivers::loadDrivers();
   dbg() << "Drivers loaded";
 
-  dbg() << "Loading IDT, here we go";
-  idt_init();
-
-  dbg() << "Start ctors at " << &start_ctors;
-  dbg() << "End ctors at " << &end_ctors;
-  for (ctor_func_t *ctor = &start_ctors; ctor < &end_ctors; ctor++) {
-    dbg() << "Calling global constructor at " << ctor;
-    (*ctor)();
-  }
-
-  init_timer(500U);
+  init_timer(50U);
   interrupt_enable();
 
   kernel_main();
 
   while (true) {
+    // asm volatile("hlt");
     yield();
   }
 }

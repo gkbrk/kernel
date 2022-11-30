@@ -19,10 +19,10 @@ void notifyHandlers() {
 }
 
 extern "C" void irq0_handler(void) {
-  Kernel::Multitasking::TaskRunner::schedulerTimerTick(500);
-  schedulerTimerTick(500);
+  Kernel::Multitasking::TaskRunner::schedulerTimerTick(50);
+  schedulerTimerTick(50);
   endOfInterrupt();
-  asm volatile("sti");
+  interrupt_enable();
   yield();
 }
 
