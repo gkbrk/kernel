@@ -1,8 +1,8 @@
-#pragma once
+#ifndef CARDINAL_LIBK_ASSERT_H
+#define CARDINAL_LIBK_ASSERT_H
 
 #include <arch/x86/idt.h>
 #include <kernel/drivers/BasicSerial.h>
-#include <stdbool.h>
 
 #define ASSERT(x)                                                              \
   do {                                                                         \
@@ -16,3 +16,5 @@
   } while (false)
 
 #define ASSERT_NOT_REACHED ASSERT(false)
+
+#endif
