@@ -1,6 +1,6 @@
-#include <libk/InterruptDisabler.h>
 #include <arch/x86/idt.h>
 #include <kernel/Task.h>
+#include <libk/InterruptDisabler.h>
 
 Task::Task(void (*main)(), uint32_t flags, uint32_t pagedir) {
   regs.eflags = flags;

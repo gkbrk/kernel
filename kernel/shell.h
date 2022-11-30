@@ -44,9 +44,9 @@ void shell_mem(char *);
 void shell_ps(char *);
 void shell_rand(char *);
 void shell_lspci(char *);
+void shell_playMelody(char *);
 Multitasking::Minitask *shell_vgademo(char *);
 [[noreturn]] void shell_vgarand(char *);
-Multitasking::Minitask *shell_playMelody(char *);
 Multitasking::Minitask *shell_read(char *);
 Multitasking::Minitask *shell_bfrun(char *);
 
@@ -98,12 +98,12 @@ ShellCommand commands[] = {
      [](char *) { Drivers::Machine::shutdown(); }},
     {"vgarand", "VGA test", shell_vgarand},
     {"lspci", "List PCI devices", shell_lspci},
+    {"play", "Play a melody", shell_playMelody},
     {"uname", "",
      [](char *) { kprintf("unnamed kernel compiled on %s\n", __DATE__); }}};
 
 ShellCommandMT mtCommands[] = {
     {"read", "Read the contents of a file", shell_read},
-    {"play", "Play a melody", shell_playMelody},
     {"vgademo", "VGA test", shell_vgademo},
     {"bfrun", "Run BF program", shell_bfrun},
 };
