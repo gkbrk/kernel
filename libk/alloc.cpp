@@ -1,12 +1,8 @@
 #include <stddef.h>
 
-#include <kernel/drivers/serial.h>
 #include <libk/alloc.h>
 #include <libk/assert.h>
 #include <libk/spinlock.h>
-#include <libk/string.h>
-
-#include "debug.h"
 
 static Spinlock lock;
 
