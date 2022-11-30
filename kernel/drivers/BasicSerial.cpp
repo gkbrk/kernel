@@ -3,7 +3,7 @@
 #include <libk/printf.h>
 #include <stdarg.h>
 
-constexpr uint16_t COM1 = 0x3F8;
+constexpr uint16_t COM1 = 0x3F8U;
 
 void basic_serial_init() {
   outb(COM1 + 1U, 0x00U); // Disable all interrupts
@@ -18,6 +18,11 @@ void basic_serial_init() {
 bool basic_serial_is_available() {
   auto status = inb(COM1 + 5U);
   return status & 1U;
+}
+
+bool basic_serial_is_ready() {
+  auto status = inb(COM1 + 5U);
+  return status & 0x20U;
 }
 
 uint8_t basic_serial_read_char() {
@@ -41,8 +46,7 @@ void basic_serial_write(const char *data, size_t size) {
 
 void basic_serial_write_cstr(const char *data) {
   for (size_t i = 0U; data[i] != '\0'; i++) {
-    auto ch = static_cast<uint8_t>(data[i]);
-    basic_serial_write_char(ch);
+    basic_serial_write_char(data[i]);
   }
 }
 

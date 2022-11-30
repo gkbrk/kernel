@@ -5,11 +5,11 @@
 // other fancy features. It is intended to be used to get data out during
 // debugging and panic situations.
 
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
 void basic_serial_init();
+bool basic_serial_is_ready();
 bool basic_serial_is_available();
 uint8_t basic_serial_read_char();
 void basic_serial_write_char(char data);
