@@ -1,7 +1,6 @@
 #include <kernel/drivers/ata.h>
 #include <kernel/drivers/io.h>
 #include <kernel/scheduler.h>
-#include <libk/debug.h>
 
 #define ATA_DATA 0
 #define ATA_ERROR 1
@@ -44,7 +43,7 @@ void ATADrive::wait_ready() const {
 
 size_t ATADrive::read_sectors(uint32_t sector, uint8_t sectorCount,
                               uint8_t *dest) const {
-  dbg() << "Reading sectors with ATA";
+  dbg("ATA") << "Reading sectors";
 
   outb(m_io_port + ATA_DRV_HEAD, (m_slave << 4) | ((sector >> 24) & 0x0F));
   outb(m_io_port + ATA_ERROR, 0);
@@ -54,12 +53,12 @@ size_t ATADrive::read_sectors(uint32_t sector, uint8_t sectorCount,
   outb(m_io_port + ATA_HCYL, sector >> 16);
   outb(m_io_port + ATA_COMMAND, ATA_READ_SECTORS);
 
-  dbg() << "Sent commands, waiting for ready";
+  dbg("ATA") << "Sent commands, waiting for ready";
   wait_ready();
-  dbg() << "Got ready";
+  dbg("ATA") << "Got ready";
 
   for (uint8_t cs = 0; cs < sectorCount; cs++) {
-    dbg() << "Reading sector";
+    dbg("ATA") << "Reading sector " << cs;
     for (int i = 0; i < 256; i++) {
       uint16_t data = inw(m_io_port + ATA_DATA);
       *dest++ = (unsigned char)data;
@@ -68,7 +67,7 @@ size_t ATADrive::read_sectors(uint32_t sector, uint8_t sectorCount,
     wait_ready();
   }
 
-  dbg() << "Read done";
+  dbg("ATA") << "Read done";
 
   // TODO: Fix return value
   return 0;
