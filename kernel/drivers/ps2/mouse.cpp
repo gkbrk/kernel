@@ -3,7 +3,6 @@
 #include <kernel/drivers/ps2/ps2.h>
 #include <kernel/drivers/vm/VMWareBackdoor.h>
 #include <kernel/scheduler.h>
-#include <libk/assert.h>
 
 namespace Kernel::Drivers {
 
@@ -32,6 +31,7 @@ static void SendMouseCommand(uint16_t port, uint8_t cmd) {
 }
 
 void Mouse::Initialize() {
+  return;
   SendMouseCommand(0x64, 0x20);
   auto compaqStatus = IO::in8(0x60);
   compaqStatus |= 3;

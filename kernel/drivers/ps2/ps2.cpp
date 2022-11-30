@@ -1,10 +1,9 @@
-#include "keyboard.h"
 #include <kernel/Random.h>
 #include <kernel/drivers/cmos.h>
 #include <kernel/drivers/io.h>
+#include <kernel/drivers/ps2/keyboard.h>
 #include <kernel/drivers/ps2/mouse.h>
 #include <kernel/drivers/ps2/ps2.h>
-#include <kernel/scheduler.h>
 
 namespace Kernel::Drivers {
 
