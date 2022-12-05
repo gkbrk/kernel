@@ -5,6 +5,7 @@
 #include <kernel/drivers/GDT.h>
 #include <kernel/drivers/loader.h>
 #include <kernel/drivers/terminal.h>
+#include <kernel/memory/PageFrameAllocator.h>
 #include <stdint.h>
 
 // Defined in the linker script
@@ -33,6 +34,9 @@ extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
   // will be the only things we can get our hands on.
   Kernel::Random::init();
 
+  void *alloc_begin = 0;
+  void *alloc_end = 0;
+
   auto *memmap = (multiboot_memory_map_t *)mb->mmap_addr;
   while ((long unsigned int)memmap <
          (long unsigned int)mb->mmap_addr + mb->mmap_length) {
@@ -53,7 +57,7 @@ extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
     alloc_begin = &__KERNEL_END;
   }
 
-  alloc_start = alloc_begin;
+  init_page_frame_allocator(alloc_begin, alloc_end);
 
   basic_serial_init();
   basic_serial_write_cstr("Serial init done!\n");

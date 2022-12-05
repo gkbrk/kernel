@@ -3,6 +3,7 @@
 #include <kernel/Minitask/TaskRunner.h>
 #include <kernel/drivers/cmos.h>
 #include <kernel/drivers/terminal.h>
+#include <kernel/memory/PageFrameAllocator.h>
 #include <kernel/shell.h>
 
 void time_display_task() {
@@ -67,9 +68,12 @@ private:
 };
 
 static void dump_memory_usage() {
+  size_t malloc_used = getMemUsage();
+  size_t page_frame_used = get_page_frame_allocator()->allocatedPages() * 4096;
+
   basic_serial_printf(
       "[MemUsage] Current usage is %d KB. Physical mem usage is %d KB\n",
-      getMemUsage() / 1000, (size_t)(alloc_begin - alloc_start) / 1000);
+      malloc_used / 1000, page_frame_used / 1000);
 }
 
 extern "C" void kernel_main() {

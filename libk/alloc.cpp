@@ -1,5 +1,6 @@
 #include <stddef.h>
 
+#include "kernel/memory/PageFrameAllocator.h"
 #include <libk/alloc.h>
 #include <libk/assert.h>
 #include <libk/spinlock.h>
@@ -15,19 +16,16 @@ struct AllocTableItem {
 
 static AllocTableItem *table = nullptr;
 
-uint8_t *alloc_start;
-uint8_t *alloc_begin;
-uint8_t *alloc_end;
-
 void *kmalloc_forever(size_t size) {
-  // Alignment
-  alloc_begin = (uint8_t *)((size_t)alloc_begin & 0xFFFFF000);
-  alloc_begin += 0x1000;
+  auto num_pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
 
-  void *ptr = alloc_begin;
-  alloc_begin += size;
-  ASSERT(alloc_begin < alloc_end);
-  return ptr;
+  if (num_pages == 1) {
+    auto *page = get_page_frame_allocator()->allocate_page();
+    return page;
+  } else {
+    auto *page = get_page_frame_allocator()->allocate_pages(num_pages);
+    return page;
+  }
 }
 
 template <typename T> static T *make_forever() {
