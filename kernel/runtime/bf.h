@@ -37,6 +37,7 @@ private:
       m_ip++;
     } else if (inst == '.') {
       Kernel::Drivers::VGATerminal::write(m_mem[m_pt]);
+      basic_serial_write_char(m_mem[m_pt]);
       m_ip++;
     } else if (inst == '[' && m_mem[m_pt] == 0) {
       size_t count = 0;
