@@ -22,8 +22,6 @@ extern "C" void irq0_handler(void) {
   Kernel::Multitasking::TaskRunner::schedulerTimerTick(50);
   schedulerTimerTick(50);
   endOfInterrupt();
-  interrupt_enable();
-  yield();
 }
 
 extern "C" void irq1_handler(void) {
