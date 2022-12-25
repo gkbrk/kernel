@@ -66,7 +66,7 @@ static void setRes(size_t width, size_t height) {
 bool BGA::setResolution(size_t width, size_t height) {
   m_width = width;
   m_height = height;
-  m_fb = (uint8_t *)kmalloc_forever(width * height * 3);
+  m_fb = (uint8_t *)kmalloc(width * height * 3);
   setRes(width, height);
   return true;
 }
