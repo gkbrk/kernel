@@ -61,8 +61,6 @@ extern "C" [[noreturn]] void init(multiboot_info_t *mb, unsigned int magic) {
 
   basic_serial_init();
   basic_serial_write_cstr("Serial init done!\n");
-  kmalloc_init();
-  basic_serial_write_cstr("Kmalloc init done!\n");
 
   basic_serial_write_cstr("Trying GDT...\n");
   Kernel::Drivers::GDT::inst();
