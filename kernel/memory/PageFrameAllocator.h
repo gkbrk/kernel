@@ -1,6 +1,7 @@
 #ifndef CARDINAL_PAGEFRAMEALLOCATOR_H
 #define CARDINAL_PAGEFRAMEALLOCATOR_H
 
+#include <kernel/drivers/BasicSerial.h>
 #include <libk/Noncopyable.h>
 #include <libk/assert.h>
 #include <libk/string.h>
@@ -27,8 +28,11 @@ class PageFrameAllocator {
   MAKE_NONMOVABLE(PageFrameAllocator);
 
 public:
-  PageFrameAllocator(void *start_addr, void *end_addr)
-      : m_start_addr(align_up(start_addr)), m_end_addr(align_down(end_addr)) {
+  PageFrameAllocator() = default;
+
+  void initialize(void *start_addr, void *end_addr) {
+    m_start_addr = align_up(start_addr);
+    m_end_addr = align_down(end_addr);
     ASSERT(m_start_addr < m_end_addr);
 
     // Calculate the number of pages in the memory range.
@@ -57,8 +61,9 @@ public:
     ASSERT(page < m_page_count);
 
     // Skip the bitmap pages.
-    auto start_addr = reinterpret_cast<size_t>(m_start_addr);
-    auto addr = start_addr + (page + m_bitmap_page_count) * PAGE_SIZE;
+    auto addr = reinterpret_cast<size_t>(m_start_addr);
+    addr += m_bitmap_page_count * PAGE_SIZE;
+    addr += page * PAGE_SIZE;
     return reinterpret_cast<void *>(addr);
   }
 
@@ -68,8 +73,9 @@ public:
 
     // Skip the bitmap pages.
     auto start_addr = reinterpret_cast<size_t>(m_start_addr);
+    start_addr += m_bitmap_page_count * PAGE_SIZE;
     auto page = (reinterpret_cast<size_t>(addr) - start_addr) / PAGE_SIZE;
-    return page - m_bitmap_page_count;
+    return page;
   }
 
   void *allocate_page() {
@@ -77,12 +83,14 @@ public:
 
     for (size_t i = 0; i < m_page_count; i++) {
       auto is_allocated = bits[i];
-      if (!is_allocated) {
+      if (is_allocated == 0) {
         bits[i] = 1;
         return page_to_addr(i);
       }
     }
 
+    basic_serial_init();
+    basic_serial_write_cstr("Out of memory!\n");
     ASSERT_NOT_REACHED;
     return nullptr;
   }
@@ -130,6 +138,11 @@ public:
     }
 
     return total;
+  }
+
+  [[nodiscard]] float utilization() const {
+    return static_cast<float>(allocatedPages()) /
+           static_cast<float>(m_page_count);
   }
 
 private:
