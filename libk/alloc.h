@@ -3,10 +3,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-size_t getMemUsage();
-
-void *kmalloc_forever(size_t size);
-void kmalloc_init();
 void *kmalloc(size_t size);
 void *kmrealloc(void *ptr, size_t size);
 void kmfree(void *ptr);

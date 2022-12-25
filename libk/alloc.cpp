@@ -1,84 +1,50 @@
 #include <stddef.h>
 
-#include "kernel/memory/PageFrameAllocator.h"
+#include <kernel/memory/PageFrameAllocator.h>
 #include <libk/alloc.h>
 #include <libk/assert.h>
-#include <libk/spinlock.h>
 
-static Spinlock lock;
+void *kmalloc(size_t size) {
+  if (size == 0) {
+    return nullptr;
+  }
 
-struct AllocTableItem {
-  bool free;
-  size_t size;
-  void *ptr;
-  AllocTableItem *next;
-};
+  auto total_size = sizeof(uint8_t) + size;
 
-static AllocTableItem *table = nullptr;
-
-void *kmalloc_forever(size_t size) {
-  auto num_pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
-
-  if (num_pages == 1) {
+  if (total_size <= PAGE_SIZE) {
     auto *page = get_page_frame_allocator()->allocate_page();
-    return page;
+
+    auto *page_u8 = reinterpret_cast<uint8_t *>(page);
+    page_u8[0] = 0;
+
+    return page_u8 + 1;
   } else {
-    auto *page = get_page_frame_allocator()->allocate_pages(num_pages);
-    return page;
+    auto *page =
+        get_page_frame_allocator()->allocate_pages(total_size / PAGE_SIZE + 1);
+
+    auto *page_u8 = reinterpret_cast<uint8_t *>(page);
+    page_u8[0] = total_size / PAGE_SIZE;
+
+    return page_u8 + 1;
+  }
+}
+
+void kmfree(void *ptr) {
+  if (ptr == nullptr) {
+    return;
+  }
+
+  auto *page = reinterpret_cast<uint8_t *>(ptr) - 1;
+  auto page_count = page[0] + 1;
+
+  for (size_t i = 0; i < page_count; i++) {
+    auto *page_to_free = reinterpret_cast<void *>(page + i * PAGE_SIZE);
+    get_page_frame_allocator()->free_page(page_to_free);
   }
 }
 
 template <typename T> static T *make_forever() {
-  return new (kmalloc_forever(sizeof(T))) T();
-}
-
-void kmalloc_init() { table = nullptr; }
-
-size_t getMemUsage() {
-  size_t used = 0;
-  lock.lock();
-
-  for (auto item = table; item; item = item->next) {
-    if (!item->free) {
-      used += item->size;
-    }
-  }
-
-  lock.unlock();
-  return used;
-}
-
-void *kmalloc(size_t size) {
-  if (size == 0)
-    return nullptr;
-
-  lock.lock();
-
-  auto last = table;
-  for (auto item = last; item; item = item->next) {
-    last = item;
-    if (item->free && item->size == size) {
-      item->free = false;
-      lock.unlock();
-      ASSERT(item->ptr);
-      return item->ptr;
-    }
-  }
-
-  auto item = make_forever<AllocTableItem>();
-  item->free = false;
-  item->size = size;
-  item->ptr = kmalloc_forever(size);
-  item->next = nullptr;
-
-  if (table == nullptr) {
-    table = item;
-  } else {
-    last->next = item;
-  }
-
-  lock.unlock();
-  return item->ptr;
+  return new (kmalloc(sizeof(T))) T();
 }
 
 template <typename T> static constexpr T min(T v1, T v2) {
@@ -89,42 +55,22 @@ template <typename T> static constexpr T min(T v1, T v2) {
   }
 }
 
-static AllocTableItem *findByPtr(void *ptr) {
-  for (auto item = table; item; item = item->next) {
-    if (item->ptr == ptr)
-      return item;
+void *kmrealloc(void *ptr, size_t size) {
+  if (ptr == nullptr) {
+    return kmalloc(size);
   }
 
-  return nullptr;
-}
-
-void *kmrealloc(void *ptr, size_t size) {
-  if (ptr == nullptr)
-    return kmalloc(size);
-
   ASSERT(size > 0);
+  auto new_buf = kmalloc(size);
 
-  auto existing = findByPtr(ptr);
-  ASSERT(existing != nullptr);
+  auto *existing = reinterpret_cast<uint8_t *>(ptr) - 1;
+  auto existing_size = (static_cast<size_t>(existing[0]) + 1) * PAGE_SIZE;
 
-  auto item = kmalloc(size);
-  auto copySize = min(size, existing->size);
-  memcpy(item, ptr, copySize);
-  existing->free = true;
+  auto copySize = min(size, existing_size - 1);
+  memcpy(new_buf, ptr, copySize);
+  kmfree(ptr);
 
-  return item;
-}
-
-void kmfree(void *ptr) {
-  if (ptr == nullptr)
-    return;
-
-  lock.lock();
-  auto item = findByPtr(ptr);
-  ASSERT(item != nullptr);
-  ASSERT(!item->free);
-  item->free = true;
-  lock.unlock();
+  return new_buf;
 }
 
 void *operator new(size_t size) { return kmalloc(size); }
