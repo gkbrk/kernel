@@ -45,7 +45,7 @@ void shell_ps(char *);
 void shell_rand(char *);
 void shell_lspci(char *);
 void shell_playMelody(char *);
-Multitasking::Minitask *shell_vgademo(char *);
+void shell_vgademo(char *);
 [[noreturn]] void shell_vgarand(char *);
 Multitasking::Minitask *shell_read(char *);
 Multitasking::Minitask *shell_bfrun(char *);
@@ -97,6 +97,7 @@ ShellCommand commands[] = {
     {"shutdown", "Shut down machine",
      [](char *) { Drivers::Machine::shutdown(); }},
     {"vgarand", "VGA test", shell_vgarand},
+    {"vgademo", "VGA test", shell_vgademo},
     {"lspci", "List PCI devices", shell_lspci},
     {"play", "Play a melody", shell_playMelody},
     {"uname", "",
@@ -104,7 +105,6 @@ ShellCommand commands[] = {
 
 ShellCommandMT mtCommands[] = {
     {"read", "Read the contents of a file", shell_read},
-    {"vgademo", "VGA test", shell_vgademo},
     {"bfrun", "Run BF program", shell_bfrun},
 };
 
