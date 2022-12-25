@@ -68,12 +68,40 @@ private:
 };
 
 static void dump_memory_usage() {
-  size_t malloc_used = getMemUsage();
   size_t page_frame_used = get_page_frame_allocator()->allocatedPages() * 4096;
 
-  basic_serial_printf(
-      "[MemUsage] Current usage is %d KB. Physical mem usage is %d KB\n",
-      malloc_used / 1000, page_frame_used / 1000);
+  basic_serial_printf("[MemUsage] Physical mem usage is %d KB\n",
+                      page_frame_used / 1000);
+
+  // Print util with fixed-point.
+  // util is between 0 and 1.
+  auto util = get_page_frame_allocator()->utilization();
+  auto util_pct = util * 100.0F;
+
+  basic_serial_write_cstr("[MemUsage] Utilization: ");
+
+  char buf[16] = {0};
+
+  // Only output individual characters with basic_serial_write_char.
+
+  // Output the integer part.
+  auto int_part = static_cast<size_t>(util_pct);
+  auto int_part_len = snprintf(buf, sizeof(buf), "%d", int_part);
+  for (size_t i = 0; i < int_part_len; i++) {
+    basic_serial_write_char(buf[i]);
+  }
+
+  // Output the decimal point.
+  basic_serial_write_char('.');
+
+  // Output the fractional part.
+  auto frac_part = static_cast<size_t>((util_pct - int_part) * 100.0F);
+  auto frac_part_len = snprintf(buf, sizeof(buf), "%d", frac_part);
+  for (size_t i = 0; i < frac_part_len; i++) {
+    basic_serial_write_char(buf[i]);
+  }
+
+  basic_serial_write_cstr("%\n");
 }
 
 extern "C" void kernel_main() {
