@@ -2,12 +2,34 @@
 #define CARDINAL_LIBK_OPTION_H
 
 #include <libk/assert.h>
+#include <libk/move.h>
+#include <libk/swap.h>
 
 template <typename T> class Option {
 public:
   Option() : m_has_value(false) {}
-
   explicit Option(T value) : m_has_value(true), m_val(value) {}
+  ~Option() = default;
+
+  Option(const Option<T> &other)
+      : m_has_value(other.m_has_value), m_val(other.m_val) {}
+
+  Option<T> &operator=(const Option<T> &other) {
+    if (this != &other) {
+      m_has_value = other.m_has_value;
+      m_val = other.m_val;
+    }
+    return *this;
+  }
+
+  Option(Option<T> &&other) noexcept
+      : m_has_value(other.m_has_value), m_val(std::move(other.m_val)) {}
+
+  Option<T> &operator=(Option<T> &&other) noexcept {
+    m_has_value = other.m_has_value;
+    m_val = std::move(other.m_val);
+    return *this;
+  }
 
   T unwrap() const {
     ASSERT(m_has_value);
